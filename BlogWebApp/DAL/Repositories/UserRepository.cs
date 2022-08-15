@@ -17,7 +17,7 @@ namespace BlogWebApp.DAL.Repositories
         }
         public async Task AddUser(UserEntity user)
         {
-            user.userCreatedDate = DateTime.Now;
+            user.UserCreatedDate = DateTime.Now;
             
             // Добавление пользователя
             var entry = _context.Entry(user);
@@ -58,10 +58,10 @@ namespace BlogWebApp.DAL.Repositories
             return  searcUser;
         }
 
-        public async Task<UserEntity[]> GetUsers()
+        public async Task<string[]> GetUsers()
         {
             // Получим всех пользователей
-            return await _context.User.ToArrayAsync();
+            return await _context.User.Select(u => u.UserName).ToArrayAsync();
         }
     }
 }

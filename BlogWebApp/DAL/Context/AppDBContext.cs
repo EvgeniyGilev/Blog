@@ -20,7 +20,7 @@ namespace BlogWebApp.DAL.Context
         //Объекты таблицы Comment
         public DbSet<TagEntity> Tag { get; set; }
 
-        public AppDBContext()
+        public AppDBContext() 
         {
             //Database.EnsureDeleted();
             Database.EnsureCreated();
@@ -30,7 +30,19 @@ namespace BlogWebApp.DAL.Context
         // The following configures EF to create a Sqlite database file in the
         // special "local" folder for your platform.
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite($"Data Source = DAL/DB/blog.db; Version = 3");
+            => options.UseSqlite($"Data Source = DAL/DB/blog.db");
+        /*
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+        */
 
     }
 }

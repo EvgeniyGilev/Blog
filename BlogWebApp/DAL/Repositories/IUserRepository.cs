@@ -7,7 +7,7 @@ namespace BlogWebApp.DAL.Repositories
         Task AddUser(UserEntity user);
         Task EditUser(UserEntity user);
         Task DelUser(UserEntity user);
-        Task<UserEntity[]> GetUsers();
+        Task<string[]> GetUsers();
         Task<UserEntity?> GetUserById(int id);
 
     }

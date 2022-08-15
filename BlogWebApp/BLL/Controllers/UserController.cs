@@ -1,52 +1,65 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BlogWebApp.DAL.Repositories;
+using BlogWebApp.BLL.Models;
+using BlogWebApp.DAL.Entities;
 
 namespace BlogWebApp.BLL.Controllers
 {
+
+    [ApiController]
+    [Route("[controller]")]
     public class UserController : Controller
     {
         private readonly IUserRepository _repo;
 
+        public UserController(IUserRepository repo)
+        {
+            _repo = repo;
+        }
+        //нужно смапить user в  userintity, сделаю позже
+
+        //получить всех пользователей
         // GET: UserController
-        public ActionResult Index()
+        [HttpGet]
+        [Route("GetUsers")]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var users = await _repo.GetUsers();
+
+            return View(users);
         }
 
-        // GET: UserController/Details/5
-        public ActionResult Details(int id)
+        //получить одного пользователя
+        // GET: UserController
+        [HttpGet]
+        [Route("GetUserById")]
+        public async Task<IActionResult> GetUserById(int id)
         {
-            return View();
+            var user = await _repo.GetUserById (id);
+
+            return View(user);
         }
 
-        // GET: UserController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UserController/Create
+        //зарегистрировать пользователя
+        // POST: UserController/Register
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Register(UserEntity newUser)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await _repo.AddUser(newUser);
+            return View(newUser);
         }
 
+        //отредактировать пользователя
         // GET: UserController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpPut]
+        public async Task<IActionResult> Edit(UserEntity newUser)
         {
-            return View();
+            await _repo.EditUser(newUser);
+            return View(newUser);
         }
 
+        //удалить пользователя
         // POST: UserController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -62,25 +75,19 @@ namespace BlogWebApp.BLL.Controllers
             }
         }
 
-        // GET: UserController/Delete/5
-        public ActionResult Delete(int id)
+        // POST: UserController/Delete/Id
+        [HttpDelete]
+        [Route("{Id}")]
+        public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
-            return View();
-        }
-
-        // POST: UserController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
+            
+                var user = await _repo.GetUserById(id);
+                if (user == null) { return RedirectToAction(nameof(Index)); }
+                else
+                { 
+                await _repo.DelUser(user);
                 return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                }
         }
     }
 }
