@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BlogWebApp.DAL.Repositories;
 
 namespace BlogWebApp.BLL.Controllers
 {
     public class UserController : Controller
     {
+        private readonly IUserRepository _repo;
+
         // GET: UserController
         public ActionResult Index()
         {

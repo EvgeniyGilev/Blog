@@ -19,10 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DAL\Repositories\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="DAL\DB\blog.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

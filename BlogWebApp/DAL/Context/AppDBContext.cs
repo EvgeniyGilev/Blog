@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.DAL.Context
 {
-    public class AppContext : DbContext
+    public class AppDBContext : DbContext
     {
         // Объекты таблицы Users
         public DbSet<UserEntity> User { get; set; }
@@ -20,7 +20,7 @@ namespace BlogWebApp.DAL.Context
         //Объекты таблицы Comment
         public DbSet<TagEntity> Tag { get; set; }
 
-        public AppContext()
+        public AppDBContext()
         {
             //Database.EnsureDeleted();
             Database.EnsureCreated();
