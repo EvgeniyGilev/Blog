@@ -44,6 +44,7 @@ namespace BlogWebApp.BLL.Controllers
         //зарегистрировать пользователя
         // POST: UserController/Register
         [HttpPost]
+        [Route("Register")]
         public async Task<IActionResult> Register(UserEntity newUser)
         {
             await _repo.AddUser(newUser);
@@ -53,31 +54,16 @@ namespace BlogWebApp.BLL.Controllers
         //отредактировать пользователя
         // GET: UserController/Edit/5
         [HttpPut]
+        [Route("Edit")]
         public async Task<IActionResult> Edit(UserEntity newUser)
         {
             await _repo.EditUser(newUser);
             return View(newUser);
         }
 
-        //удалить пользователя
-        // POST: UserController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
         // POST: UserController/Delete/Id
         [HttpDelete]
-        [Route("{Id}")]
+        [Route("Delete/{Id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             

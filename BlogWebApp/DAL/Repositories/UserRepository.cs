@@ -53,9 +53,9 @@ namespace BlogWebApp.DAL.Repositories
         // поиск пользователя по Id
         public async Task<UserEntity?> GetUserById(int id)
         {
-            var searcUser = await _context.User.FindAsync(id);
+            var searchUser = await _context.User.FindAsync(id);
 
-            return  searcUser;
+            return  searchUser;
         }
 
         public async Task<string[]> GetUsers()

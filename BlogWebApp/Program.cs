@@ -1,16 +1,17 @@
 using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddControllers();
 
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" }); });
 
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
