@@ -1,7 +1,9 @@
+using BlogWebApp;
 using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" }); });
 
+var assembly = Assembly.GetAssembly(typeof(MappingProfile));
+builder.Services.AddAutoMapper(assembly);
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 

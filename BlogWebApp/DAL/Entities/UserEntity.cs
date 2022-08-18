@@ -7,7 +7,7 @@
         public int RoleId { get; set; }
         public string UserPassword { get; set; }
         public string UserLogin { get; set; }
-        public DateTime UserCreatedDate { get; set; }
+        public string UserCreateDate { get; set; }
 
     }
 }

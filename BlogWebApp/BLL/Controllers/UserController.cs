@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BlogWebApp.DAL.Repositories;
 using BlogWebApp.BLL.Models;
 using BlogWebApp.DAL.Entities;
+using AutoMapper;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -12,12 +13,13 @@ namespace BlogWebApp.BLL.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _repo;
+        private IMapper _mapper;
 
-        public UserController(IUserRepository repo)
+        public UserController(IUserRepository repo, IMapper mapper)
         {
             _repo = repo;
+            _mapper = mapper;
         }
-        //нужно смапить user в  userintity, сделаю позже
 
         //получить всех пользователей
         // GET: UserController
@@ -26,7 +28,7 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _repo.GetUsers();
-
+            //var mapusers = _mapper.Map<UserEntity[], User[]>(users);
             return View(users);
         }
 
@@ -38,7 +40,7 @@ namespace BlogWebApp.BLL.Controllers
         {
             var user = await _repo.GetUserById (id);
 
-            return View(user);
+            return View(user.UserName);
         }
 
         //зарегистрировать пользователя

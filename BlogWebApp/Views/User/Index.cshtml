@@ -1,0 +1,11 @@
+﻿@using BlogWebApp.DAL.Entities
+@model UserEntity[]
+@{
+    ViewData["Title"] = "GetUsers";
+}
+
+@foreach(UserEntity user in Model)
+{
+    <p>Имя пользователя @user.UserName</p>
+}
+
