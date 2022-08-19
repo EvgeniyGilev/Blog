@@ -5,6 +5,6 @@
         public int id { get; set; }
         public int userId { get; set; }
         public string commentTextle { get; set; }
-        public DateTime commentCreatedDate { get; set; }
+        public string commentCreatedDate { get; set; }
     }
 }

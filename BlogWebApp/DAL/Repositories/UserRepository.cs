@@ -2,6 +2,7 @@
 using BlogWebApp.DAL.Context;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using BlogWebApp.DAL.Repositories.Interfaces;
 
 namespace BlogWebApp.DAL.Repositories
 {

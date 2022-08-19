@@ -1,6 +1,6 @@
 ﻿using BlogWebApp.DAL.Entities;
 
-namespace BlogWebApp.DAL.Repositories
+namespace BlogWebApp.DAL.Repositories.Interfaces
 {
     public interface IUserRepository
     {
@@ -9,6 +9,6 @@ namespace BlogWebApp.DAL.Repositories
         Task DelUser(UserEntity user);
         Task<UserEntity[]> GetUsers();
         Task<UserEntity?> GetUserById(int id);
-
+    
     }
 }

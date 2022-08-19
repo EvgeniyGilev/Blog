@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using BlogWebApp.DAL.Repositories;
 using BlogWebApp.BLL.Models;
 using BlogWebApp.DAL.Entities;
 using AutoMapper;
+using BlogWebApp.DAL.Repositories.Interfaces;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -40,7 +40,7 @@ namespace BlogWebApp.BLL.Controllers
         {
             var user = await _repo.GetUserById (id);
 
-            return View(user.UserName);
+            return View(user);
         }
 
         //зарегистрировать пользователя
@@ -68,14 +68,14 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Delete/{Id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
-            
-                var user = await _repo.GetUserById(id);
-                if (user == null) { return RedirectToAction(nameof(Index)); }
-                else
-                { 
+
+            var user = await _repo.GetUserById(id);
+            if (user == null) { return RedirectToAction(nameof(Index)); }
+            else
+            {
                 await _repo.DelUser(user);
-                return RedirectToAction(nameof(Index));
-                }
+                return View(user);
+            }
         }
     }
 }

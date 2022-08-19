@@ -1,83 +1,80 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using BlogWebApp.DAL.Entities;
+using BlogWebApp.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class PostController : Controller
     {
-        // GET: PostController
-        public ActionResult Index()
+
+        private readonly IPostRepository _repo;
+        private IMapper _mapper;
+
+        public PostController(IPostRepository repo, IMapper mapper)
         {
-            return View();
+            _repo = repo;
+            _mapper = mapper;
         }
 
-        // GET: PostController/Details/5
-        public ActionResult Details(int id)
+
+        //получить все статьи
+        // GET: UserController
+        [HttpGet]
+        [Route("GetPosts")]
+        public async Task<IActionResult> GetPosts()
         {
-            return View();
+            var posts = await _repo.GetPosts();
+            return View(posts);
+        }
+
+        //получить одного пользователя
+        // GET: UserController
+        [HttpGet]
+        [Route("GetPostsByUserId")]
+        public async Task<IActionResult> GetPostsByUserId(int id)
+        {
+            var posts = await _repo.GetPostsByUserId(id);
+
+            return View(posts);
         }
 
         // GET: PostController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: PostController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(PostEntity newPost)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await _repo.CreatePost(newPost);
+            return View(newPost);
         }
 
-        // GET: PostController/Edit/5
-        public ActionResult Edit(int id)
+
+        // Put: PostController/Edit/5
+        [HttpPut]
+        [Route("Edit")]
+        public async Task<IActionResult> Edit(PostEntity newPost)
         {
-            return View();
+            await _repo.EditPost(newPost);
+            return View(newPost);
         }
 
-        // POST: PostController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: PostController/Delete/5
-        public ActionResult Delete(int id)
+        [HttpDelete]
+        [Route("Delete/{Id}")]
+        public async Task<IActionResult> DeletePost([FromRoute] int id)
         {
-            return View();
+
+            var post = await _repo.GetPostById(id);
+            if (post == null) { return RedirectToAction(nameof(Index)); }
+            else
+            {
+                await _repo.DelPost(post);
+                return View(post);
+            }
         }
 
-        // POST: PostController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }

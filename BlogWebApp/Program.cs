@@ -1,6 +1,7 @@
 using BlogWebApp;
 using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories;
+using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
