@@ -1,8 +1,8 @@
-﻿using BlogWebApp.DAL.Entities;
-using BlogWebApp.DAL.Context;
+﻿using BlogWebApp.DAL.Context;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BlogWebApp.DAL.Repositories.Interfaces;
+using BlogWebApp.BLL.Models.Entities;
 
 namespace BlogWebApp.DAL.Repositories
 {
@@ -16,7 +16,7 @@ namespace BlogWebApp.DAL.Repositories
         {
             _context = context;
         }
-        public async Task AddUser(UserEntity user)
+        public async Task AddUser(User user)
         {
             user.UserCreateDate = DateTime.Now.ToString();
             user.RoleId = 1; // Пользователь
@@ -30,7 +30,7 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DelUser(UserEntity user)
+        public async Task DelUser(User user)
         {
             // Удаление пользователя
             var entry = _context.Entry(user);
@@ -41,7 +41,7 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditUser(UserEntity user)
+        public async Task EditUser(User user)
         {
             // изменение данных пользователя
             var entry = _context.Entry(user);
@@ -53,17 +53,30 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         // поиск пользователя по Id
-        public async Task<UserEntity?> GetUserById(int id)
+        public async Task<User?> GetUserById(int id)
         {
             var searchUser = await _context.User.FindAsync(id);
 
             return  searchUser;
         }
 
-        public async Task<UserEntity[]> GetUsers()
+        public async Task<User[]> GetUsers()
         {
             // Получим всех пользователей
             return await _context.User.ToArrayAsync();
         }
+
+        // поиск пользователя по Login
+        public User? GetUserByLogin(string login)
+        {
+            var user = _context.User.FirstOrDefault(u => u.UserLogin == login);
+            if (user != null)
+            {
+                var userRole = _context.Role.FirstOrDefault(r =>r.Id == user.RoleId);
+                user.Role = userRole;
+            }
+            return user;
+        }
+
     }
 }

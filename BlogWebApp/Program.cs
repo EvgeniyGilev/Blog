@@ -19,7 +19,23 @@ builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title
 var assembly = Assembly.GetAssembly(typeof(MappingProfile));
 builder.Services.AddAutoMapper(assembly);
 
+builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies").AddCookie("Cookies", options =>
+{
+    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = redirectContext =>
+        {
+            redirectContext.HttpContext.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        }
+    };
+});
+
+
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
+builder.Services.AddSingleton<ITagRepository, TagRepository>();
+builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 //builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connection), ServiceLifetime.Singleton);

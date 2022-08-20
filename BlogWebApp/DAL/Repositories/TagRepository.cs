@@ -1,5 +1,5 @@
-﻿using BlogWebApp.DAL.Context;
-using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
+using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +17,7 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         //Добавляем тег
-        public async Task CreateTag(TagEntity tag)
+        public async Task CreateTag(Tag tag)
         {
             var entry = _context.Entry(tag);
             if (entry.State == EntityState.Detached)
@@ -28,7 +28,7 @@ namespace BlogWebApp.DAL.Repositories
         }
         
         //Удаляем тег
-        public async Task DelTag(TagEntity tag)
+        public async Task DelTag(Tag tag)
         {
             var entry = _context.Entry(tag);
             if (entry.State == EntityState.Detached)
@@ -39,7 +39,7 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         //редактируем тег
-        public async Task EditTag(TagEntity tag)
+        public async Task EditTag(Tag tag)
         {
             var entry = _context.Entry(tag);
             if (entry.State == EntityState.Detached)
@@ -49,14 +49,14 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
         //получаем тег по идентификатору
-        public async Task<TagEntity?> GetTagById(int id)
+        public async Task<Tag?> GetTagById(int id)
         {
             var tagById = await _context.Tag.FindAsync(id);
 
             return tagById;
         }
 
-        public async Task<TagEntity[]> GetTags()
+        public async Task<Tag[]> GetTags()
         {
             // Получим все статьи
             return await _context.Tag.ToArrayAsync();

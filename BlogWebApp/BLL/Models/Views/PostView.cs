@@ -1,12 +1,13 @@
-﻿namespace BlogWebApp.BLL.Models
+﻿namespace BlogWebApp.BLL.Models.Views
 {
-    public class Post
-    {   public int Id { get; set; }
+    public class PostView
+    {
+        public int Id { get; set; }
         public int UserId { get; set; }
         public string PostText { get; set; }
         public DateTime PostCreateDate { get; set; }
 
-        public Post (int id, int userId, string postText, DateTime postCreateDate)
+        public PostView(int id, int userId, string postText, DateTime postCreateDate)
         {
             Id = id;
             UserId = userId;

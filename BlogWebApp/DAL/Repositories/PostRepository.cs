@@ -1,5 +1,5 @@
-﻿using BlogWebApp.DAL.Context;
-using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
+using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +16,7 @@ namespace BlogWebApp.DAL.Repositories
             _context = context;
         }
 
-        public async Task CreatePost(PostEntity post)
+        public async Task CreatePost(Post post)
         {
             post.postCreateDate = DateTime.Now.ToString();
 
@@ -29,7 +29,7 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DelPost(PostEntity post)
+        public async Task DelPost(Post post)
         {
             // Удаление статьи
             var entry = _context.Entry(post);
@@ -40,7 +40,7 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditPost(PostEntity post)
+        public async Task EditPost(Post post)
         {
             // редактирование статьи
             var entry = _context.Entry(post);
@@ -51,14 +51,14 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<PostEntity[]> GetPosts()
+        public async Task<Post[]> GetPosts()
         {
             // Получим все статьи
             return await _context.Post.ToArrayAsync();
         }
 
         // Получим все статьи автора по его id
-        public async Task<PostEntity[]> GetPostsByUserId(int id)
+        public async Task<Post[]> GetPostsByUserId(int id)
         {
             var postsByUserId = await _context.Post.Where(p => p.userId ==id).ToArrayAsync();
 
@@ -66,7 +66,7 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         // найти конкретную статью по Id
-        public async Task<PostEntity?> GetPostById(int id)
+        public async Task<Post?> GetPostById(int id)
         {
             var postById = await _context.Post.FindAsync(id);
 

@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BlogWebApp.BLL.Models;
-using BlogWebApp.DAL.Entities;
 using AutoMapper;
 using BlogWebApp.DAL.Repositories.Interfaces;
+using BlogWebApp.BLL.Models.Entities;
+using System.Security.Authentication;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -21,6 +26,7 @@ namespace BlogWebApp.BLL.Controllers
 
         //получить всех пользователей
         // GET: UserController
+        [Authorize(Roles = "Администратор")]
         [HttpGet]
         [Route("GetUsers")]
         public async Task<IActionResult> Index()
@@ -32,6 +38,7 @@ namespace BlogWebApp.BLL.Controllers
 
         //получить одного пользователя
         // GET: UserController
+        [Authorize(Roles = "Администратор")]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(int id)
@@ -43,9 +50,10 @@ namespace BlogWebApp.BLL.Controllers
 
         //зарегистрировать пользователя
         // POST: UserController/Register
+        [Authorize(Roles = "Администратор")]
         [HttpPost]
         [Route("Register")]
-        public async Task<IActionResult> Register(UserEntity newUser)
+        public async Task<IActionResult> Register(User newUser)
         {
             await _repo.AddUser(newUser);
             return View(newUser);
@@ -53,15 +61,18 @@ namespace BlogWebApp.BLL.Controllers
 
         //отредактировать пользователя
         // GET: UserController/Edit/5
+        [Authorize(Roles = "Администратор")]
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(UserEntity newUser)
+        public async Task<IActionResult> Edit(User newUser)
         {
             await _repo.EditUser(newUser);
             return View(newUser);
         }
 
+
         // POST: UserController/Delete/Id
+        [Authorize(Roles = "Администратор")]
         [HttpDelete]
         [Route("Delete/{Id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
@@ -74,6 +85,34 @@ namespace BlogWebApp.BLL.Controllers
                 await _repo.DelUser(user);
                 return View(user);
             }
+        }
+
+        [HttpPost]
+        [Route("Authenticate")]
+        public async Task<IActionResult> Authenticate(string login, string password)
+        {
+            if (String.IsNullOrEmpty(login) ||
+              String.IsNullOrEmpty(password))
+                throw new ArgumentNullException("Запрос не корректен");
+
+            User? user = _repo.GetUserByLogin(login);
+            if (user is null)
+                throw new AuthenticationException("Пользователь на найден");
+
+            if (user.UserPassword != password)
+                throw new AuthenticationException("Введенный пароль не корректен");
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserLogin),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType,user.Role.RoleName)
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "AppCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+            return View(user);
         }
     }
 }

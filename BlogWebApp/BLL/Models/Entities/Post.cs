@@ -1,6 +1,6 @@
-﻿namespace BlogWebApp.DAL.Entities
+﻿namespace BlogWebApp.BLL.Models.Entities
 {
-    public class PostEntity
+    public class Post
     {
         public int id { get; set; }
         public int userId { get; set; }

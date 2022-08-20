@@ -1,4 +1,4 @@
-﻿using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.DAL.Context
@@ -6,19 +6,19 @@ namespace BlogWebApp.DAL.Context
     public class AppDBContext : DbContext
     {
         // Объекты таблицы Users
-        public DbSet<UserEntity> User { get; set; }
+        public DbSet<User> User { get; set; }
 
         // Объекты таблицы Post
-        public DbSet<PostEntity> Post { get; set; }
+        public DbSet<Post> Post { get; set; }
 
         //Объекты таблицы Role
-        public DbSet<RoleEntity> Role { get; set; }
+        public DbSet<Role> Role { get; set; }
 
         //Объекты таблицы Comment
-        public DbSet<CommentEntity> Comment { get; set; }
+        public DbSet<Comment> Comment { get; set; }
 
         //Объекты таблицы Comment
-        public DbSet<TagEntity> Tag { get; set; }
+        public DbSet<Tag> Tag { get; set; }
 
         public AppDBContext() 
         {

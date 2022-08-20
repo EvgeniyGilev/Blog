@@ -1,13 +1,13 @@
-﻿namespace BlogWebApp.BLL.Models
+﻿namespace BlogWebApp.BLL.Models.Views
 {
-    public class Comment
+    public class CommentView
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string CommentTextle { get; set; }
         public DateTime CommentCreatedDate { get; set; }
 
-        public Comment (int id, int userId, string commentTextle, DateTime commentCreatedDate)
+        public CommentView(int id, int userId, string commentTextle, DateTime commentCreatedDate)
         {
             Id = id;
             UserId = userId;

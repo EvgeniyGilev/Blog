@@ -1,13 +1,13 @@
-﻿using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
 
 namespace BlogWebApp.DAL.Repositories.Interfaces
 {
     public interface ITagRepository
     {
-        Task CreateTag(TagEntity tag);
-        Task EditTag(TagEntity tag);
-        Task DelTag(TagEntity tag);
-        Task<TagEntity[]> GetTags();
-        Task<TagEntity?> GetTagById(int id);
+        Task CreateTag(Tag tag);
+        Task EditTag(Tag tag);
+        Task DelTag(Tag tag);
+        Task<Tag[]> GetTags();
+        Task<Tag?> GetTagById(int id);
     }
 }

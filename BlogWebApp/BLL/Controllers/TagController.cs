@@ -1,4 +1,4 @@
-﻿using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +41,7 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: TagController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(TagEntity newTag)
+        public async Task<IActionResult> Create(Tag newTag)
         {
             await _repo.CreateTag(newTag);
             return View(newTag);
@@ -50,7 +50,7 @@ namespace BlogWebApp.BLL.Controllers
         // GET: TagController/Edit
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(TagEntity newTag)
+        public async Task<IActionResult> Edit(Tag newTag)
         {
             await _repo.EditTag(newTag);
             return View(newTag);

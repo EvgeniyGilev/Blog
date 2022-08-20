@@ -1,5 +1,5 @@
-﻿@using BlogWebApp.DAL.Entities
-@model UserEntity[]
+﻿@using BlogWebApp.BLL.Models.Entities
+@model User[]
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -7,7 +7,7 @@
 <div class="text-center">
 
 
-@foreach(UserEntity user in Model)
+@foreach(User user in Model)
 {
     <p>@user.UserName</p>
 }

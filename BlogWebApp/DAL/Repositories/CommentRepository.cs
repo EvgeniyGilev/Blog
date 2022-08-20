@@ -1,5 +1,5 @@
-﻿using BlogWebApp.DAL.Context;
-using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
+using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +18,7 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         // Добавление комментария
-        public async Task CreateComment(CommentEntity comment)
+        public async Task CreateComment(Comment comment)
         {
             comment.commentCreatedDate = DateTime.Now.ToString();
 
@@ -30,7 +30,7 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
         // Удаление комментария
-        public async Task DelComment(CommentEntity comment)
+        public async Task DelComment(Comment comment)
         {
             var entry = _context.Entry(comment);
             if (entry.State == EntityState.Detached)
@@ -41,7 +41,7 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         // редактирование комментария
-        public async Task EditComment(CommentEntity comment)
+        public async Task EditComment(Comment comment)
         {
             
             var entry = _context.Entry(comment);
@@ -52,14 +52,14 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<CommentEntity?> GetCommentById(int id)
+        public async Task<Comment?> GetCommentById(int id)
         {
             var commentById = await _context.Comment.FindAsync(id);
 
             return commentById;
         }
 
-        public async Task<CommentEntity[]> GetComments()
+        public async Task<Comment[]> GetComments()
         {
             // Получим все статьи
             return await _context.Comment.ToArrayAsync();

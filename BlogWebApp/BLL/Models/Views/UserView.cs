@@ -1,6 +1,6 @@
-﻿namespace BlogWebApp.BLL.Models
+﻿namespace BlogWebApp.BLL.Models.Views
 {
-    public class User
+    public class UserView
     {
         public int Id { get; set; }
         public string UserName { get; set; }
@@ -9,7 +9,7 @@
         public string UserLogin { get; set; }
         public DateTime UserCreatedDate { get; set; }
 
-        public User(int id, string userName, int roleId, string userPassword, string userLogin, DateTime userCreatedDate)
+        public UserView(int id, string userName, int roleId, string userPassword, string userLogin, DateTime userCreatedDate)
         {
             Id = id;
             UserName = userName;

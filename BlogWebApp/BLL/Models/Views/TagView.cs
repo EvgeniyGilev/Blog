@@ -1,11 +1,11 @@
-﻿namespace BlogWebApp.BLL.Models
+﻿namespace BlogWebApp.BLL.Models.Views
 {
-    public class Tag
+    public class TagView
     {
         public int Id { get; set; }
         public string TagText { get; set; }
 
-        public Tag (int id, string tagText)
+        public TagView(int id, string tagText)
         {
             Id = id;
             TagText = tagText;

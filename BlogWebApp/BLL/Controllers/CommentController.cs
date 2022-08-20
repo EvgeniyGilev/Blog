@@ -1,4 +1,4 @@
-﻿using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +39,7 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: CommentController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(CommentEntity newComment)
+        public async Task<IActionResult> Create(Comment newComment)
         {
             await _repo.CreateComment(newComment);
             return View(newComment);
@@ -49,7 +49,7 @@ namespace BlogWebApp.BLL.Controllers
         // GET: CommentController/Edit/5
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(CommentEntity newComment)
+        public async Task<IActionResult> Edit(Comment newComment)
         {
             await _repo.EditComment(newComment);
             return View(newComment);

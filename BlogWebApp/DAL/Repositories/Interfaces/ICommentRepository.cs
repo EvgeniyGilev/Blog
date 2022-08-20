@@ -1,14 +1,14 @@
-﻿using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
 
 namespace BlogWebApp.DAL.Repositories.Interfaces
 {
     public interface ICommentRepository
     {
-        Task CreateComment(CommentEntity comment);
-        Task EditComment(CommentEntity comment);
-        Task DelComment(CommentEntity comment);
-        Task<CommentEntity[]> GetComments();
-        Task<CommentEntity?> GetCommentById(int id);
+        Task CreateComment(Comment comment);
+        Task EditComment(Comment comment);
+        Task DelComment(Comment comment);
+        Task<Comment[]> GetComments();
+        Task<Comment?> GetCommentById(int id);
 
     }
 }

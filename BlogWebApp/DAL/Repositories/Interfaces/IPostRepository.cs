@@ -1,15 +1,15 @@
-﻿using BlogWebApp.DAL.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
 
 namespace BlogWebApp.DAL.Repositories.Interfaces
 {
     public interface IPostRepository
     {
-        Task CreatePost(PostEntity post);
-        Task EditPost(PostEntity post);
-        Task DelPost(PostEntity post);
-        Task<PostEntity[]> GetPosts();
-        Task<PostEntity[]> GetPostsByUserId(int id);
-        Task<PostEntity?> GetPostById(int id);
+        Task CreatePost(Post post);
+        Task EditPost(Post post);
+        Task DelPost(Post post);
+        Task<Post[]> GetPosts();
+        Task<Post[]> GetPostsByUserId(int id);
+        Task<Post?> GetPostById(int id);
 
     }
 }
