@@ -1,82 +1,73 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BlogWebApp.DAL.Entities;
+using BlogWebApp.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class CommentController : Controller
     {
-        // GET: CommentController
-        public ActionResult Index()
+        private readonly ICommentRepository _repo;
+
+        public CommentController(ICommentRepository repo)
         {
-            return View();
+            _repo = repo;
         }
 
-        // GET: CommentController/Details/5
-        public ActionResult Details(int id)
+        //получить все комментарии
+        // GET: CommentController
+        [HttpGet]
+        [Route("GetComments")]
+        public async Task<IActionResult> GetComments()
         {
-            return View();
+            var comments = await _repo.GetComments();
+            return View(comments);
+        }
+
+        //получить комментарий по id
+        // GET: CommentController
+        [HttpGet]
+        [Route("GetCommentById")]
+        public async Task<IActionResult> GetCommentById(int id)
+        {
+            var comment = await _repo.GetCommentById(id);
+
+            return View(comment);
         }
 
         // GET: CommentController/Create
-        public ActionResult Create()
+        [HttpPost]
+        public async Task<IActionResult> Create(CommentEntity newComment)
         {
-            return View();
+            await _repo.CreateComment(newComment);
+            return View(newComment);
         }
 
-        // POST: CommentController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: CommentController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpPut]
+        [Route("Edit")]
+        public async Task<IActionResult> Edit(CommentEntity newComment)
         {
-            return View();
+            await _repo.EditComment(newComment);
+            return View(newComment);
         }
 
-        // POST: CommentController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: CommentController/Delete/5
-        public ActionResult Delete(int id)
+        [HttpDelete]
+        [Route("Delete/{Id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            return View();
-        }
 
-        // POST: CommentController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            var comment = await _repo.GetCommentById(id);
+            if (comment == null) { return RedirectToAction(nameof(Index)); }
+            else
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                await _repo.DelComment(comment);
+                return View(comment);
             }
         }
     }

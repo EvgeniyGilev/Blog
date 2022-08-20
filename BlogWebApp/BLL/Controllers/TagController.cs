@@ -1,82 +1,73 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BlogWebApp.DAL.Entities;
+using BlogWebApp.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class TagController : Controller
     {
-        // GET: TagController
-        public ActionResult Index()
+
+        private readonly ITagRepository _repo;
+
+        public TagController(ITagRepository repo)
         {
-            return View();
+            _repo = repo;
         }
 
-        // GET: TagController/Details/5
-        public ActionResult Details(int id)
+        //получить все комментарии
+        // GET: TagController
+        [HttpGet]
+        [Route("GetTags")]
+        public async Task<IActionResult> GetTagss()
         {
-            return View();
+            var tags = await _repo.GetTags();
+            return View(tags);
+        }
+
+
+        //получить комментарий по id
+        // GET: TagController
+        [HttpGet]
+        [Route("GetTagById")]
+        public async Task<IActionResult> GetTagById(int id)
+        {
+            var tag = await _repo.GetTagById(id);
+
+            return View(tag);
         }
 
         // GET: TagController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: TagController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(TagEntity newTag)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await _repo.CreateTag(newTag);
+            return View(newTag);
         }
 
-        // GET: TagController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: TagController/Edit
+        [HttpPut]
+        [Route("Edit")]
+        public async Task<IActionResult> Edit(TagEntity newTag)
         {
-            return View();
-        }
-
-        // POST: TagController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            await _repo.EditTag(newTag);
+            return View(newTag);
         }
 
         // GET: TagController/Delete/5
-        public ActionResult Delete(int id)
+        [HttpDelete]
+        [Route("Delete/{Id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            return View();
-        }
 
-        // POST: TagController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            var tag = await _repo.GetTagById(id);
+            if (tag == null) { return RedirectToAction(nameof(Index)); }
+            else
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                await _repo.DelTag(tag);
+                return View(tag);
             }
         }
     }

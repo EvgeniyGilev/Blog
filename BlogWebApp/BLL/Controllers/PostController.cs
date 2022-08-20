@@ -12,17 +12,14 @@ namespace BlogWebApp.BLL.Controllers
     {
 
         private readonly IPostRepository _repo;
-        private IMapper _mapper;
 
-        public PostController(IPostRepository repo, IMapper mapper)
+        public PostController(IPostRepository repo)
         {
             _repo = repo;
-            _mapper = mapper;
         }
 
-
         //получить все статьи
-        // GET: UserController
+        // GET: PostController
         [HttpGet]
         [Route("GetPosts")]
         public async Task<IActionResult> GetPosts()
@@ -31,8 +28,8 @@ namespace BlogWebApp.BLL.Controllers
             return View(posts);
         }
 
-        //получить одного пользователя
-        // GET: UserController
+        //получить все статьи одного пользователя
+        // GET: PostController
         [HttpGet]
         [Route("GetPostsByUserId")]
         public async Task<IActionResult> GetPostsByUserId(int id)

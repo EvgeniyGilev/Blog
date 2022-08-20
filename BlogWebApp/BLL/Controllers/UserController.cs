@@ -13,12 +13,10 @@ namespace BlogWebApp.BLL.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _repo;
-        private IMapper _mapper;
 
-        public UserController(IUserRepository repo, IMapper mapper)
+        public UserController(IUserRepository repo)
         {
             _repo = repo;
-            _mapper = mapper;
         }
 
         //получить всех пользователей

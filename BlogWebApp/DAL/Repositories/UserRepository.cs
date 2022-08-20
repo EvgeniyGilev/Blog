@@ -19,6 +19,7 @@ namespace BlogWebApp.DAL.Repositories
         public async Task AddUser(UserEntity user)
         {
             user.UserCreateDate = DateTime.Now.ToString();
+            user.RoleId = 1; // Пользователь
             
             // Добавление пользователя
             var entry = _context.Entry(user);
