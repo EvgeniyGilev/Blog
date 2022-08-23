@@ -1,0 +1,17 @@
+﻿<div class="text-start">
+    <div>
+        <h3 style="text-align: left">Редактирование роли</h3>
+        <form>
+            <div class="mb-3">
+                <label for="InputRole" class="form-label">Название</label>
+                <input type="text" class="form-control" id="InputRole">
+            </div>
+             <div class="mb-3">
+                <label for="inputDescription" class="form-label">Описание</label>
+                <textarea class="form-control" id="inputDescription" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+        <p><a asp-area="" asp-controller="Role" asp-action="GetRoles">Перейти к списку всех ролей</a></p>
+    </div>
+</div>

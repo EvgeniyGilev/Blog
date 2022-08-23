@@ -54,6 +54,13 @@ namespace BlogWebApp.BLL.Controllers
             return View(newTag);
         }
 
+        [HttpGet]
+        [Route("Edit")]
+        public IActionResult Edit()
+        {
+            return View();
+        }
+
         // GET: TagController/Edit
         [HttpPut]
         [Route("Edit")]

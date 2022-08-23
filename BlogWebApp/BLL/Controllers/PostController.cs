@@ -54,6 +54,12 @@ namespace BlogWebApp.BLL.Controllers
         }
 
 
+        [HttpGet]
+        [Route("Edit")]
+        public IActionResult Edit()
+        {
+            return View();
+        }
         // Put: PostController/Edit/5
         [HttpPut]
         [Route("Edit")]
