@@ -19,7 +19,6 @@ namespace BlogWebApp.DAL.Repositories
         public async Task AddUser(User user)
         {
             user.UserCreateDate = DateTime.Now.ToString();
-            user.RoleId = 1; // Пользователь
             
             // Добавление пользователя
             var entry = _context.Entry(user);
@@ -62,19 +61,16 @@ namespace BlogWebApp.DAL.Repositories
 
         public async Task<User[]> GetUsers()
         {
-            // Получим всех пользователей
-            return await _context.User.ToArrayAsync();
+
+            return await _context.User.Include(u => u.Roles).ToArrayAsync();
+
         }
 
         // поиск пользователя по Login
         public User? GetUserByLogin(string login)
         {
-            var user = _context.User.FirstOrDefault(u => u.UserLogin == login);
-            if (user != null)
-            {
-                var userRole = _context.Role.FirstOrDefault(r =>r.Id == user.RoleId);
-                user.Role = userRole;
-            }
+            var user = _context.User.Include(u => u.Roles).FirstOrDefault(u => u.UserLogin == login);
+
             return user;
         }
 

@@ -26,13 +26,12 @@ namespace BlogWebApp.BLL.Controllers
 
         //получить всех пользователей
         // GET: UserController
-        [Authorize(Roles = "Администратор")]
         [HttpGet]
         [Route("GetUsers")]
         public async Task<IActionResult> Index()
         {
             var users = await _repo.GetUsers();
-            //var mapusers = _mapper.Map<UserEntity[], User[]>(users);
+
             return View(users);
         }
 
@@ -125,7 +124,7 @@ namespace BlogWebApp.BLL.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserLogin),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType,user.Role.RoleName)
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, string.Join(";",user.Roles))
             };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "AppCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);

@@ -6,6 +6,7 @@
         public string RoleName { get; set; }
         public string RoleDescription { get; set; }
 
-        public List<User> Users { get; set; }
+        // ссылка на пользователей
+        public List<User> Users { get; set; } = new();
     }
 }

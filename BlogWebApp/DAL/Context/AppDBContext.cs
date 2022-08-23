@@ -23,7 +23,11 @@ namespace BlogWebApp.DAL.Context
         public AppDBContext() 
         {
             //Database.EnsureDeleted();
+
             Database.EnsureCreated();
+
+            
+
         }
 
 
@@ -43,6 +47,10 @@ namespace BlogWebApp.DAL.Context
             optionsBuilder.UseSqlServer(connectionString);
         }
         */
-
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            //builder.Entity<Room>().ToTable("Rooms");
+            //builder.Entity<Device>().ToTable("Devices");
+        }
     }
 }

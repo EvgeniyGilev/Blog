@@ -4,8 +4,17 @@
     ViewData["Title"] = "GetUsers";
 }
 
-@foreach(User user in Model)
+@foreach (User user in Model)
 {
-    <p>Имя пользователя @user.UserFirstName</p>
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@user.UserFirstName @user.UserLastName</h5>
+            @foreach (Role roleUser in @user.Roles)
+            {
+                <span class="badge bg-info text-dark">@roleUser.RoleName</span>                
+            }
+            <p class="card-text">@user.UserLogin</p>
+        </div>
+    </div>
 }
 

@@ -11,8 +11,8 @@
         public string UserLogin { get; set; }
         public string UserCreateDate { get; set; }
 
-        public int RoleId { get; set; }
-        public Role Role { get; set; }
+        //ссылка на роли
+        public virtual List<Role> Roles { get; set; } = new();
 
     }
 }
