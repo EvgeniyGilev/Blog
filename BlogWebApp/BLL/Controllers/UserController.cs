@@ -48,9 +48,15 @@ namespace BlogWebApp.BLL.Controllers
             return View(user);
         }
 
+        [HttpGet]
+        [Route("Register")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
         //зарегистрировать пользователя
         // POST: UserController/Register
-        [Authorize(Roles = "Администратор")]
         [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register(User newUser)
@@ -85,6 +91,13 @@ namespace BlogWebApp.BLL.Controllers
                 await _repo.DelUser(user);
                 return View(user);
             }
+        }
+
+        [HttpGet]
+        [Route("Authenticate")]
+        public IActionResult Authenticate()
+        {
+            return View();
         }
 
         [HttpPost]

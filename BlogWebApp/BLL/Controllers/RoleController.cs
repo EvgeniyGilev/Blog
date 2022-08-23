@@ -1,18 +1,17 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.DAL.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TagController : Controller
+    public class RoleController : Controller
     {
 
         private readonly ITagRepository _repo;
 
-        public TagController(ITagRepository repo)
+        public RoleController(ITagRepository repo)
         {
             _repo = repo;
         }

@@ -1,0 +1,17 @@
+﻿<div class="text-center">
+    <div>
+        <h3 style="text-align: left">Добавление роли</h3>
+        <form>
+            <div class="mb-3">
+                <label for="InputRole" class="form-label">Название</label>
+                <input type="text" class="form-control" id="InputRole">
+            </div>
+             <div class="mb-3">
+                <label for="inputDescription" class="form-label">Описание</label>
+                <input type="text-area" class="form-control" id="inputDescription">
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
+        <p><a asp-area="" asp-controller="Role" asp-action="GetRoles">Перейти к списку всех ролей</a></p>
+    </div>
+</div>
