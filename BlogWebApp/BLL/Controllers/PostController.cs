@@ -39,6 +39,12 @@ namespace BlogWebApp.BLL.Controllers
             return View(posts);
         }
 
+        [HttpGet]
+        [Route("Create")]
+        public IActionResult Create()
+        {
+            return View();
+        }
         // GET: PostController/Create
         [HttpPost]
         public async Task<IActionResult> Create(Post newPost)

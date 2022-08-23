@@ -65,6 +65,13 @@ namespace BlogWebApp.BLL.Controllers
             return View(newUser);
         }
 
+        [HttpGet]
+        [Route("Edit")]
+        public IActionResult Edit()
+        {
+            return View();
+        }
+
         //отредактировать пользователя
         // GET: UserController/Edit/5
         [Authorize(Roles = "Администратор")]

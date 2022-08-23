@@ -1,10 +1,20 @@
 ﻿<div class="text-start">
    <div>
-           @if (Model == null)
-           {
-            <h3 style="text-align: left">Регистрация пользователя</h3>
+            <h3 style="text-align: left">Редактирование пользователя</h3>
             <br>
             <form>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="" id="Check1" disabled checked>
+                    <label class="form-check-label" for="Check1">Пользователь</label>
+                </div>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="" id="Check2">
+                    <label class="form-check-label" for="Check2">Администратор</label>
+                </div>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="" id="Check3">
+                    <label class="form-check-label" for="Check3">Модератор</label>
+                </div>
                 <div class="mb-3">
                     <label for="InputFirstname" class="form-label">Имя</label>
                     <input type="text" class="form-control" id="InputFirstname">
@@ -21,12 +31,7 @@
                     <label for="exampleInputPassword1" class="form-label">Пароль</label>
                     <input type="password" class="form-control" id="exampleInputPassword1">
                 </div>
-                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
             </form>
-           }
-           else
-           {
-               @await Html.PartialAsync("_Thanks")
-           }
    </div>
 </div>
