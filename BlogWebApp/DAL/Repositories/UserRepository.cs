@@ -45,10 +45,10 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditUser(User user)
+        public async Task EditUser(User user,int id)
         {
             // изменение данных пользователя
-            var dbuser = _context.User.Where(u => u.UserLogin == user.UserLogin).First();
+            var dbuser = _context.User.Where(u => u.Id == id).First();
             if (dbuser != null)
             {
                 dbuser.UserLogin = user.UserLogin;

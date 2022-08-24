@@ -48,30 +48,33 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: TagController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(Tag newTag)
+        [Route("Create")]
+        public async Task<IActionResult> Create([FromForm] Tag newTag)
         {
             await _repo.CreateTag(newTag);
-            return View(newTag);
+            return RedirectToAction("GetTags");
         }
 
         [HttpGet]
-        [Route("Edit")]
-        public IActionResult Edit()
+        [Route("Edit/{Id}")]
+        public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            return View();
+            var tag = await _repo.GetTagById(id);
+
+            return View(tag);
         }
 
         // GET: TagController/Edit
-        [HttpPut]
-        [Route("Edit")]
-        public async Task<IActionResult> Edit(Tag newTag)
+        [HttpPost]
+        [Route("Edit/{Id}")]
+        public async Task<IActionResult> Edit([FromForm] Tag newTag, [FromRoute] int id)
         {
-            await _repo.EditTag(newTag);
-            return View(newTag);
+            await _repo.EditTag(newTag,id);
+            return RedirectToAction("GetTags");
         }
 
         // GET: TagController/Delete/5
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete/{Id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -81,7 +84,7 @@ namespace BlogWebApp.BLL.Controllers
             else
             {
                 await _repo.DelTag(tag);
-                return View(tag);
+                return RedirectToAction("GetTags");
             }
         }
     }

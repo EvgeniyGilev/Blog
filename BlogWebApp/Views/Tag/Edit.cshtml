@@ -1,13 +1,27 @@
-﻿<div class="text-start">
+﻿@using BlogWebApp.BLL.Models.Entities
+@model BlogWebApp.BLL.Models.Entities.Tag
+
+@{
+    ViewData["Title"] = "Редактирование тега";
+}
+<div class="text-start">
     <div>
         <h3>Редактирование тега</h3>
-        <form>
+        <form method="post" asp-action="Edit" asp-controller="Tag" asp-route-id="@Model.id">
+             <div class="mb-3">
+                <label for="InputTag" class="form-label">Id</label>
+                <input type="text" class="form-control" id="InputTag" asp-for="id" value="@Model.id" disabled>
+            </div>
             <div class="mb-3">
                 <label for="InputTag" class="form-label">Название тега</label>
-                <input type="text" class="form-control" id="InputTag">
+                <input type="text" class="form-control" id="InputTag" asp-for="tagText" value="@Model.tagText">
             </div>
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
-        <p><a asp-area="" asp-controller="Tag" asp-action="Register">Перейти к списку всех тегов</a></p>
+        <br>
+        <form method="post" asp-action="Delete" asp-action="Tag" asp-route-id="@Model.id">
+            <button type="submit" class="btn btn-sm btn-danger float-right btn-mrg">Удалить</button>
+        </form>
+        <p><a asp-area="" asp-controller="Tag" asp-action="GetTags">Перейти к списку всех тегов</a></p>
     </div>
 </div>

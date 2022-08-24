@@ -5,7 +5,7 @@ namespace BlogWebApp.DAL.Repositories.Interfaces
     public interface IUserRepository
     {
         Task AddUser(User user);
-        Task EditUser(User user);
+        Task EditUser(User user,int id);
         Task DelUser(User user);
         Task<User[]> GetUsers();
         Task<User?> GetUserById(int id);

@@ -30,20 +30,25 @@ namespace BlogWebApp.DAL.Repositories
         //Удаляем тег
         public async Task DelTag(Tag tag)
         {
-            var entry = _context.Entry(tag);
-            if (entry.State == EntityState.Detached)
-                _context.Tag.Remove(tag);
+
+            // Удаление пользователя
+            var dbtag = _context.Tag.Where(u => u.tagText == tag.tagText).First();
+            if (dbtag != null)
+                _context.Tag.Remove(dbtag);
 
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
 
         //редактируем тег
-        public async Task EditTag(Tag tag)
+        public async Task EditTag(Tag tag, int id)
         {
-            var entry = _context.Entry(tag);
-            if (entry.State == EntityState.Detached)
-                _context.Tag.Update(tag);
+            // изменение тега
+            var dbtag = _context.Tag.Where(u => u.id == id).First();
+            if (dbtag != null)
+            {
+                dbtag.tagText = tag.tagText;
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();

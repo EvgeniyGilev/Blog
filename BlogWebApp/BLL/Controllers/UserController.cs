@@ -64,8 +64,8 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         [HttpGet]
-        [Route("Edit")]
-        public IActionResult Edit()
+        [Route("Edit/{Id}")]
+        public IActionResult Edit([FromRoute] int id)
         {
             return View();
         }
@@ -73,10 +73,10 @@ namespace BlogWebApp.BLL.Controllers
         //отредактировать пользователя
         // GET: UserController/Edit/5
         [HttpPost]
-        [Route("Edit")]
-        public async Task<IActionResult> Edit([FromForm] User newUser)
+        [Route("Edit/{Id}")]
+        public async Task<IActionResult> Edit([FromForm] User newUser, [FromRoute] int id)
         {
-            await _repo.EditUser(newUser);
+            await _repo.EditUser(newUser,id);
             return RedirectToAction("GetAllUsers");
         }
 

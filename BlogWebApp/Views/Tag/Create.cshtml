@@ -1,13 +1,19 @@
-﻿<div class="text-start">
+﻿@model BlogWebApp.BLL.Models.Entities.Tag
+
+@{
+    ViewData["Title"] = "Добавление тега";
+}
+
+<div class="text-start">
     <div>
         <h3>Добавление тега</h3>
-        <form method="post">
+        <form method="post" asp-action="Create" asp-controller="Tag">
             <div class="mb-3">
                 <label for="InputTag" class="form-label">Название тега</label>
-                <input type="text" class="form-control" id="InputTag">
+                <input type="text" class="form-control" id="InputTag" asp-for="tagText">
             </div>
             <button type="submit" class="btn btn-primary">Добавить</button>
         </form>
-        <p><a asp-area="" asp-controller="Tag" asp-action="Register">Перейти к списку всех тегов</a></p>
+        <p><a asp-area="" asp-controller="Tag" asp-action="GetTags">Перейти к списку всех тегов</a></p>
     </div>
 </div>
