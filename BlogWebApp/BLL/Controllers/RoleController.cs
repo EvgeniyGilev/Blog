@@ -9,9 +9,9 @@ namespace BlogWebApp.BLL.Controllers
     public class RoleController : Controller
     {
 
-        private readonly ITagRepository _repo;
+        private readonly IRoleRepository _repo;
 
-        public RoleController(ITagRepository repo)
+        public RoleController(IRoleRepository repo)
         {
             _repo = repo;
         }
@@ -19,21 +19,21 @@ namespace BlogWebApp.BLL.Controllers
         //получить все комментарии
         // GET: TagController
         [HttpGet]
-        [Route("GetTags")]
-        public async Task<IActionResult> GetTags()
+        [Route("GetRoles")]
+        public async Task<IActionResult> GetRoles()
         {
-            var tags = await _repo.GetTags();
-            return View(tags);
+            var roles = await _repo.GetRoles();
+            return View(roles);
         }
 
 
         //получить комментарий по id
         // GET: TagController
         [HttpGet]
-        [Route("GetTagById")]
-        public async Task<IActionResult> GetTagById(int id)
+        [Route("GetRoleById")]
+        public async Task<IActionResult> GetRoleById(int id)
         {
-            var tag = await _repo.GetTagById(id);
+            var tag = await _repo.GetRoleById(id);
 
             return View(tag);
         }
@@ -47,10 +47,10 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: TagController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(Tag newTag)
+        public async Task<IActionResult> Create(Role newRole)
         {
-            await _repo.CreateTag(newTag);
-            return View(newTag);
+            await _repo.CreateRole(newRole);
+            return View(newRole);
         }
 
         [HttpGet]
@@ -63,10 +63,10 @@ namespace BlogWebApp.BLL.Controllers
         // GET: TagController/Edit
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(Tag newTag)
+        public async Task<IActionResult> Edit(Role newRole)
         {
-            await _repo.EditTag(newTag);
-            return View(newTag);
+            await _repo.EditRole(newRole);
+            return View(newRole);
         }
 
         // GET: TagController/Delete/5
@@ -75,12 +75,12 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
-            var tag = await _repo.GetTagById(id);
-            if (tag == null) { return RedirectToAction(nameof(Index)); }
+            var role = await _repo.GetRoleById(id);
+            if (role == null) { return RedirectToAction(nameof(Index)); }
             else
             {
-                await _repo.DelTag(tag);
-                return View(tag);
+                await _repo.DelRole(role);
+                return View(role);
             }
         }
     }

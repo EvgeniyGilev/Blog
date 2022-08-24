@@ -14,5 +14,11 @@
         //ссылка на роли
         public virtual List<Role> Roles { get; set; } = new();
 
+        //ссылка на статьи
+        public virtual List<Post> Posts { get; set; } = new();
+
+        //ссылка на комментарии
+        public virtual List<Comment> Comments { get; set; } = new();
+
     }
 }

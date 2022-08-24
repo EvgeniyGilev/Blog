@@ -1,17 +1,20 @@
-﻿<div class="text-start">
-    <div>
-        <h3 style="text-align: left">Добавление тега</h3>
-        <form>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Почтовый адрес</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
-            </div>
-            <button type="submit" class="btn btn-primary">Войти</button>
-        </form>
-        <p>Еще нет аккаунта? <a asp-area="" asp-controller="User" asp-action="Register">Зарегистрируйтесь!</a></p>
+﻿@using BlogWebApp.BLL.Models.Entities
+@model Role[]
+@{
+    ViewData["Title"] = "GetRoles";
+}
+
+<div class="text-start">
+<h3>Все роли</h3>
+<p><a asp-area="" asp-controller="Role" asp-action="Create">Добавить роль</a></p>
+@foreach (Role role in Model)
+{
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@role.RoleName</h5>
+            <p class="card-text">@role.RoleDescription</p>
+            <a class="btn btn-outline-secondary" asp-area="" asp-controller="Role" asp-action="Edit">Редактировать</a>
+        </div>
     </div>
+}
 </div>

@@ -1,0 +1,33 @@
+﻿@using BlogWebApp.BLL.Models.Entities
+@model Post
+@{
+    ViewData["Title"] = "GetPost";
+}
+
+<div class="text-start">
+    <div>
+        <h3>@Model.postName</h3>
+        @foreach (Tag tag in @Model.Tags)
+        {
+            <span class="badge bg-info text-dark">@tag.tagText</span>
+        }
+        <p class="lh-1">@Model.postText</p>
+        <p class="text-end">@Model.User.UserFirstName @Model.User.UserLastName</p>
+        
+        <hr class="mt-2 mb-3"/>
+
+        <h6>Комментарии к статье</h6>
+        @foreach (Comment com in @Model.Comments)
+        {
+            <p class="text-left">@com.commentTexte</p>
+            <p class="text-end">@com.User.UserFirstName @com.User.UserLastName</p>
+            
+        }
+        <hr class="mt-2 mb-3"/>
+        <div class="mb-3">
+            <textarea class="form-control" id="inputDescription" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" asp-area="" asp-controller="Comment" asp-action="Create">Оставить комментарий</button>
+        <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
+    </div>
+</div>

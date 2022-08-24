@@ -60,7 +60,7 @@ namespace BlogWebApp.DAL.Repositories
         // Получим все статьи автора по его id
         public async Task<Post[]> GetPostsByUserId(int id)
         {
-            var postsByUserId = await _context.Post.Where(p => p.userId ==id).ToArrayAsync();
+            var postsByUserId = await _context.Post.Include(p => p.User).Where(p => p.UserId ==id).ToArrayAsync();
 
             return postsByUserId;
         }
@@ -68,7 +68,7 @@ namespace BlogWebApp.DAL.Repositories
         // найти конкретную статью по Id
         public async Task<Post?> GetPostById(int id)
         {
-            var postById = await _context.Post.FindAsync(id);
+            var postById = await _context.Post.Include(c => c.Comments).ThenInclude(u =>u.User).Include(p=> p.User).Where(p => p.id == id).FirstOrDefaultAsync();
 
             return postById;
         }

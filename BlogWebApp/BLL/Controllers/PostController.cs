@@ -21,6 +21,16 @@ namespace BlogWebApp.BLL.Controllers
         //получить все статьи
         // GET: PostController
         [HttpGet]
+        [Route("GetPost")]
+        public async Task<IActionResult> GetPost(int id)
+        {
+            var post = await _repo.GetPostById(id);
+            return View(post);
+        }
+
+        //получить все статьи
+        // GET: PostController
+        [HttpGet]
         [Route("GetPosts")]
         public async Task<IActionResult> GetPosts()
         {
