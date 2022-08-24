@@ -33,9 +33,9 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetRoleById")]
         public async Task<IActionResult> GetRoleById(int id)
         {
-            var tag = await _repo.GetRoleById(id);
+            var role = await _repo.GetRoleById(id);
 
-            return View(tag);
+            return View(role);
         }
 
         [HttpGet]
@@ -47,30 +47,33 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: TagController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(Role newRole)
+        [Route("Create")]
+        public async Task<IActionResult> Create([FromForm] Role newRole)
         {
             await _repo.CreateRole(newRole);
-            return View(newRole);
+            return RedirectToAction("GetRoles");
         }
 
         [HttpGet]
-        [Route("Edit")]
-        public IActionResult Edit()
+        [Route("Edit/{Id}")]
+        public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            return View();
+            var role = await _repo.GetRoleById(id);
+
+            return View(role);
         }
 
         // GET: TagController/Edit
-        [HttpPut]
-        [Route("Edit")]
-        public async Task<IActionResult> Edit(Role newRole)
+        [HttpPost]
+        [Route("Edit/{Id}")]
+        public async Task<IActionResult> Edit([FromForm] Role newRole, [FromRoute] int id)
         {
-            await _repo.EditRole(newRole);
-            return View(newRole);
+            await _repo.EditRole(newRole,id);
+            return RedirectToAction("GetRoles");
         }
 
         // GET: TagController/Delete/5
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete/{Id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -80,7 +83,7 @@ namespace BlogWebApp.BLL.Controllers
             else
             {
                 await _repo.DelRole(role);
-                return View(role);
+                return RedirectToAction("GetRoles");
             }
         }
     }

@@ -13,7 +13,7 @@
         <div class="card-body">
             <h5 class="card-title">@role.RoleName</h5>
             <p class="card-text">@role.RoleDescription</p>
-            <a class="btn btn-outline-secondary" asp-area="" asp-controller="Role" asp-action="Edit">Редактировать</a>
+            <a class="btn btn-outline-secondary" asp-controller="Role" asp-action="Edit" asp-route-id="@role.Id">Редактировать</a>
         </div>
     </div>
 }

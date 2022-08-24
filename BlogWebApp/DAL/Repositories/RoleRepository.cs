@@ -30,21 +30,24 @@ namespace BlogWebApp.DAL.Repositories
         //Удаляем тег
         public async Task DelRole(Role role)
         {
-            var entry = _context.Entry(role);
-            if (entry.State == EntityState.Detached)
-                _context.Role.Remove(role);
-
+            // Удаление пользователя
+            var dbrole = _context.Role.Where(u => u.RoleName == role.RoleName).First();
+            if (dbrole != null)
+                _context.Role.Remove(dbrole);
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
 
         //редактируем тег
-        public async Task EditRole(Role role)
+        public async Task EditRole(Role role, int id)
         {
-            var entry = _context.Entry(role);
-            if (entry.State == EntityState.Detached)
-                _context.Role.Update(role);
-
+            // изменение тега
+            var dbrole = _context.Role.Where(u => u.Id == id).First();
+            if (dbrole != null)
+            {
+                dbrole.RoleName = role.RoleName;
+                dbrole.RoleDescription = role.RoleDescription;
+            }
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
