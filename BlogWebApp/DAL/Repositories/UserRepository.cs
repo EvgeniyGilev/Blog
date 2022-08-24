@@ -19,11 +19,16 @@ namespace BlogWebApp.DAL.Repositories
         public async Task AddUser(User user)
         {
             user.UserCreateDate = DateTime.Now.ToString();
-            
+
+            //по умолчанию права пользователя
+            user.Roles = _context.Role.Where(r => r.Id == 1).ToList();
+
             // Добавление пользователя
             var entry = _context.Entry(user);
             if (entry.State == EntityState.Detached)
+            {
                 await _context.User.AddAsync(user);
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();
@@ -32,8 +37,8 @@ namespace BlogWebApp.DAL.Repositories
         public async Task DelUser(User user)
         {
             // Удаление пользователя
-            var entry = _context.Entry(user);
-            if (entry.State == EntityState.Detached)
+            var dbuser = _context.User.Where(u => u.Id == user.Id).First();
+            if (dbuser !=null)
                  _context.User.Remove(user);
 
             // Сохранение изменений
@@ -43,9 +48,14 @@ namespace BlogWebApp.DAL.Repositories
         public async Task EditUser(User user)
         {
             // изменение данных пользователя
-            var entry = _context.Entry(user);
-            if (entry.State == EntityState.Detached)
-                 _context.User.Update(user);
+            var dbuser = _context.User.Where(u => u.UserLogin == user.UserLogin).First();
+            if (dbuser != null)
+            {
+                dbuser.UserLogin = user.UserLogin;
+                dbuser.UserPassword = user.UserPassword;
+                dbuser.UserLastName = user.UserLastName;
+                dbuser.UserFirstName = user.UserFirstName;
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();

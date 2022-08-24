@@ -10,7 +10,7 @@
 {
     <div class="card" style="width: 18rem;">
         <div class="card-body">
-            <p><a asp-area="" asp-controller="Post" asp-action="GetPost" asp-route-id="@post.id">@post.postName</a></p>
+            <p><a asp-controller="Post" asp-action="GetPost" asp-route-id="@post.id">@post.postName</a></p>
             @foreach (Tag tag in @post.Tags)
             {
                 <span class="badge bg-info text-dark">@tag.tagText</span>               

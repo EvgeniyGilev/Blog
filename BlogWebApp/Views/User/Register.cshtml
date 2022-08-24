@@ -1,25 +1,31 @@
-﻿<div class="text-start">
+﻿@model BlogWebApp.BLL.Models.Entities.User
+
+@{
+    ViewData["Title"] = "Добавление пользователя";
+}
+
+<div class="text-start">
    <div>
            @if (Model == null)
            {
             <h3 style="text-align: left">Регистрация пользователя</h3>
             <br>
-            <form method="post">
+            <form method="post" asp-action="Register" asp-controller="User">
                 <div class="mb-3">
                     <label for="InputFirstname" class="form-label">Имя</label>
-                    <input type="text" class="form-control" id="InputFirstname">
+                    <input type="text" class="form-control" id="InputFirstname" asp-for="UserFirstName">
                 </div>
                 <div class="mb-3">
                     <label for="InputLastname" class="form-label">Фамилия</label>
-                    <input type="text" class="form-control" id="InputLastname">
+                    <input type="text" class="form-control" id="InputLastname" asp-for="UserLastName">
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Почтовый адрес</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1">
+                    <input type="email" class="form-control" id="exampleInputEmail1" asp-for="UserLogin">
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
+                    <input type="password" class="form-control" id="exampleInputPassword1" asp-for="UserPassword">
                 </div>
                 <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
             </form>

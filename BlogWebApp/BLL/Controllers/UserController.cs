@@ -37,7 +37,6 @@ namespace BlogWebApp.BLL.Controllers
 
         //получить одного пользователя
         // GET: UserController
-        [Authorize(Roles = "Администратор")]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(int id)
@@ -58,10 +57,10 @@ namespace BlogWebApp.BLL.Controllers
         // POST: UserController/Register
         [HttpPost]
         [Route("Register")]
-        public async Task<IActionResult> Register(User newUser)
-        {
+        public async Task<IActionResult> Register([FromForm] User newUser)
+        {            
             await _repo.AddUser(newUser);
-            return View(newUser);
+            return RedirectToAction("GetAllUsers");
         }
 
         [HttpGet]
@@ -73,19 +72,17 @@ namespace BlogWebApp.BLL.Controllers
 
         //отредактировать пользователя
         // GET: UserController/Edit/5
-        [Authorize(Roles = "Администратор")]
-        [HttpPut]
+        [HttpPost]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(User newUser)
+        public async Task<IActionResult> Edit([FromForm] User newUser)
         {
             await _repo.EditUser(newUser);
-            return View(newUser);
+            return RedirectToAction("GetAllUsers");
         }
 
 
         // POST: UserController/Delete/Id
-        [Authorize(Roles = "Администратор")]
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete/{Id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
@@ -95,7 +92,7 @@ namespace BlogWebApp.BLL.Controllers
             else
             {
                 await _repo.DelUser(user);
-                return View(user);
+                return RedirectToAction("GetAllUsers");
             }
         }
 

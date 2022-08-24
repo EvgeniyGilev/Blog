@@ -1,8 +1,41 @@
 ﻿@using BlogWebApp.BLL.Models.Entities
-@model User
+@model BlogWebApp.BLL.Models.Entities.User
+
 @{
-    ViewData["Title"] = "GetUsersByID";
+    ViewData["Title"] = "Редактирование пользователя";
 }
 
-    <p>логин пользователя для проверки работоспособности @Model.UserLogin</p>
+<div class="text-start">
+   <div>
+            <h3 style="text-align: left">Редактирование пользователя @Model.UserLogin</h3>
+        <br>
+        <form method="post" asp-action="Edit" asp-controller="User">
+            <div class="mb-3">
+                <label for="InputId" class="form-label">Id</label>
+                <input type="text" class="form-control" id="InputId" asp-for="Id" value="@Model.Id" disabled>
+            </div>
+            <div class="mb-3">
+                <label for="InputFirstname" class="form-label">Имя</label>
+                <input type="text" class="form-control" id="InputFirstname" asp-for="UserFirstName" value="@Model.UserFirstName">
+            </div>
+            <div class="mb-3">
+                <label for="InputLastname" class="form-label">Фамилия</label>
+                <input type="text" class="form-control" id="InputLastname" asp-for="UserLastName" value="@Model.UserLastName">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Почтовый адрес</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" asp-for="UserLogin" value="@Model.UserLogin">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" asp-for="UserPassword" value="@Model.UserPassword">
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+        <br>
+        <form method="post" asp-action="Delete" asp-action="User" asp-route-id="@Model.Id">
+            <button type="submit" class="btn btn-sm btn-danger float-right btn-mrg">Удалить</button>
+        </form>
 
+    </div>
+</div>

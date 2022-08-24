@@ -10,7 +10,7 @@
 {
     <div class="card" style="width: 18rem;">
         <div class="card-body">
-            <h5 class="card-title">@user.UserFirstName @user.UserLastName</h5>
+            <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.Id">@user.UserFirstName @user.UserLastName.</a></p>
             @foreach (Role roleUser in @user.Roles)
             {
                 <span class="badge bg-info text-dark">@roleUser.RoleName</span>                
