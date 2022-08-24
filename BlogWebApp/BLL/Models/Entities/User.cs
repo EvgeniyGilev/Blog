@@ -9,7 +9,7 @@
         
         //email
         public string UserLogin { get; set; }
-        public string UserCreateDate { get; set; }
+        public string ?UserCreateDate { get; set; }
 
         //ссылка на роли
         public virtual List<Role> Roles { get; set; } = new();

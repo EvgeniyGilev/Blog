@@ -19,11 +19,16 @@ namespace BlogWebApp.DAL.Repositories
         public async Task AddUser(User user)
         {
             user.UserCreateDate = DateTime.Now.ToString();
-            
+
+            //по умолчанию права пользователя
+            user.Roles = _context.Role.Where(r => r.Id == 1).ToList();
+
             // Добавление пользователя
             var entry = _context.Entry(user);
             if (entry.State == EntityState.Detached)
+            {
                 await _context.User.AddAsync(user);
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();

@@ -37,7 +37,6 @@ namespace BlogWebApp.BLL.Controllers
 
         //получить одного пользователя
         // GET: UserController
-        [Authorize(Roles = "Администратор")]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(int id)
@@ -58,10 +57,10 @@ namespace BlogWebApp.BLL.Controllers
         // POST: UserController/Register
         [HttpPost]
         [Route("Register")]
-        public async Task<IActionResult> Register(User newUser)
-        {
+        public async Task<IActionResult> Register([FromForm] User newUser)
+        {            
             await _repo.AddUser(newUser);
-            return View(newUser);
+            return RedirectToAction("GetAllUsers");
         }
 
         [HttpGet]
