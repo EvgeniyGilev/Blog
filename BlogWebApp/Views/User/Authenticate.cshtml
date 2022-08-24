@@ -1,16 +1,24 @@
-﻿<div class="text-start">
+﻿@using BlogWebApp.BLL.Models.Entities
+
+@model BlogWebApp.BLL.Models.Entities.User
+
+@{
+    ViewData["Title"] = "Добавление пользователя";
+}
+
+<div class="text-start">
     <div>
-        <form>
+        <form method="post" asp-controller="User" asp-action="Authenticate">
             <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Почтовый адрес</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <label for="login" class="form-label">Почтовый адрес</label>
+                <input type="email" class="form-control" id="login" asp-for="UserLogin">
             </div>
             <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
+                <label for="password" class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="password" asp-for="UserPassword">
             </div>
             <button type="submit" class="btn btn-primary">Войти</button>
         </form>
-        <p>Еще нет аккаунта? <a asp-area="" asp-controller="User" asp-action="Register">Зарегистрируйтесь!</a></p>
+        <p>Еще нет аккаунта? <a asp-controller="User" asp-action="Register">Зарегистрируйтесь!</a></p>
     </div>
 </div>

@@ -37,7 +37,19 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="GetRoles">Роли</a>
                         </li>
                     </ul>
-                    <a class="btn btn-sm btn-outline-secondary" asp-area="" asp-controller="User" asp-action="Authenticate">Войти</a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a class="btn btn-sm btn-outline-secondary" onclick="removeCookie();">Выйти</a>
+                        <script>
+                            function removeCookie() {
+                                $.cookie('AppCookie', '');
+                            }
+                        </script>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-outline-secondary" asp-area="" asp-controller="User" asp-action="Authenticate">Войти</a>
+                    }
                 </div>
             </div>
         </nav>

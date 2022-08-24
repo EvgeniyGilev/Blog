@@ -105,17 +105,13 @@ namespace BlogWebApp.BLL.Controllers
 
         [HttpPost]
         [Route("Authenticate")]
-        public async Task<IActionResult> Authenticate(string login, string password)
+        public async Task<IActionResult> Authenticate([FromForm] User user)
         {
-            if (String.IsNullOrEmpty(login) ||
-              String.IsNullOrEmpty(password))
-                throw new ArgumentNullException("Запрос не корректен");
-
-            User? user = _repo.GetUserByLogin(login);
-            if (user is null)
+            User? dbuser = _repo.GetUserByLogin(user.UserLogin);
+            if (dbuser is null)
                 throw new AuthenticationException("Пользователь на найден");
 
-            if (user.UserPassword != password)
+            if (dbuser.UserPassword != user.UserPassword)
                 throw new AuthenticationException("Введенный пароль не корректен");
 
             var claims = new List<Claim>
@@ -128,7 +124,7 @@ namespace BlogWebApp.BLL.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-            return View(user);
+            return RedirectToAction("index","Home");
         }
     }
 }

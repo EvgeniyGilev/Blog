@@ -2,9 +2,10 @@ using BlogWebApp;
 using BlogWebApp.DAL.Context;
 using BlogWebApp.DAL.Repositories;
 using BlogWebApp.DAL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using BlogWebApp.BLL.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies")
 });
 
 
+
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<ITagRepository, TagRepository>();
@@ -42,6 +44,16 @@ builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 //builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connection), ServiceLifetime.Singleton);
 //builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
 builder.Services.AddDbContext<AppDBContext>(ServiceLifetime.Singleton);
+
+builder.Services.AddIdentity<User, IdentityRole>(opts =>
+{
+    opts.Password.RequiredLength = 3;
+    opts.Password.RequireNonAlphanumeric = false;
+    opts.Password.RequireLowercase = false;
+    opts.Password.RequireUppercase = false;
+    opts.Password.RequireDigit = false;
+}).AddEntityFrameworkStores<AppDBContext>();
+
 
 var app = builder.Build();
 

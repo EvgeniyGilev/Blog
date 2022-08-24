@@ -1,10 +1,12 @@
-﻿namespace BlogWebApp.BLL.Models.Entities
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace BlogWebApp.BLL.Models.Entities
 {
-    public class User
+    public class User: IdentityUser
     {
         public int Id { get; set; }
-        public string UserFirstName { get; set; }
-        public string UserLastName { get; set; }
+        public string ?UserFirstName { get; set; }
+        public string ?UserLastName { get; set; }
         public string UserPassword { get; set; }
         
         //email
