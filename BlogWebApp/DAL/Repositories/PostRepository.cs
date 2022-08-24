@@ -54,7 +54,7 @@ namespace BlogWebApp.DAL.Repositories
         public async Task<Post[]> GetPosts()
         {
             // Получим все статьи
-            return await _context.Post.ToArrayAsync();
+            return await _context.Post.Include(p => p.Tags).ToArrayAsync();
         }
 
         // Получим все статьи автора по его id

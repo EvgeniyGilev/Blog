@@ -27,8 +27,8 @@ namespace BlogWebApp.BLL.Controllers
         //получить всех пользователей
         // GET: UserController
         [HttpGet]
-        [Route("GetUsers")]
-        public async Task<IActionResult> Index()
+        [Route("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
         {
             var users = await _repo.GetUsers();
 

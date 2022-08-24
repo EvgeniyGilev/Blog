@@ -3,7 +3,9 @@
 @{
     ViewData["Title"] = "GetUsers";
 }
-
+<div class="text-start">
+<h3>Все пользователи</h3>
+<p><a asp-area="" asp-controller="User" asp-action="Register">Добавить пользователя</a></p>
 @foreach (User user in Model)
 {
     <div class="card" style="width: 18rem;">
@@ -17,4 +19,5 @@
         </div>
     </div>
 }
+</div>
 

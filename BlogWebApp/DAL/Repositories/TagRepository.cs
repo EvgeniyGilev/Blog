@@ -59,7 +59,7 @@ namespace BlogWebApp.DAL.Repositories
         public async Task<Tag[]> GetTags()
         {
             // Получим все статьи
-            return await _context.Tag.ToArrayAsync();
+            return await _context.Tag.Include(t => t.Posts).ToArrayAsync();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace BlogWebApp.DAL.Context
 
         public AppDBContext() 
         {
-            //Database.EnsureDeleted();
+           // Database.EnsureDeleted();
 
             Database.EnsureCreated();
 
