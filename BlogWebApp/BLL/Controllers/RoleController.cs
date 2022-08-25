@@ -7,13 +7,13 @@ namespace BlogWebApp.BLL.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RoleController1 : Controller
+    public class RoleController : Controller
     {
         RoleManager<IdentityRole> _roleManager;
         UserManager<User> _userManager;
         private readonly IRoleRepository _repo;
 
-        public RoleController1(IRoleRepository repo, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
+        public RoleController(IRoleRepository repo, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             _repo = repo;
             _roleManager = roleManager;
