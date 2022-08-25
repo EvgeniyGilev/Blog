@@ -57,10 +57,11 @@ namespace BlogWebApp.BLL.Controllers
         }
         // GET: PostController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(Post newPost)
+        [Route("Create")]
+        public async Task<IActionResult> Create([FromForm] Post newPost)
         {
             await _repo.CreatePost(newPost);
-            return View(newPost);
+            return RedirectToAction("GetPosts");
         }
 
 
@@ -73,7 +74,7 @@ namespace BlogWebApp.BLL.Controllers
         // Put: PostController/Edit/5
         [HttpPut]
         [Route("Edit")]
-        public async Task<IActionResult> Edit(Post newPost)
+        public async Task<IActionResult> Edit([FromForm] Post newPost)
         {
             await _repo.EditPost(newPost);
             return View(newPost);

@@ -5,7 +5,7 @@
         public int id { get; set; }
         public string postName { get; set; }
         public string postText { get; set; }
-        public string postCreateDate { get; set; }
+        public string ?postCreateDate { get; set; }
 
         //ссылка на пользователя
         public int UserId { get; set; }
