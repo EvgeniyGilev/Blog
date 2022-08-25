@@ -8,7 +8,7 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -18,10 +18,14 @@ namespace BlogWebApp.BLL.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _repo;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
 
-        public UserController(IUserRepository repo)
+        public UserController(IUserRepository repo, SignInManager<User> signInManager, UserManager<User> userManager)
         {
             _repo = repo;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         //получить всех пользователей
@@ -39,7 +43,7 @@ namespace BlogWebApp.BLL.Controllers
         // GET: UserController
         [HttpGet]
         [Route("GetUserById")]
-        public async Task<IActionResult> GetUserById(int id)
+        public async Task<IActionResult> GetUserById(string id)
         {
             var user = await _repo.GetUserById (id);
 
@@ -58,14 +62,27 @@ namespace BlogWebApp.BLL.Controllers
         [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register([FromForm] User newUser)
-        {            
-            await _repo.AddUser(newUser);
+        {
+
+            newUser.UserName = newUser.Email;
+            newUser.UserCreateDate = DateTime.Now.ToString();
+
+            //по умолчанию права пользователя
+            
+            var result = await _userManager.CreateAsync(newUser, newUser.UserPassword);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(newUser, false);
+            }
+            
+              
+           // await _repo.AddUser(newUser);
             return RedirectToAction("GetAllUsers");
         }
 
         [HttpGet]
-        [Route("Edit/{Id}")]
-        public IActionResult Edit([FromRoute] int id)
+        [Route("Edit")]
+        public IActionResult Edit()
         {
             return View();
         }
@@ -74,9 +91,9 @@ namespace BlogWebApp.BLL.Controllers
         // GET: UserController/Edit/5
         [HttpPost]
         [Route("Edit/{Id}")]
-        public async Task<IActionResult> Edit([FromForm] User newUser, [FromRoute] int id)
+        public async Task<IActionResult> Edit([FromForm] User newUser, [FromRoute] string Id)
         {
-            await _repo.EditUser(newUser,id);
+            await _repo.EditUser(newUser,Id);
             return RedirectToAction("GetAllUsers");
         }
 
@@ -84,7 +101,7 @@ namespace BlogWebApp.BLL.Controllers
         // POST: UserController/Delete/Id
         [HttpPost]
         [Route("Delete/{Id}")]
-        public async Task<IActionResult> DeleteUser([FromRoute] int id)
+        public async Task<IActionResult> DeleteUser([FromRoute] string id)
         {
 
             var user = await _repo.GetUserById(id);
@@ -97,12 +114,12 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         [HttpGet]
-        [Route("Authenticate")]
-        public IActionResult Authenticate()
+        [Route("Login")]
+        public IActionResult Login()
         {
             return View();
         }
-
+        /*
         [HttpPost]
         [Route("Authenticate")]
         public async Task<IActionResult> Authenticate([FromForm] User user)
@@ -126,5 +143,44 @@ namespace BlogWebApp.BLL.Controllers
 
             return RedirectToAction("index","Home");
         }
+        */
+        [Route("Login")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([FromForm] User user)
+        {
+            
+            var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == user.Email);
+
+            if (searchuser != null)
+            {
+                var result = await _signInManager.PasswordSignInAsync(user.Email,user.UserPassword, false,false);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Неправильный логин и (или) пароль");
+                }
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [Route("Logout")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
+            HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
+
+            return RedirectToAction("Index", "Home");
+        }
+
+
     }
 }

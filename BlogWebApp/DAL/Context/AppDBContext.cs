@@ -1,9 +1,10 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BlogWebApp.DAL.Context
 {
-    public class AppDBContext : DbContext
+    public class AppDBContext : IdentityDbContext<User>
     {
         // Объекты таблицы Users
         public DbSet<User> User { get; set; }
@@ -20,13 +21,11 @@ namespace BlogWebApp.DAL.Context
         //Объекты таблицы Comment
         public DbSet<Tag> Tag { get; set; }
 
-        public AppDBContext() 
+        public AppDBContext(DbContextOptions<AppDBContext> options): base(options)
         {
             //Database.EnsureDeleted();
 
             Database.EnsureCreated();
-
-            
 
         }
 
@@ -49,6 +48,8 @@ namespace BlogWebApp.DAL.Context
         */
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             //builder.Entity<Room>().ToTable("Rooms");
             //builder.Entity<Device>().ToTable("Devices");
         }

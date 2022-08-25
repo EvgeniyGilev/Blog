@@ -8,10 +8,10 @@
 
 <div class="text-start">
     <div>
-        <form method="post" asp-controller="User" asp-action="Authenticate">
+        <form method="post" asp-controller="User" asp-action="Login">
             <div class="mb-3">
                 <label for="login" class="form-label">Почтовый адрес</label>
-                <input type="email" class="form-control" id="login" asp-for="UserLogin">
+                <input type="email" class="form-control" id="login" asp-for="Email">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Пароль</label>

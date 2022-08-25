@@ -32,7 +32,9 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies")
     };
 });
 
-
+builder.Services.Configure<PasswordHasherOptions>(options =>
+    options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+);
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
@@ -52,6 +54,10 @@ builder.Services.AddIdentity<User, IdentityRole>(opts =>
     opts.Password.RequireLowercase = false;
     opts.Password.RequireUppercase = false;
     opts.Password.RequireDigit = false;
+    opts.Password.RequiredUniqueChars = 0;
+    opts.SignIn.RequireConfirmedAccount = false;
+    opts.SignIn.RequireConfirmedEmail = false;
+    opts.SignIn.RequireConfirmedPhoneNumber = false;
 }).AddEntityFrameworkStores<AppDBContext>();
 
 
@@ -81,6 +87,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();    // подключение аутентификации
 app.UseAuthorization();
 //app.UseMvc();
 

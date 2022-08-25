@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using BlogWebApp.BLL.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlogWebApp.DAL.Repositories
 {
@@ -10,6 +11,10 @@ namespace BlogWebApp.DAL.Repositories
     {
         // ссылка на контекст
         private readonly AppDBContext _context;
+
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+
 
         // Метод-конструктор для инициализации
         public UserRepository(AppDBContext context)
@@ -29,7 +34,7 @@ namespace BlogWebApp.DAL.Repositories
             {
                 await _context.User.AddAsync(user);
             }
-
+            
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
@@ -45,13 +50,13 @@ namespace BlogWebApp.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditUser(User user,int id)
+        public async Task EditUser(User user,string id)
         {
             // изменение данных пользователя
             var dbuser = _context.User.Where(u => u.Id == id).First();
             if (dbuser != null)
             {
-                dbuser.UserLogin = user.UserLogin;
+                dbuser.Email = user.Email;
                 dbuser.UserPassword = user.UserPassword;
                 dbuser.UserLastName = user.UserLastName;
                 dbuser.UserFirstName = user.UserFirstName;
@@ -62,7 +67,7 @@ namespace BlogWebApp.DAL.Repositories
         }
 
         // поиск пользователя по Id
-        public async Task<User?> GetUserById(int id)
+        public async Task<User?> GetUserById(string id)
         {
             var searchUser = await _context.User.FindAsync(id);
 
@@ -79,7 +84,7 @@ namespace BlogWebApp.DAL.Repositories
         // поиск пользователя по Login
         public User? GetUserByLogin(string login)
         {
-            var user = _context.User.Include(u => u.Roles).FirstOrDefault(u => u.UserLogin == login);
+            var user = _context.User.Include(u => u.Roles).FirstOrDefault(u => u.Email == login);
 
             return user;
         }
