@@ -1,19 +1,23 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.DAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RoleController : Controller
+    public class RoleController1 : Controller
     {
-
+        RoleManager<IdentityRole> _roleManager;
+        UserManager<User> _userManager;
         private readonly IRoleRepository _repo;
 
-        public RoleController(IRoleRepository repo)
+        public RoleController1(IRoleRepository repo, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             _repo = repo;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         //получить все комментарии
