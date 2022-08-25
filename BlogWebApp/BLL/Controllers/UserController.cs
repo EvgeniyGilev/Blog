@@ -154,10 +154,11 @@ namespace BlogWebApp.BLL.Controllers
 
             if (searchuser != null)
             {
-                var result = await _signInManager.PasswordSignInAsync(user.Email,user.UserPassword, false,false);
+                var result = await _signInManager.CanSignInAsync(searchuser);
 
-                if (result.Succeeded)
+                if (result)
                 {
+                    await _signInManager.SignInAsync(searchuser, false);
                     return RedirectToAction("Index", "Home");
                 }
                 else

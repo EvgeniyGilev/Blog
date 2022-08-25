@@ -20,7 +20,7 @@
                 <textarea class="form-control" id="inputContent" rows="3" asp-for="postText"></textarea>
             </div>
            <div class="mb-3">
-                <label for="InputAuthor" class="form-label">Заголовок</label>
+                <label for="InputAuthor" class="form-label">Автор</label>
                 <input type="text" class="form-control" id="InputAuthor" asp-for="User.UserName" value="@User.Identity.Name" readonly>
             </div>
             <button type="submit" class="btn btn-primary">Добавить</button>
