@@ -55,6 +55,7 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Create([FromForm] Role newRole)
         {
             await _repo.CreateRole(newRole);
+            await _roleManager.CreateAsync(new IdentityRole { Name = newRole.RoleName, NormalizedName = newRole.RoleName.ToUpper() });
             return RedirectToAction("GetRoles");
         }
 

@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -66,6 +67,7 @@ namespace BlogWebApp.BLL.Controllers
 
             newUser.UserName = newUser.Email;
             newUser.UserCreateDate = DateTime.Now.ToString();
+            
 
             //по умолчанию права пользователя
             
@@ -97,20 +99,30 @@ namespace BlogWebApp.BLL.Controllers
             return RedirectToAction("GetAllUsers");
         }
 
-
+     
         // POST: UserController/Delete/Id
         [HttpPost]
         [Route("Delete/{Id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)
         {
 
-            var user = await _repo.GetUserById(id);
-            if (user == null) { return RedirectToAction(nameof(Index)); }
+            if (User.IsInRole("Администратор"))
+            {
+
+
+                var user = await _repo.GetUserById(id);
+                if (user == null) { return RedirectToAction(nameof(Index)); }
+                else
+                {
+                    await _repo.DelUser(user);
+                    return RedirectToAction("GetAllUsers");
+                }
+            }
             else
             {
-                await _repo.DelUser(user);
-                return RedirectToAction("GetAllUsers");
+                return RedirectToAction("AccessDenied","Home");
             }
+
         }
 
         [HttpGet]
