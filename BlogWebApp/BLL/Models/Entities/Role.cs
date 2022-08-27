@@ -1,12 +1,18 @@
-﻿namespace BlogWebApp.BLL.Models.Entities
-{
-    public class Role
-    {
-        public int Id { get; set; }
-        public string RoleName { get; set; }
-        public string RoleDescription { get; set; }
+﻿using Microsoft.AspNetCore.Identity;
 
-        // ссылка на пользователей
-        public List<User> Users { get; set; } = new();
+namespace BlogWebApp.BLL.Models.Entities
+{
+    public class Role : IdentityRole
+    {
+        public string Description { get; set; } = null;
+
+        public Role()
+        { }
+        public Role(string name, string description)
+        {
+            Name = name;
+            Description = description;
+        }
+
     }
 }

@@ -47,10 +47,10 @@ builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 //builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
 builder.Services.AddDbContext<AppDBContext>(ServiceLifetime.Singleton);
 
-IdentityRole IRole = new IdentityRole();
 
 
-builder.Services.AddIdentity<User, IdentityRole>(opts =>
+
+builder.Services.AddIdentity<User, Role>(opts =>
 {
     opts.Password.RequiredLength = 3;
     opts.Password.RequireNonAlphanumeric = false;

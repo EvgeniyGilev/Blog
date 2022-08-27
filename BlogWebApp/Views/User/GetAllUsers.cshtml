@@ -13,7 +13,7 @@
             <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.Id">@user.UserFirstName @user.UserLastName.</a></p>
             @foreach (Role roleUser in @user.Roles)
             {
-                <span class="badge bg-info text-dark">@roleUser.RoleName</span>                
+                <span class="badge bg-info text-dark">@roleUser.Name</span>                
             }
             <p class="card-text">@user.Email</p>
         </div>

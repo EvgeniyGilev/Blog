@@ -26,7 +26,7 @@ namespace BlogWebApp.DAL.Repositories
             user.UserCreateDate = DateTime.Now.ToString();
 
             //по умолчанию права пользователя
-            user.Roles = _context.Role.Where(r => r.Id == 1).ToList();
+           // user.Roles = _context.Role.Where(r => r.Id == 1).ToList();
 
             // Добавление пользователя
             var entry = _context.Entry(user);

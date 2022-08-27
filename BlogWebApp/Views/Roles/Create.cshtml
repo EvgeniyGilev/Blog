@@ -1,20 +1,17 @@
-﻿@model BlogWebApp.BLL.Models.Entities.Role
-
-@{
-    ViewData["Title"] = "Добавление роли";
-}
-
+﻿@model string
+ 
+<div asp-validation-summary="All" class="text-danger"></div>
 <div class="text-start">
     <div>
         <h3>Добавление роли</h3>
-        <form method="post" asp-action="Create" asp-controller="Role">
+        <form method="post" asp-action="Create" asp-controller="Roles">
             <div class="mb-3">
-                <label for="InputRole" class="form-label">Название</label>
-                <input type="text" class="form-control" id="InputRole" asp-for="RoleName">
+                <label for="InputRole" class="form-label">Новая роль</label>
+                <input type="text" class="form-control" id="InputRole" name="name">
             </div>
              <div class="mb-3">
                 <label for="inputDescription" class="form-label">Описание</label>
-                <textarea class="form-control" id="inputDescription" rows="3" asp-for="RoleDescription"></textarea>
+                <textarea class="form-control" id="inputDescription" rows="3" name="description"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Добавить</button>
         </form>

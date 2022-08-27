@@ -1,0 +1,28 @@
+﻿@using BlogWebApp.BLL.Models.Entities
+@model IEnumerable<Role>
+
+<h2>Список ролей</h2>
+<table class="table">
+    @foreach (var role in Model)
+    {
+        <tr>
+            <td>@role.Name</td>
+            <td>@role.Description</td>
+            <td>
+                <form asp-action="EditRole" asp-route-id="@role.Id" asp-controller="Roles" method="get">
+                    <button type="submit" class="btn btn-sm btn-secondary">
+                        Редактировать
+                    </button>
+                </form>
+                  <form asp-action="Delete" asp-route-id="@role.Id" asp-controller="Roles" method="post">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        Удалить
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
+<a asp-action="Create">Добавить роль</a>
+<br />
+<a asp-action="UserList">Список пользователей и их ролей</a>
