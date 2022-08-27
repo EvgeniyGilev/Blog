@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using BlogWebApp.BLL.Models.ViewModels;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -35,9 +36,29 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _repo.GetUsers();
 
-            return View(users);
+            var users = _userManager.Users.ToList();
+
+            List<ShowUserViewModel> model = new List<ShowUserViewModel>();
+            foreach (var user in users)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                List<string> roles = new List<string>();
+
+                foreach (var role in userRoles)
+                {
+                    roles.Add(role.ToString());
+                }
+
+                model.Add(new ShowUserViewModel
+                {
+                    UserId = user.Id,
+                    UserEmail = user.Email,
+                    UserName = user.UserFirstName + " " + user.UserLastName,
+                    UserRoles = roles
+                });
+            }
+            return View(model);
         }
 
         //получить одного пользователя
@@ -46,9 +67,18 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(string id)
         {
-            var user = await _repo.GetUserById (id);
+            var user = await _userManager.FindByIdAsync(id);
 
-            return View(user);
+            EditUserViewModel model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserFirstName = user.UserFirstName,
+                UserLastName = user.UserLastName,
+                UserPassword = user.UserPassword
+            };
+
+            return View(model);
         }
 
         [HttpGet]
@@ -62,44 +92,81 @@ namespace BlogWebApp.BLL.Controllers
         // POST: UserController/Register
         [HttpPost]
         [Route("Register")]
-        public async Task<IActionResult> Register([FromForm] User newUser)
+        public async Task<IActionResult> Register([FromForm] CreateUserViewModel newUser)
         {
+            User user = new User();
 
-            newUser.UserName = newUser.Email;
-            newUser.UserCreateDate = DateTime.Now.ToString();
-            
+            user.Email = newUser.Email;
+            user.UserName = newUser.Email;
+            user.UserCreateDate = DateTime.Now.ToString();
+            user.UserFirstName = newUser.UserFirstName;
+            user.UserLastName = newUser.UserLastName;
+            user.UserPassword = newUser.UserPassword;
+
 
             //по умолчанию права пользователя
-            
-            var result = await _userManager.CreateAsync(newUser, newUser.UserPassword);
+
+            var result = await _userManager.CreateAsync(user, newUser.UserPassword);
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(newUser, false);
+                //добавляем роль по умолчанию Пользователь
+                await _userManager.AddToRoleAsync(user, "Пользователь");
+                if (!User.Identity.IsAuthenticated)
+                {
+                    await _signInManager.SignInAsync(user, false);
+                }
+
+                // await _repo.AddUser(newUser);
             }
-            
-              
-           // await _repo.AddUser(newUser);
             return RedirectToAction("GetAllUsers");
         }
-
+        /*
         [HttpGet]
         [Route("Edit")]
         public IActionResult Edit()
         {
             return View();
         }
-
+        */
         //отредактировать пользователя
         // GET: UserController/Edit/5
         [HttpPost]
         [Route("Edit/{Id}")]
-        public async Task<IActionResult> Edit([FromForm] User newUser, [FromRoute] string Id)
+        public async Task<IActionResult> Edit([FromForm] EditUserViewModel newUser, [FromRoute] string Id)
         {
-            await _repo.EditUser(newUser,Id);
+            //await _repo.EditUser(newUser, Id);
+
+            if (ModelState.IsValid)
+            {
+                User user = await _userManager.FindByIdAsync(Id);
+                if (user != null)
+                {
+                    user.Email = newUser.Email;
+                    user.UserName = newUser.Email;
+
+                    user.UserLastName = newUser.UserLastName;
+                    user.UserFirstName = newUser.UserFirstName;
+                    user.UserPassword = newUser.UserPassword;
+
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("GetAllUsers");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                    }
+                }
+            }
+
             return RedirectToAction("GetAllUsers");
         }
 
-     
+
         // POST: UserController/Delete/Id
         [HttpPost]
         [Route("Delete/{Id}")]
@@ -110,17 +177,18 @@ namespace BlogWebApp.BLL.Controllers
             {
 
 
-                var user = await _repo.GetUserById(id);
+                var user = await _userManager.FindByIdAsync(id); //await _repo.GetUserById(id);
                 if (user == null) { return RedirectToAction(nameof(Index)); }
                 else
                 {
-                    await _repo.DelUser(user);
+                    // await _repo.DelUser(user);
+                    await _userManager.DeleteAsync(user);
                     return RedirectToAction("GetAllUsers");
                 }
             }
             else
             {
-                return RedirectToAction("AccessDenied","Home");
+                return RedirectToAction("AccessDenied", "Home");
             }
 
         }
@@ -161,7 +229,7 @@ namespace BlogWebApp.BLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] User user)
         {
-            
+
             var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == user.Email);
 
             if (searchuser != null)

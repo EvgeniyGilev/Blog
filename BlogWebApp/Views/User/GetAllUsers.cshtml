@@ -1,21 +1,22 @@
-﻿@using BlogWebApp.BLL.Models.Entities
-@model User[]
+﻿@using BlogWebApp.BLL.Models.ViewModels
+
+@model IEnumerable<ShowUserViewModel>
 @{
     ViewData["Title"] = "GetUsers";
 }
 <div class="text-start">
 <h3>Все пользователи</h3>
 <p><a asp-area="" asp-controller="User" asp-action="Register">Добавить пользователя</a></p>
-@foreach (User user in Model)
+@foreach (var user in Model)
 {
     <div class="card" style="width: 18rem;">
         <div class="card-body">
-            <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.Id">@user.UserFirstName @user.UserLastName.</a></p>
-            @foreach (Role roleUser in @user.Roles)
+            <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.UserId">@user.UserName</a></p>
+            @foreach (string roleUser in @user.UserRoles)
             {
-                <span class="badge bg-info text-dark">@roleUser.Name</span>                
+                <span class="badge bg-info text-dark">@roleUser</span>                
             }
-            <p class="card-text">@user.Email</p>
+            <p class="card-text">@user.UserEmail</p>
         </div>
     </div>
 }

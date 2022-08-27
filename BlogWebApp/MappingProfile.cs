@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BlogWebApp.BLL.Models.Entities;
-using BlogWebApp.BLL.Models.Views;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 
@@ -16,11 +15,7 @@ namespace BlogWebApp
 /// </summary>
         public MappingProfile()
 {
-            CreateMap<User, UserView>();
-            CreateMap<Comment, Comment>();
-            CreateMap<Post, PostView>();
-            CreateMap<Tag, TagView>();
-            CreateMap<Role, RoleView>();
+     //здесь можно подключить маппинг автомаппера, но пока сопоставляем модели с вьюмоделями руками
 
         }
     }
