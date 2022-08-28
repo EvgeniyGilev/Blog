@@ -1,6 +1,7 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using BlogWebApp.BLL.Models.ViewModels.TagViews
+@using Microsoft.AspNetCore.Identity
 @using BlogWebApp.BLL.Models.Entities
-@model BlogWebApp.BLL.Models.ViewModels.CreateTagViewModel
+@model CreateTagViewModel
 
 @{
     ViewData["Title"] = "Добавление тега";
@@ -10,12 +11,20 @@
     <div>
         <h3>Добавление тега</h3>
         <form method="post" asp-action="Create" asp-controller="Tag">
+            <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
                 <label for="InputTag" class="form-label">Название тега</label>
                 <input type="text" class="form-control" id="InputTag" asp-for="tagText">
+                <span asp-validation-for="tagText"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
         </form>
         <p><a asp-area="" asp-controller="Tag" asp-action="GetTags">Перейти к списку всех тегов</a></p>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

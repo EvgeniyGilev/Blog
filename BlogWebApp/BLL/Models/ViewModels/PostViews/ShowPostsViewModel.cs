@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
-namespace BlogWebApp.BLL.Models.ViewModels
+namespace BlogWebApp.BLL.Models.ViewModels.PostViews
 {
 
     public class ShowPostsViewModel

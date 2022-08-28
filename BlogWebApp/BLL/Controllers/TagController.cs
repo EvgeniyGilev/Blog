@@ -1,7 +1,7 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.DAL.Repositories.Interfaces;
-using BlogWebApp.BLL.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using BlogWebApp.BLL.Models.ViewModels.TagViews;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -68,9 +68,12 @@ namespace BlogWebApp.BLL.Controllers
         // GET: TagController/Edit
         [HttpPost]
         [Route("Edit/{Id}")]
-        public async Task<IActionResult> Edit([FromForm] Tag newTag, [FromRoute] int id)
+        public async Task<IActionResult> Edit([FromForm] EditeTagViewModel newTag, [FromRoute] int id)
         {
-            await _repo.EditTag(newTag,id);
+            var tag = await _repo.GetTagById(id);
+            tag.tagText = newTag.tagText;
+
+            await _repo.EditTag(tag, id);
             return RedirectToAction("GetTags");
         }
 

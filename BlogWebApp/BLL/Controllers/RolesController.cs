@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using BlogWebApp.BLL.Models.Entities;
-using BlogWebApp.BLL.Models.ViewModels;
+using BlogWebApp.BLL.Models.ViewModels.RoleViews;
 
 namespace CustomIdentityApp.Controllers
 {
@@ -21,12 +21,12 @@ namespace CustomIdentityApp.Controllers
 
         public IActionResult Create() => View();
         [HttpPost]
-        public async Task<IActionResult> Create(string name, string description)
+        public async Task<IActionResult> Create([FromForm] CreateRoleViewModel newRole)
         {
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(newRole.Name))
             {
       
-                IdentityResult result = await _roleManager.CreateAsync(new Role { Name = name, Description = description });
+                IdentityResult result = await _roleManager.CreateAsync(new Role { Name = newRole.Name, Description = newRole.Description });
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index");
@@ -39,7 +39,7 @@ namespace CustomIdentityApp.Controllers
                     }
                 }
             }
-            return View(name);
+            return View();
         }
 
         [HttpPost]
@@ -55,13 +55,14 @@ namespace CustomIdentityApp.Controllers
 
         public IActionResult UserList() => View(_userManager.Users.ToList());
 
+        [HttpGet]
         public async Task<IActionResult> Edit(string userId)
         {
             // получаем пользователя
             User user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
-                // получем список ролей пользователя
+                // получаем список ролей пользователя
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var allRoles = _roleManager.Roles.ToList();
                 ChangeRoleViewModel model = new ChangeRoleViewModel
@@ -83,7 +84,7 @@ namespace CustomIdentityApp.Controllers
             User user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
-                // получем список ролей пользователя
+                // получаем список ролей пользователя
                 var userRoles = await _userManager.GetRolesAsync(user);
                 // получаем все роли
                 var allRoles = _roleManager.Roles.ToList();
@@ -106,21 +107,32 @@ namespace CustomIdentityApp.Controllers
         public async Task<IActionResult> EditRole([FromRoute] string id)
         {
             Role role = await _roleManager.FindByIdAsync(id);
+
             if (role != null)
-                return View(role);
+            {
+                EditeRoleViewModel model = new EditeRoleViewModel
+                {
+                    Id = id,
+                    Name = role.Name,
+                    Description = role.Description
+                };
+
+                return View(model);
+            }
+
             else return RedirectToAction("Index");
         }
 
         // GET: TagController/Edit
         [HttpPost]
         [Route("EditRole/{Id}")]
-        public async Task<IActionResult> EditRole([FromRoute] string id,string name, string description)
+        public async Task<IActionResult> EditRole([FromRoute] string id, [FromForm] EditeRoleViewModel newRole)
         {
             Role role = await _roleManager.FindByIdAsync(id);
             if (role != null)
             {
-                role.Name = name;
-                role.Description = description;
+                role.Name = newRole.Name;
+                role.Description = newRole.Description;
                 IdentityResult result = await _roleManager.UpdateAsync(role);
             }
             return RedirectToAction("Index");

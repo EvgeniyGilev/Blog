@@ -1,5 +1,7 @@
-﻿@using BlogWebApp.BLL.Models.Entities
-@model BlogWebApp.BLL.Models.Entities.Tag
+﻿@using BlogWebApp.BLL.Models.ViewModels.TagViews
+@using Microsoft.AspNetCore.Identity
+@using BlogWebApp.BLL.Models.Entities
+@model EditeTagViewModel
 
 @{
     ViewData["Title"] = "Редактирование тега";
@@ -8,13 +10,16 @@
     <div>
         <h3>Редактирование тега</h3>
         <form method="post" asp-action="Edit" asp-controller="Tag" asp-route-id="@Model.id">
+            <div asp-validation-summary="ModelOnly"></div>
              <div class="mb-3">
                 <label for="InputTag" class="form-label">Id</label>
-                <input type="text" class="form-control" id="InputTag" asp-for="id" value="@Model.id" disabled>
+                <input type="text" class="form-control" id="InputTag" asp-for="id" value="@Model.id" readonly>
+                <span asp-validation-for="id"></span>
             </div>
             <div class="mb-3">
                 <label for="InputTag" class="form-label">Название тега</label>
                 <input type="text" class="form-control" id="InputTag" asp-for="tagText" value="@Model.tagText">
+                <span asp-validation-for="tagText"></span>
             </div>
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
@@ -25,3 +30,9 @@
         <p><a asp-area="" asp-controller="Tag" asp-action="GetTags">Перейти к списку всех тегов</a></p>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

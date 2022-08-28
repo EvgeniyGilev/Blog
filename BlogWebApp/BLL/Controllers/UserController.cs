@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using BlogWebApp.BLL.Models.ViewModels;
+using BlogWebApp.BLL.Models.ViewModels.UserViews;
 
 namespace BlogWebApp.BLL.Controllers
 {

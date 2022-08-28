@@ -1,20 +1,33 @@
-﻿@model string
+﻿@using BlogWebApp.BLL.Models.ViewModels.RoleViews
+@using Microsoft.AspNetCore.Identity
+@model CreateRoleViewModel
  
 <div asp-validation-summary="All" class="text-danger"></div>
 <div class="text-start">
     <div>
         <h3>Добавление роли</h3>
         <form method="post" asp-action="Create" asp-controller="Roles">
+            <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
                 <label for="InputRole" class="form-label">Новая роль</label>
-                <input type="text" class="form-control" id="InputRole" name="name">
+                <input type="text" class="form-control" id="InputRole" asp-for="Name">
+                <span asp-validation-for="Name"></span>
             </div>
              <div class="mb-3">
                 <label for="inputDescription" class="form-label">Описание</label>
-                <textarea class="form-control" id="inputDescription" rows="3" name="description"></textarea>
+                <textarea class="form-control" id="inputDescription" rows="3" asp-for="Description"></textarea>
+                <span asp-validation-for="Description"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
         </form>
         <p><a asp-area="" asp-controller="Role" asp-action="GetRoles">Перейти к списку всех ролей</a></p>
     </div>
 </div>
+
+@section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
+

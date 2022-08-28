@@ -1,21 +1,30 @@
-﻿@using BlogWebApp.BLL.Models.Entities
-@model Role
- 
+﻿@using BlogWebApp.BLL.Models.ViewModels.RoleViews
+@using Microsoft.AspNetCore.Identity
+@model EditeRoleViewModel
+
 <div asp-validation-summary="All" class="text-danger"></div>
 <div class="text-start">
     <div>
         <h3>Изменение роли</h3>
         <form method="post" asp-action="EditRole" asp-controller="Roles" asp-route-id="@Model.Id">
+            <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
                 <label for="InputRole" class="form-label">Изменить роль</label>
                 <input type="text" class="form-control" id="InputRole" name="name" value="@Model.Name">
+                <span asp-validation-for="Name"></span>
             </div>
              <div class="mb-3">
                 <label for="inputDescription" class="form-label">Описание</label>
                 <textarea class="form-control" id="inputDescription" rows="3" name="description">@Model.Description</textarea>
+                <span asp-validation-for="Description"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
         </form>
         <p><a asp-area="" asp-controller="Roles" asp-action="index">Перейти к списку всех ролей</a></p>
     </div>
 </div>
+
+@section Scripts
+    {@{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }}

@@ -1,5 +1,5 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
-using BlogWebApp.BLL.Models.ViewModels;
+using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
