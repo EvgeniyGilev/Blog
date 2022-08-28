@@ -31,11 +31,11 @@
                 <label for="exampleInputPassword1" class="form-label">Пароль</label>
                 <input type="password" class="form-control" id="exampleInputPassword1" asp-for="UserPassword" value="@Model.UserPassword">
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
         </form>
         <br>
         <form method="post" asp-action="Delete" asp-action="User" asp-route-id="@Model.Id">
-            <button type="submit" class="btn btn-sm btn-danger float-right btn-mrg">Удалить</button>
+            <button type="submit" class="btn btn-sm btn-danger btn-sm">Удалить</button>
         </form>
 
     </div>

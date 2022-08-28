@@ -1,5 +1,5 @@
 ﻿@using BlogWebApp.BLL.Models.Entities
-@model Tag[]
+@model IEnumerable<Tag>
 @{
     ViewData["Title"] = "GetTags";
 }
@@ -12,7 +12,7 @@
         <div class="card-body">
             <h5 class="card-title">@tag.tagText</h5>
             <p class="card-text">Статей по тегу: @tag.Posts.Count.ToString()</p>
-            <a class="btn btn-outline-secondary" asp-controller="Tag" asp-action="Edit" asp-route-id="@tag.id">Редактировать</a>
+            <a class="btn btn-outline-secondary btn-sm" asp-controller="Tag" asp-action="Edit" asp-route-id="@tag.id">Редактировать</a>
         </div>
     </div>
 }

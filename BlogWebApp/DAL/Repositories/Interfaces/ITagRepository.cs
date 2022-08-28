@@ -7,7 +7,7 @@ namespace BlogWebApp.DAL.Repositories.Interfaces
         Task CreateTag(Tag tag);
         Task EditTag(Tag tag, int id);
         Task DelTag(Tag tag);
-        Task<Tag[]> GetTags();
+        Task<List<Tag>> GetTags();
         Task<Tag?> GetTagById(int id);
     }
 }

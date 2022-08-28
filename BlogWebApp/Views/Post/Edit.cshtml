@@ -1,25 +1,40 @@
-﻿<div class="text-start">
+﻿@using Microsoft.AspNetCore.Identity
+@using BlogWebApp.BLL.Models.Entities
+@model BlogWebApp.BLL.Models.ViewModels.EditPostViewModel
+
+@{
+    ViewData["Title"] = "Добавление тега";
+}
+
+<div class="text-start">
     <div>
-        <h3 style="text-align: left">Редактирование статьи</h3>
-        <form method="post">
-            <div class="form-check-inline">
-                <input class="form-check-input" type="checkbox" value="" id="tagCheck1">
-                <label class="form-check-label" for="tagCheck1">Разработка</label>
-            </div>
-            <div class="form-check-inline">
-                <input class="form-check-input" type="checkbox" value="" id="tagCheck2">
-                <label class="form-check-label" for="tagCheck2">.Net Core</label>
-            </div>
-            <div class="mb-3">
-                <label for="InputPost" class="form-label">Заголовок</label>
-                <input type="text" class="form-control" id="InputPost">
-            </div>
-            <div class="mb-3">
-                <label for="inputContent" class="form-label">Контент</label>
-                <textarea class="form-control" id="inputContent" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-        </form>
-        <p><a asp-area="" asp-controller="Role" asp-action="GetRoles">Перейти к списку всех статей</a></p>
+        <h3 style="text-align: left">Добавление статьи</h3>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form method="post" asp-action="Create" asp-controller="Post">
+                <div class="mb-3">
+                    <label for="InputPost" class="form-label">Заголовок</label>
+                    <input type="text" class="form-control" id="InputPost" asp-for="PostName" value="@Model.PostName">
+                </div>
+                <div class="form-group">
+                    @foreach (Tag tag in Model.PostTags)
+                    {
+                        <input type="checkbox" name="postTags" value="@tag.tagText" @(Model.PostTags.Contains(tag) ? "checked=\"checked\"" : "") />
+
+                        @tag.tagText <br />
+                    }
+                </div>
+                <div class="mb-3">
+                    <label for="inputContent" class="form-label">Контент</label>
+                    <textarea class="form-control" id="inputContent" rows="3" asp-for="PostText">@Model.PostText"</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="InputAuthor" class="form-label">Автор</label>
+                    <input type="text" class="form-control" id="InputAuthor" value="@User.Identity.Name" readonly>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+            </form>
+        }
+        <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>

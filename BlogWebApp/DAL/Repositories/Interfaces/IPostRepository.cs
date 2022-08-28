@@ -8,7 +8,7 @@ namespace BlogWebApp.DAL.Repositories.Interfaces
         Task EditPost(Post post);
         Task DelPost(Post post);
         Task<Post[]> GetPosts();
-        Task<Post[]> GetPostsByUserId(int id);
+        Task<Post[]> GetPostsByUserId(string id);
         Task<Post?> GetPostById(int id);
 
     }

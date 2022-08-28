@@ -7,5 +7,10 @@
 
         //ссылка на статьи
         public virtual List<Post> Posts { get; set; } = new();
+
+        public Tag(string tagText)
+        {
+            this.tagText = tagText;
+        }
     }
 }

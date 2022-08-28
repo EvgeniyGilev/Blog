@@ -8,7 +8,6 @@
         public string ?postCreateDate { get; set; }
 
         //ссылка на пользователя
-        public int UserId { get; set; }
         public virtual User? User { get; set; }
 
         //ссылка на теги

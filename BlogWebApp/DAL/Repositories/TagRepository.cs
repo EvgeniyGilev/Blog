@@ -61,10 +61,10 @@ namespace BlogWebApp.DAL.Repositories
             return tagById;
         }
 
-        public async Task<Tag[]> GetTags()
+        public async Task<List<Tag>> GetTags()
         {
             // Получим все статьи
-            return await _context.Tag.Include(t => t.Posts).ToArrayAsync();
+            return await _context.Tag.Include(t => t.Posts).ToListAsync();
         }
     }
 }

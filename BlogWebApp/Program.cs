@@ -36,7 +36,7 @@ builder.Services.Configure<PasswordHasherOptions>(options =>
     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
 );
 
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+
 builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<ITagRepository, TagRepository>();
 builder.Services.AddSingleton<IPostRepository, PostRepository>();

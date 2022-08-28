@@ -1,7 +1,8 @@
-﻿using AutoMapper;
-using BlogWebApp.BLL.Models.Entities;
+﻿using BlogWebApp.BLL.Models.Entities;
+using BlogWebApp.BLL.Models.ViewModels;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
@@ -12,10 +13,14 @@ namespace BlogWebApp.BLL.Controllers
     {
 
         private readonly IPostRepository _repo;
+        private readonly ITagRepository _repotags;
+        private readonly UserManager<User> _userManager;
 
-        public PostController(IPostRepository repo)
+        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager)
         {
             _repo = repo;
+            _repotags = repotags;
+            _userManager = userManager;
         }
 
         //получить все статьи
@@ -42,7 +47,7 @@ namespace BlogWebApp.BLL.Controllers
         // GET: PostController
         [HttpGet]
         [Route("GetPostsByUserId")]
-        public async Task<IActionResult> GetPostsByUserId(int id)
+        public async Task<IActionResult> GetPostsByUserId(string id)
         {
             var posts = await _repo.GetPostsByUserId(id);
 
@@ -51,29 +56,71 @@ namespace BlogWebApp.BLL.Controllers
 
         [HttpGet]
         [Route("Create")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            CreatePostViewModel model = new CreatePostViewModel
+            {
+                PostTags = await _repotags.GetTags()
+            };
+            return View(model);
         }
         // GET: PostController/Create
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> Create([FromForm] Post newPost)
+        public async Task<IActionResult> Create([FromForm] CreatePostViewModel newPost, [FromForm] List<string> postTags)
         {
-            await _repo.CreatePost(newPost);
+            var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == newPost.PostAuthorEmail);
+            if (searchuser != null)
+            {
+                List<Tag> _posttags = new List<Tag>();
+
+                foreach (var tag in postTags)
+                {
+                    _posttags.Add(new Tag(tag));
+                }
+
+                Post post = new Post
+                {
+                    postName = newPost.PostName,
+                    postText = newPost.PostText,
+                    User = searchuser,
+                    Tags = _posttags
+                };
+                await _repo.CreatePost(post);
+            }
+
             return RedirectToAction("GetPosts");
         }
 
 
         [HttpGet]
-        [Route("Edit")]
-        public IActionResult Edit()
+        [Route("Edit/{Id}")]
+        public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            return View();
+            var post = await _repo.GetPostById(id);
+
+            //редактировать статью может только автор или администратор
+            if ((User.Identity.Name == post.User.UserName)|| User.IsInRole("Администратор"))
+            {
+         
+            EditPostViewModel model = new EditPostViewModel
+            {
+                PostName=post.postName,
+                PostText=post.postText,
+                PostTags=post.Tags
+
+            };
+
+            return View(model);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Home");
+            }
         }
         // Put: PostController/Edit/5
-        [HttpPut]
-        [Route("Edit")]
+        [HttpPost]
+        [Route("Edit/{Id}")]
         public async Task<IActionResult> Edit([FromForm] Post newPost)
         {
             await _repo.EditPost(newPost);
