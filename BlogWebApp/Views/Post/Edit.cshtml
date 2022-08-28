@@ -13,9 +13,11 @@
         @if (User.Identity.IsAuthenticated)
         {
             <form method="post" asp-action="Edit" asp-controller="Post" asp-route-id="@Model.PostId">
+                <div asp-validation-summary="ModelOnly"></div>
                 <div class="mb-3">
                     <label for="InputPost" class="form-label">Заголовок</label>
                     <input type="text" class="form-control" id="InputPost" asp-for="PostName" value="@Model.PostName">
+                    <span asp-validation-for="PostName"></span>
                 </div>
                 <div class="form-group">
                     @foreach (Tag tag in Model.PostTagsAll)
@@ -28,6 +30,7 @@
                 <div class="mb-3">
                     <label for="inputContent" class="form-label">Контент</label>
                     <textarea class="form-control" id="inputContent" rows="3" asp-for="PostText">@Model.PostText"</textarea>
+                    <span asp-validation-for="PostText"></span>
                 </div>
                 <div class="mb-3">
                     <label for="InputAuthor" class="form-label">Автор</label>
@@ -44,3 +47,9 @@
         <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>
+@section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

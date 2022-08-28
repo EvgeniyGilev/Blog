@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlogWebApp.BLL.Models.ViewModels.RoleViews
+
 {
 
     public class EditeRoleViewModel

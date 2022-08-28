@@ -35,8 +35,10 @@
         }
         <hr class="mt-2 mb-3" />
         <form method="post" asp-action="Create" asp-controller="Comment" asp-route-id="@Model.PostId">
+            <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
                 <textarea class="form-control" id="inputDescription" rows="3" asp-for="Comment"></textarea>
+                <span asp-validation-for="Comment"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">
                 Оставить комментарий
@@ -45,3 +47,9 @@
         <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>
+@section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

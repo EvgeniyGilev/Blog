@@ -62,7 +62,13 @@ namespace BlogWebApp.BLL.Controllers
         {
             var tag = await _repo.GetTagById(id);
 
-            return View(tag);
+            EditeTagViewModel model = new EditeTagViewModel
+            {
+                id = id,
+                tagText = tag.tagText
+            };
+
+            return View(model);
         }
 
         // GET: TagController/Edit

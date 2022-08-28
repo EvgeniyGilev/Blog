@@ -10,12 +10,12 @@
             <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
                 <label for="InputRole" class="form-label">Изменить роль</label>
-                <input type="text" class="form-control" id="InputRole" name="name" value="@Model.Name">
+                <input type="text" class="form-control" id="InputRole" asp-for="Name" value="@Model.Name">
                 <span asp-validation-for="Name"></span>
             </div>
              <div class="mb-3">
                 <label for="inputDescription" class="form-label">Описание</label>
-                <textarea class="form-control" id="inputDescription" rows="3" name="description">@Model.Description</textarea>
+                <textarea class="form-control" id="inputDescription" rows="3" asp-for="Description">@Model.Description</textarea>
                 <span asp-validation-for="Description"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
@@ -25,6 +25,8 @@
 </div>
 
 @section Scripts
-    {@{
+    {
+    @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }}
+    }
+    }
