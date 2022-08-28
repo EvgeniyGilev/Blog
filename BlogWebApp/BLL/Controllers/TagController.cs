@@ -1,6 +1,6 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.DAL.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
+using BlogWebApp.BLL.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
@@ -49,9 +49,10 @@ namespace BlogWebApp.BLL.Controllers
         // GET: TagController/Create
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> Create([FromForm] Tag newTag)
+        public async Task<IActionResult> Create([FromForm] CreateTagViewModel newTag)
         {
-            await _repo.CreateTag(newTag);
+            Tag tag = new Tag(newTag.tagText);
+            await _repo.CreateTag(tag);
             return RedirectToAction("GetTags");
         }
 

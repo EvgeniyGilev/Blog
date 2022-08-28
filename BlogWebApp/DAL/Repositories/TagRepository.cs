@@ -31,7 +31,7 @@ namespace BlogWebApp.DAL.Repositories
         public async Task DelTag(Tag tag)
         {
 
-            // Удаление пользователя
+            // Удаление тега
             var dbtag = _context.Tag.Where(u => u.tagText == tag.tagText).First();
             if (dbtag != null)
                 _context.Tag.Remove(dbtag);
@@ -65,6 +65,14 @@ namespace BlogWebApp.DAL.Repositories
         {
             // Получим все статьи
             return await _context.Tag.Include(t => t.Posts).ToListAsync();
+        }
+
+        //получаем тег по имени
+        public async Task<Tag?> GetTagByName(string Name)
+        {
+            var tagByName = await _context.Tag.FirstOrDefaultAsync(t => t.tagText == Name);
+
+            return tagByName;
         }
     }
 }

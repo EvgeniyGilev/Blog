@@ -9,5 +9,7 @@ namespace BlogWebApp.DAL.Repositories.Interfaces
         Task DelTag(Tag tag);
         Task<List<Tag>> GetTags();
         Task<Tag?> GetTagById(int id);
+        Task<Tag?> GetTagByName(string Name);
+
     }
 }

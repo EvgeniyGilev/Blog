@@ -26,11 +26,17 @@ namespace BlogWebApp.BLL.Controllers
         //получить все статьи
         // GET: PostController
         [HttpGet]
-        [Route("GetPost")]
-        public async Task<IActionResult> GetPost(int id)
+        [Route("GetPost/{Id}")]
+        public async Task<IActionResult> GetPost([FromRoute] int id)
         {
             var post = await _repo.GetPostById(id);
-            return View(post);
+            if (post != null)
+            {
+                ShowPostAndCommentViewModel model = new ShowPostAndCommentViewModel { ShowPost = post, PostId=id };
+                return View(model);
+            }
+
+            return RedirectToAction("GetPosts");
         }
 
         //получить все статьи
@@ -40,7 +46,13 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> GetPosts()
         {
             var posts = await _repo.GetPosts();
-            return View(posts);
+            ShowPostsViewModel model = new ShowPostsViewModel
+            {
+
+                ShowPosts = posts
+            };
+
+            return View(model);
         }
 
         //получить все статьи одного пользователя
@@ -76,7 +88,9 @@ namespace BlogWebApp.BLL.Controllers
 
                 foreach (var tag in postTags)
                 {
-                    _posttags.Add(new Tag(tag));
+                    Tag newtag = await _repotags.GetTagByName(tag);
+                    if (newtag != null)
+                        _posttags.Add(newtag);
                 }
 
                 Post post = new Post
@@ -100,18 +114,19 @@ namespace BlogWebApp.BLL.Controllers
             var post = await _repo.GetPostById(id);
 
             //редактировать статью может только автор или администратор
-            if ((User.Identity.Name == post.User.UserName)|| User.IsInRole("Администратор"))
+            if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
             {
-         
-            EditPostViewModel model = new EditPostViewModel
-            {
-                PostName=post.postName,
-                PostText=post.postText,
-                PostTags=post.Tags
 
-            };
+                EditPostViewModel model = new EditPostViewModel
+                {
+                    PostName = post.postName,
+                    PostText = post.postText,
+                    PostTagsCurrent = post.Tags,
+                    PostTagsAll = await _repotags.GetTags(),
+                    PostId = id
+                };
 
-            return View(model);
+                return View(model);
             }
             else
             {
@@ -121,26 +136,53 @@ namespace BlogWebApp.BLL.Controllers
         // Put: PostController/Edit/5
         [HttpPost]
         [Route("Edit/{Id}")]
-        public async Task<IActionResult> Edit([FromForm] Post newPost)
+        public async Task<IActionResult> Edit([FromForm] EditPostViewModel newPost, [FromForm] List<string> postTags, [FromRoute] int id)
         {
-            await _repo.EditPost(newPost);
-            return View(newPost);
+
+            List<Tag> _posttags = new List<Tag>();
+
+            foreach (var tag in postTags)
+            {
+                Tag newtag = await _repotags.GetTagByName(tag);
+                if (newtag != null)
+                    _posttags.Add(newtag);
+            }
+
+            var post = await _repo.GetPostById(id);
+
+            post.postName = newPost.PostName;
+            post.postText = newPost.PostText;
+            post.Tags = _posttags;
+
+            await _repo.EditPost(post, id);
+
+            return RedirectToAction("GetPosts");
+
         }
 
 
         // GET: PostController/Delete/5
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete/{Id}")]
-        public async Task<IActionResult> DeletePost([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
             var post = await _repo.GetPostById(id);
-            if (post == null) { return RedirectToAction(nameof(Index)); }
+            //удалить статью может только автор или администратор
+            if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+            {
+                if (post == null) { return RedirectToAction(nameof(Index)); }
+                else
+                {
+                    await _repo.DelPost(post);
+                    return RedirectToAction("GetPosts");
+                }
+            }
             else
             {
-                await _repo.DelPost(post);
-                return View(post);
+                return RedirectToAction("AccessDenied", "Home");
             }
+
         }
 
     }

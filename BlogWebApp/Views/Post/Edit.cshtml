@@ -3,23 +3,23 @@
 @model BlogWebApp.BLL.Models.ViewModels.EditPostViewModel
 
 @{
-    ViewData["Title"] = "Добавление тега";
+    ViewData["Title"] = "Редактирование статьи";
 }
 
 <div class="text-start">
     <div>
-        <h3 style="text-align: left">Добавление статьи</h3>
+        <h3 style="text-align: left">Редактирование статьи</h3>
         @if (User.Identity.IsAuthenticated)
         {
-            <form method="post" asp-action="Create" asp-controller="Post">
+            <form method="post" asp-action="Edit" asp-controller="Post" asp-route-id="@Model.PostId">
                 <div class="mb-3">
                     <label for="InputPost" class="form-label">Заголовок</label>
                     <input type="text" class="form-control" id="InputPost" asp-for="PostName" value="@Model.PostName">
                 </div>
                 <div class="form-group">
-                    @foreach (Tag tag in Model.PostTags)
+                    @foreach (Tag tag in Model.PostTagsAll)
                     {
-                        <input type="checkbox" name="postTags" value="@tag.tagText" @(Model.PostTags.Contains(tag) ? "checked=\"checked\"" : "") />
+                        <input type="checkbox" name="postTags" value="@tag.tagText" @(Model.PostTagsCurrent.Contains(tag) ? "checked=\"checked\"" : "") />
 
                         @tag.tagText <br />
                     }
@@ -32,7 +32,12 @@
                     <label for="InputAuthor" class="form-label">Автор</label>
                     <input type="text" class="form-control" id="InputAuthor" value="@User.Identity.Name" readonly>
                 </div>
-                <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+                <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+            </form>
+            <form method="post" asp-action="Delete" asp-controller="Post" asp-route-id="@Model.PostId">
+                <button type="submit" class="btn btn-danger btn-sm">
+                    Удалить
+                </button>
             </form>
         }
         <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>

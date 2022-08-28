@@ -50,5 +50,10 @@ namespace BlogWebApp.BLL.Controllers
         {
             return View("403");
         }
+
+        public IActionResult InternalError()
+        {
+            return View("500");
+        }
     }
 }

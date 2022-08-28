@@ -32,23 +32,29 @@ namespace BlogWebApp.DAL.Repositories
         public async Task DelPost(Post post)
         {
             // Удаление статьи
-            var entry = _context.Entry(post);
-            if (entry.State == EntityState.Detached)
-                _context.Post.Remove(post);
+            var dbpost = _context.Post.Where(u => u.id == post.id).First();
+            if (dbpost != null)
+                _context.Post.Remove(dbpost);
 
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditPost(Post post)
+        public async Task EditPost(Post post,int id)
         {
             // редактирование статьи
-            var entry = _context.Entry(post);
-            if (entry.State == EntityState.Detached)
-                _context.Post.Update(post);
+
+            var dbpost = _context.Post.Where(u => u.id == id).First();
+            if (dbpost != null)
+            {
+                dbpost.postName = post.postName;
+                dbpost.postText = post.postText;
+                dbpost.Tags = post.Tags;
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();
+
         }
 
         public async Task<Post[]> GetPosts()

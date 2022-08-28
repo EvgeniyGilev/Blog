@@ -1,14 +1,16 @@
-﻿@using BlogWebApp.BLL.Models.Entities
-@model Post[]
+﻿@using Microsoft.AspNetCore.Identity
+@using BlogWebApp.BLL.Models.Entities
+@model BlogWebApp.BLL.Models.ViewModels.ShowPostsViewModel
+
 @{
     ViewData["Title"] = "GetPosts";
 }
 <div class="text-start">
     <h3>Все статьи</h3>
     <p><a asp-area="" asp-controller="Post" asp-action="Create">Добавить статью</a></p>
-    @foreach (Post post in Model)
+    @foreach (Post post in Model.ShowPosts)
     {
-        <div class="card" style="width: 18rem;">
+        <div class="card w-auto p-3" style="width: 18rem;">
             <div class="card-body">
                 <p><a asp-controller="Post" asp-action="GetPost" asp-route-id="@post.id">@post.postName</a></p>
                 @foreach (Tag tag in @post.Tags)
@@ -16,17 +18,13 @@
                     <span class="badge bg-info text-dark">@tag.tagText</span>
                 }
                 <br />
+                <p class="card-text">@Model.MiniPost(post)</p>
                 <form asp-action="Edit" asp-controller="Post" asp-route-id="@post.id" method="get">
                     <button type="submit" class="btn btn-outline-secondary btn-sm">
                         Редактировать
                     </button>
                 </form>
                 <br />
-                <form asp-action="Delete" asp-route-id="@post.id" asp-controller="Post" method="post">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                        Удалить
-                    </button>
-                </form>
             </div>
         </div>
     }

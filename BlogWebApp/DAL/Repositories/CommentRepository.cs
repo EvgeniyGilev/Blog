@@ -32,9 +32,10 @@ namespace BlogWebApp.DAL.Repositories
         // Удаление комментария
         public async Task DelComment(Comment comment)
         {
-            var entry = _context.Entry(comment);
-            if (entry.State == EntityState.Detached)
-                _context.Comment.Remove(comment);
+            // Удаление комментария
+            var dbcomment = _context.Comment.Where(u => u.id == comment.id).First();
+            if (dbcomment != null)
+                _context.Comment.Remove(dbcomment);
 
             // Сохранение изменений
             await _context.SaveChangesAsync();

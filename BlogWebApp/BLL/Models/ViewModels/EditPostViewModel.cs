@@ -9,7 +9,9 @@ namespace BlogWebApp.BLL.Models.ViewModels
     {
         public string PostName { get; set; }
         public string PostText { get; set; }
-        public List<Tag> PostTags{ get; set; }
+        public int PostId { get; set; }
+        public List<Tag> ?PostTagsCurrent{ get; set; }
+        public List<Tag> ?PostTagsAll { get; set; }
 
     }
 }

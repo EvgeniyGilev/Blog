@@ -1,7 +1,9 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
+using BlogWebApp.BLL.Models.ViewModels;
 using BlogWebApp.DAL.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -10,56 +12,59 @@ namespace BlogWebApp.BLL.Controllers
     public class CommentController : Controller
     {
         private readonly ICommentRepository _repo;
+        private readonly IPostRepository _repoposts;
+        private readonly UserManager<User> _userManager;
 
-        public CommentController(ICommentRepository repo)
+        public CommentController(ICommentRepository repo, IPostRepository repoposts, UserManager<User> userManager)
         {
             _repo = repo;
+            _repoposts = repoposts;
+            _userManager = userManager;
         }
 
-        //получить все комментарии
-        // GET: CommentController
-        [HttpGet]
-        [Route("GetComments")]
-        public async Task<IActionResult> GetComments()
-        {
-            var comments = await _repo.GetComments();
-            return View(comments);
-        }
 
-        //получить комментарий по id
-        // GET: CommentController
-        [HttpGet]
-        [Route("GetCommentById")]
-        public async Task<IActionResult> GetCommentById(int id)
-        {
-            var comment = await _repo.GetCommentById(id);
-
-            return View(comment);
-        }
 
         // GET: CommentController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(Comment newComment)
+        [Route("Create/{Id}")]
+        public async Task<IActionResult> Create([FromForm] ShowPostAndCommentViewModel newComment, [FromRoute] int id)
         {
-            await _repo.CreateComment(newComment);
-            return View(newComment);
-        }
+            if (User.Identity.IsAuthenticated)
+            {
+                ClaimsPrincipal currentUser = User;
+                var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
 
+                var user = await _userManager.FindByIdAsync(currentUserID);
+                if (user != null)
+                {
+                    var post = await _repoposts.GetPostById(id);
+                    if (post != null)
+                    {
 
-        // GET: CommentController/Edit/5
-        [HttpPut]
-        [Route("Edit")]
-        public async Task<IActionResult> Edit(Comment newComment)
-        {
-            await _repo.EditComment(newComment);
-            return View(newComment);
+                        Comment comment = new Comment();
+                        comment.commentTexte = newComment.Comment;
+                        comment.Post = post;
+                        comment.User = user;
+
+                        await _repo.CreateComment(comment);
+                        return RedirectToAction("GetPost", "Post", new { id = id });
+                    }
+                    return RedirectToAction("InternalError", "Home");
+                }
+                return RedirectToAction("InternalError", "Home");
+            }
+            else
+            {
+                return RedirectToAction("InternalError", "Home");
+            }
+
         }
 
 
         // GET: CommentController/Delete/5
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete/{Id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, int PostId)
         {
 
             var comment = await _repo.GetCommentById(id);
@@ -67,7 +72,7 @@ namespace BlogWebApp.BLL.Controllers
             else
             {
                 await _repo.DelComment(comment);
-                return View(comment);
+                return RedirectToAction("GetPost", "Post", new { id = PostId });
             }
         }
     }

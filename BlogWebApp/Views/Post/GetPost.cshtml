@@ -1,33 +1,46 @@
-﻿@using BlogWebApp.BLL.Models.Entities
-@model Post
+﻿@using Microsoft.AspNetCore.Identity
+@using BlogWebApp.BLL.Models.Entities
+@model BlogWebApp.BLL.Models.ViewModels.ShowPostAndCommentViewModel
 @{
     ViewData["Title"] = "GetPost";
 }
 
 <div class="text-start">
     <div>
-        <h3>@Model.postName</h3>
-        @foreach (Tag tag in @Model.Tags)
+        <h3>@Model.ShowPost.postName</h3>
+        @foreach (Tag tag in @Model.ShowPost.Tags)
         {
             <span class="badge bg-info text-dark">@tag.tagText</span>
         }
-        <p class="lh-1">@Model.postText</p>
-        <p class="text-end">@Model.User.UserFirstName @Model.User.UserLastName</p>
-        
-        <hr class="mt-2 mb-3"/>
+        <p class="lh-sm">@Model.ShowPost.postText</p>
+        <p class="text-end">@Model.ShowPost.User.UserFirstName @Model.ShowPost.User.UserLastName</p>
+
+        <hr class="mt-2 mb-3" />
 
         <h6>Комментарии к статье</h6>
-        @foreach (Comment com in @Model.Comments)
+        @foreach (Comment com in @Model.ShowPost.Comments)
         {
             <p class="text-left">@com.commentTexte</p>
+            @if (User.IsInRole("Администратор"))
+            {
+                <form asp-action="Delete" asp-route-id="@com.id" asp-route-Postid =@Model.PostId asp-controller="Comment" method="post">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        Удалить комментарий
+                    </button>
+                </form>
+            }
             <p class="text-end">@com.User.UserFirstName @com.User.UserLastName</p>
-            
+
         }
-        <hr class="mt-2 mb-3"/>
-        <div class="mb-3">
-            <textarea class="form-control" id="inputDescription" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-sm" asp-area="" asp-controller="Comment" asp-action="Create">Оставить комментарий</button>
+        <hr class="mt-2 mb-3" />
+        <form method="post" asp-action="Create" asp-controller="Comment" asp-route-id="@Model.PostId">
+            <div class="mb-3">
+                <textarea class="form-control" id="inputDescription" rows="3" asp-for="Comment"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+                Оставить комментарий
+            </button>
+        </form>
         <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>

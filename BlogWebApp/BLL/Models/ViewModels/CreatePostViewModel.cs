@@ -10,7 +10,7 @@ namespace BlogWebApp.BLL.Models.ViewModels
         public string PostName { get; set; }
         public string PostText { get; set; }
         public string PostAuthorEmail { get; set; }
-        public List<Tag> PostTags{ get; set; }
+        public List<Tag> ?PostTags{ get; set; }
 
     }
 }
