@@ -219,26 +219,31 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([FromForm] User user)
+        public async Task<IActionResult> Login([FromForm] LoginUserViewModel user)
         {
 
-            var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == user.Email);
-
-            if (searchuser != null)
+            if (ModelState.IsValid)
             {
-                var result = await _signInManager.CanSignInAsync(searchuser);
+                var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == user.Email);
 
-                if (result)
+                if (searchuser != null)
                 {
-                    await _signInManager.SignInAsync(searchuser, false);
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Неправильный логин и (или) пароль");
+                    var result = await _signInManager.PasswordSignInAsync(user.Email, user.Password, true, false);
+
+
+                    if (result.Succeeded)
+                    {
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Неправильный логин и (или) пароль");
+                        return View();
+                    }
                 }
             }
-
+           
             return RedirectToAction("Index", "Home");
         }
 

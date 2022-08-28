@@ -1,6 +1,6 @@
-﻿@using BlogWebApp.BLL.Models.Entities
+﻿@using BlogWebApp.BLL.Models.ViewModels
 
-@model BlogWebApp.BLL.Models.Entities.User
+@model LoginUserViewModel
 
 @{
     ViewData["Title"] = "Добавление пользователя";
@@ -9,16 +9,25 @@
 <div class="text-start">
     <div>
         <form method="post" asp-controller="User" asp-action="Login">
+            <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
                 <label for="login" class="form-label">Почтовый адрес</label>
                 <input type="email" class="form-control" id="login" asp-for="Email">
+                <span asp-validation-for="Email"></span>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="password" asp-for="UserPassword">
+                <input type="password" class="form-control" id="password" asp-for="Password">
+                <span asp-validation-for="Password"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Войти</button>
         </form>
         <p>Еще нет аккаунта? <a asp-controller="User" asp-action="Register">Зарегистрируйтесь!</a></p>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
