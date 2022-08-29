@@ -6,21 +6,33 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using BlogWebApp.BLL.Models.Entities;
+using NLog;
+using NLog.Web;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("Старт приложения");
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+try
+{
 
-builder.Services.AddControllers();
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Add services to the container.
+    builder.Services.AddControllersWithViews();
+
+    builder.Services.AddControllers();
+
+    // NLog: Setup NLog for Dependency injection
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
 
 
-builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" }); });
+    builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" }); });
 
-var assembly = Assembly.GetAssembly(typeof(MappingProfile));
-builder.Services.AddAutoMapper(assembly);
+    var assembly = Assembly.GetAssembly(typeof(MappingProfile));
+    builder.Services.AddAutoMapper(assembly);
 
-builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies").AddCookie("Cookies", options =>
+    builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies").AddCookie("Cookies", options =>
 {
     options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
     {
@@ -105,3 +117,16 @@ app.UseEndpoints(endpoints =>
 
 
 app.Run();
+
+}
+catch (Exception exception)
+{
+    // NLog: catch setup errors
+    logger.Error(exception, "Остановка программы, ошибка");
+    throw;
+}
+finally
+{
+    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+    NLog.LogManager.Shutdown();
+}

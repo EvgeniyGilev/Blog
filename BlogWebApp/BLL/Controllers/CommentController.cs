@@ -14,12 +14,14 @@ namespace BlogWebApp.BLL.Controllers
         private readonly ICommentRepository _repo;
         private readonly IPostRepository _repoposts;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<CommentController> _logger;
 
-        public CommentController(ICommentRepository repo, IPostRepository repoposts, UserManager<User> userManager)
+        public CommentController(ICommentRepository repo, IPostRepository repoposts, UserManager<User> userManager, ILogger<CommentController> logger)
         {
             _repo = repo;
             _repoposts = repoposts;
             _userManager = userManager;
+            _logger = logger;
         }
 
 

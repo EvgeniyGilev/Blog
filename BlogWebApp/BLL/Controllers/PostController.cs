@@ -14,16 +14,22 @@ namespace BlogWebApp.BLL.Controllers
 
         private readonly IPostRepository _repo;
         private readonly ITagRepository _repotags;
+        private readonly ILogger<PostController> _logger;
         private readonly UserManager<User> _userManager;
 
-        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager)
+        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger)
         {
             _repo = repo;
             _repotags = repotags;
             _userManager = userManager;
+            _logger = logger;
         }
 
-        //получить все статьи
+        /// <summary>
+        /// получить статью по ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: PostController
         [HttpGet]
         [Route("GetPost/{Id}")]
@@ -33,13 +39,17 @@ namespace BlogWebApp.BLL.Controllers
             if (post != null)
             {
                 ShowPostAndCommentViewModel model = new ShowPostAndCommentViewModel { ShowPost = post, PostId=id };
+                _logger.LogInformation("Получаем статью с ID: "+ id.ToString());
                 return View(model);
             }
-
+            _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
             return RedirectToAction("GetPosts");
         }
 
-        //получить все статьи
+        /// <summary>
+        /// получить все статьи
+        /// </summary>
+        /// <returns></returns>
         // GET: PostController
         [HttpGet]
         [Route("GetPosts")]
@@ -48,21 +58,24 @@ namespace BlogWebApp.BLL.Controllers
             var posts = await _repo.GetPosts();
             ShowPostsViewModel model = new ShowPostsViewModel
             {
-
                 ShowPosts = posts
             };
-
+            _logger.LogInformation("Страница со ");
             return View(model);
         }
 
-        //получить все статьи одного пользователя
+        /// <summary>
+        /// получить все статьи одного пользователя
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: PostController
         [HttpGet]
         [Route("GetPostsByUserId")]
         public async Task<IActionResult> GetPostsByUserId(string id)
         {
             var posts = await _repo.GetPostsByUserId(id);
-
+            _logger.LogInformation("Получить все статьи пользователя с id: " + id);
             return View(posts);
         }
 
@@ -74,6 +87,7 @@ namespace BlogWebApp.BLL.Controllers
             {
                 PostTags = await _repotags.GetTags()
             };
+            _logger.LogInformation("открываем страницу создания новой статьи");
             return View(model);
         }
         // GET: PostController/Create
@@ -100,7 +114,9 @@ namespace BlogWebApp.BLL.Controllers
                     User = searchuser,
                     Tags = _posttags
                 };
+                
                 await _repo.CreatePost(post);
+                _logger.LogInformation("новая статья добавлена: " + post.postName);
             }
 
             return RedirectToAction("GetPosts");
@@ -125,7 +141,7 @@ namespace BlogWebApp.BLL.Controllers
                     PostTagsAll = await _repotags.GetTags(),
                     PostId = id
                 };
-
+                _logger.LogInformation("Статья отредактирована: " + post.postName);
                 return View(model);
             }
             else
@@ -154,7 +170,9 @@ namespace BlogWebApp.BLL.Controllers
             post.postText = newPost.PostText;
             post.Tags = _posttags;
 
+            
             await _repo.EditPost(post, id);
+            _logger.LogInformation("Статья отредактирована: " + post.postName);
 
             return RedirectToAction("GetPosts");
 
@@ -175,6 +193,7 @@ namespace BlogWebApp.BLL.Controllers
                 else
                 {
                     await _repo.DelPost(post);
+                    _logger.LogInformation("Статья удалена: " + post.postName);
                     return RedirectToAction("GetPosts");
                 }
             }

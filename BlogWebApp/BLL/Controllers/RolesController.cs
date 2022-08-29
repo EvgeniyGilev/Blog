@@ -12,12 +12,18 @@ namespace CustomIdentityApp.Controllers
     {
         RoleManager<Role> _roleManager;
         UserManager<User> _userManager;
-        public RolesController(RoleManager<Role> roleManager, UserManager<User> userManager)
+        private readonly ILogger<RolesController> _logger;
+        public RolesController(RoleManager<Role> roleManager, UserManager<User> userManager, ILogger<RolesController> logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _logger = logger;
         }
-        public IActionResult Index() => View(_roleManager.Roles.ToList());
+        public IActionResult Index()
+        {
+            _logger.LogInformation("Показываем все доступные роли");
+            return View(_roleManager.Roles.ToList());
+        }
 
         public IActionResult Create() => View();
         [HttpPost]
@@ -29,6 +35,7 @@ namespace CustomIdentityApp.Controllers
                 IdentityResult result = await _roleManager.CreateAsync(new Role { Name = newRole.Name, Description = newRole.Description });
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation("Новая роль добавлена: " + newRole.Name);
                     return RedirectToAction("Index");
                 }
                 else
@@ -37,6 +44,7 @@ namespace CustomIdentityApp.Controllers
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
+                    _logger.LogWarning("Роль не добавлена: " + newRole.Name);
                 }
             }
             return View();
@@ -49,11 +57,16 @@ namespace CustomIdentityApp.Controllers
             if (role != null)
             {
                 IdentityResult result = await _roleManager.DeleteAsync(role);
+                _logger.LogInformation("Роль удалена: " + role.Name);
             }
             return RedirectToAction("Index");
         }
 
-        public IActionResult UserList() => View(_userManager.Users.ToList());
+        public IActionResult UserList()
+        {
+            _logger.LogInformation("Список пользователей и их прав" );
+            return View(_userManager.Users.ToList());
+        }
 
         [HttpGet]
         public async Task<IActionResult> Edit(string userId)
@@ -72,6 +85,7 @@ namespace CustomIdentityApp.Controllers
                     UserRoles = userRoles,
                     AllRoles = allRoles
                 };
+                _logger.LogInformation("Форма изменения ролей пользователя: " + user.Email);
                 return View(model);
             }
 
@@ -97,6 +111,8 @@ namespace CustomIdentityApp.Controllers
 
                 await _userManager.RemoveFromRolesAsync(user, removedRoles);
 
+                _logger.LogInformation("Изменили права пользователя: " + user.Email);
+
                 return RedirectToAction("UserList");
             }
 
@@ -116,7 +132,7 @@ namespace CustomIdentityApp.Controllers
                     Name = role.Name,
                     Description = role.Description
                 };
-
+                _logger.LogInformation("Форма изменения роли: " + role.Name);
                 return View(model);
             }
 
@@ -134,6 +150,7 @@ namespace CustomIdentityApp.Controllers
                 role.Name = newRole.Name;
                 role.Description = newRole.Description;
                 IdentityResult result = await _roleManager.UpdateAsync(role);
+                _logger.LogInformation("изменили роль: " + role.Name);
             }
             return RedirectToAction("Index");
         }

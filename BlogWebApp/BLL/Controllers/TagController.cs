@@ -11,31 +11,41 @@ namespace BlogWebApp.BLL.Controllers
     {
 
         private readonly ITagRepository _repo;
+        private readonly ILogger<TagController> _logger;
 
-        public TagController(ITagRepository repo)
+        public TagController(ITagRepository repo, ILogger<TagController> logger)
         {
             _repo = repo;
+            _logger = logger;
         }
 
-        //получить все комментарии
+        /// <summary>
+        ///  получить все теги
+        /// </summary>
+        /// <returns></returns>
         // GET: TagController
         [HttpGet]
         [Route("GetTags")]
         public async Task<IActionResult> GetTags()
         {
             var tags = await _repo.GetTags();
+            _logger.LogInformation("Получили все теги");
             return View(tags);
         }
 
 
-        //получить комментарий по id
+        /// <summary>
+        /// получить теги по id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: TagController
         [HttpGet]
         [Route("GetTagById")]
         public async Task<IActionResult> GetTagById(int id)
         {
             var tag = await _repo.GetTagById(id);
-
+            _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
             return View(tag);
         }
 
@@ -46,6 +56,11 @@ namespace BlogWebApp.BLL.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Создание нового тега
+        /// </summary>
+        /// <param name="newTag"></param>
+        /// <returns></returns>
         // GET: TagController/Create
         [HttpPost]
         [Route("Create")]
@@ -53,9 +68,15 @@ namespace BlogWebApp.BLL.Controllers
         {
             Tag tag = new Tag(newTag.tagText);
             await _repo.CreateTag(tag);
+            _logger.LogInformation("Создан новый тег" + tag.tagText);
             return RedirectToAction("GetTags");
         }
 
+        /// <summary>
+        /// Форма редактирования тега по его id получаем текущий тег
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("Edit/{Id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
@@ -67,10 +88,15 @@ namespace BlogWebApp.BLL.Controllers
                 id = id,
                 tagText = tag.tagText
             };
-
+            _logger.LogInformation("Открыли форму изменения тега по id: " + id.ToString() + " имя тега: " + tag.tagText);
             return View(model);
         }
-
+        /// <summary>
+        /// редактируем тег по его id
+        /// </summary>
+        /// <param name="newTag"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: TagController/Edit
         [HttpPost]
         [Route("Edit/{Id}")]
@@ -80,9 +106,15 @@ namespace BlogWebApp.BLL.Controllers
             tag.tagText = newTag.tagText;
 
             await _repo.EditTag(tag, id);
+            _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
             return RedirectToAction("GetTags");
         }
 
+        /// <summary>
+        /// Удаляем тег по его id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: TagController/Delete/5
         [HttpPost]
         [Route("Delete/{Id}")]
@@ -94,6 +126,7 @@ namespace BlogWebApp.BLL.Controllers
             else
             {
                 await _repo.DelTag(tag);
+                _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
                 return RedirectToAction("GetTags");
             }
         }

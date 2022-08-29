@@ -21,13 +21,16 @@ namespace BlogWebApp.BLL.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogInformation("Переход на стартовую страницу ");
             return View();
         }
 
         public IActionResult Logout()
         {
+            _logger.LogInformation("Пользователь разлогинился: " + User.Identity.Name);
+
             //разлогиневаемся и чистим куки
-             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
              _signInManager.SignOutAsync();
             HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
 
@@ -43,16 +46,19 @@ namespace BlogWebApp.BLL.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            _logger.LogError("Возникла ошибка");
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         public IActionResult AccessDenied()
         {
+            _logger.LogWarning("Доступ запрещен");
             return View("403");
         }
 
         public IActionResult InternalError()
         {
+            _logger.LogError("Внутренняя ошибка сервера");
             return View("500");
         }
     }

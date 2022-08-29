@@ -21,11 +21,14 @@ namespace BlogWebApp.BLL.Controllers
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(SignInManager<User> signInManager, UserManager<User> userManager)
+
+        public UserController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<UserController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _logger = logger;
         }
 
         /// <summary>
@@ -59,6 +62,7 @@ namespace BlogWebApp.BLL.Controllers
                     UserRoles = roles
                 });
             }
+            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + users.Count.ToString() );
             return View(model);
         }
 
@@ -82,10 +86,13 @@ namespace BlogWebApp.BLL.Controllers
                 UserLastName = user.UserLastName,
                 UserPassword = user.UserPassword
             };
-
+            _logger.LogInformation("Форма редактирования пользователя по его id: " + id + " Email: " +user.UserName);
             return View(model);
         }
-
+        /// <summary>
+        /// Создание пользователя (регистрация)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("Register")]
         public IActionResult Register()
@@ -125,14 +132,14 @@ namespace BlogWebApp.BLL.Controllers
                 {
                     await _signInManager.SignInAsync(user, false);
                 }
-
+                _logger.LogInformation("Пользователь зарегистрирован Email: " + user.UserName);
                 // await _repo.AddUser(newUser);
             }
             return RedirectToAction("GetAllUsers");
         }
 
         /// <summary>
-        /// отредактировать пользователя
+        /// отредактировать пользователя по его id
         /// </summary>
         /// <param name="newUser"></param>
         /// <param name="Id"></param>
@@ -159,6 +166,7 @@ namespace BlogWebApp.BLL.Controllers
                     var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
+                        _logger.LogInformation("Пользователь отредактирован Email: " + user.UserName);
                         return RedirectToAction("GetAllUsers");
                     }
                     else
@@ -167,6 +175,7 @@ namespace BlogWebApp.BLL.Controllers
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
+                        _logger.LogWarning("При редактировании пользователя возникли ошибки " + user.UserName);
                     }
                 }
             }
@@ -195,6 +204,7 @@ namespace BlogWebApp.BLL.Controllers
                 {
                     // await _repo.DelUser(user);
                     await _userManager.DeleteAsync(user);
+                    _logger.LogInformation("Пользователь удален Email: " + user.UserName);
                     return RedirectToAction("GetAllUsers");
                 }
             }
@@ -233,12 +243,13 @@ namespace BlogWebApp.BLL.Controllers
 
                     if (result.Succeeded)
                     {
-
+                        _logger.LogInformation("Пользователь успешно залогинился Email: " + user.Email);
                         return RedirectToAction("Index", "Home");
                     }
                     else
                     {
                         ModelState.AddModelError("", "Неправильный логин и (или) пароль");
+                        _logger.LogWarning("Неправильный логин и(или) пароль");
                         return View();
                     }
                 }
@@ -252,9 +263,12 @@ namespace BlogWebApp.BLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            var username = User.Identity.Name;
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
+
+            _logger.LogInformation("Пользователь успешно вышел Email: " + username);
 
             return RedirectToAction("Index", "Home");
         }
