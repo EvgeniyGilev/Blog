@@ -10,6 +10,7 @@ using NLog;
 using NLog.Web;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+
 logger.Debug("Старт приложения");
 
 try
@@ -44,79 +45,83 @@ try
     };
 });
 
-builder.Services.Configure<PasswordHasherOptions>(options =>
-    options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
-);
+    builder.Services.Configure<PasswordHasherOptions>(options =>
+        options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+    );
 
 
-builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
-builder.Services.AddSingleton<ITagRepository, TagRepository>();
-builder.Services.AddSingleton<IPostRepository, PostRepository>();
+    builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
+    builder.Services.AddSingleton<ITagRepository, TagRepository>();
+    builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connection), ServiceLifetime.Singleton);
-//builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
-builder.Services.AddDbContext<AppDBContext>(ServiceLifetime.Singleton);
-
-
+    //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    //builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connection), ServiceLifetime.Singleton);
+    //builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+    builder.Services.AddDbContext<AppDBContext>(ServiceLifetime.Singleton);
 
 
-builder.Services.AddIdentity<User, Role>(opts =>
-{
-    opts.Password.RequiredLength = 3;
-    opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequireLowercase = false;
-    opts.Password.RequireUppercase = false;
-    opts.Password.RequireDigit = false;
-    opts.Password.RequiredUniqueChars = 0;
-    opts.SignIn.RequireConfirmedAccount = false;
-    opts.SignIn.RequireConfirmedEmail = false;
-    opts.SignIn.RequireConfirmedPhoneNumber = false;
-}).AddEntityFrameworkStores<AppDBContext>();
 
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    //app.UseHsts();
-
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlogApi v1"));
-
-}
-else {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-
-}
-
-//app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthentication();    // подключение аутентификации
-app.UseAuthorization();
-//app.UseMvc();
-
-// Сопоставляем маршруты с контроллерами
-//app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-});
+    builder.Services.AddIdentity<User, Role>(opts =>
+    {
+        opts.Password.RequiredLength = 3;
+        opts.Password.RequireNonAlphanumeric = false;
+        opts.Password.RequireLowercase = false;
+        opts.Password.RequireUppercase = false;
+        opts.Password.RequireDigit = false;
+        opts.Password.RequiredUniqueChars = 0;
+        opts.SignIn.RequireConfirmedAccount = false;
+        opts.SignIn.RequireConfirmedEmail = false;
+        opts.SignIn.RequireConfirmedPhoneNumber = false;
+    }).AddEntityFrameworkStores<AppDBContext>();
 
 
-app.Run();
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        //app.UseHsts();
+
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlogApi v1"));
+
+    }
+    else
+    {
+        // обработка ошибок HTTP
+        app.UseStatusCodePagesWithRedirects("/Error/Error{0}");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+
+    }
+
+  
+
+    //app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    app.UseAuthentication();    // подключение аутентификации
+    app.UseAuthorization();
+    //app.UseMvc();
+
+    // Сопоставляем маршруты с контроллерами
+    //app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+    });
+
+
+    app.Run();
 
 }
 catch (Exception exception)

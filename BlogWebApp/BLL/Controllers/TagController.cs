@@ -2,9 +2,11 @@
 using BlogWebApp.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using BlogWebApp.BLL.Models.ViewModels.TagViews;
+using BlogWebApp.Handlers;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
     public class TagController : Controller

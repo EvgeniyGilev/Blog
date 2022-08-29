@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using BlogWebApp.BLL.Models.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using BlogWebApp.Handlers;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ExceptionHandler]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -50,16 +52,5 @@ namespace BlogWebApp.BLL.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult AccessDenied()
-        {
-            _logger.LogWarning("Доступ запрещен");
-            return View("403");
-        }
-
-        public IActionResult InternalError()
-        {
-            _logger.LogError("Внутренняя ошибка сервера");
-            return View("500");
-        }
     }
 }

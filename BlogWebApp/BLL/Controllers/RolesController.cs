@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.BLL.Models.ViewModels.RoleViews;
+using BlogWebApp.Handlers;
 
 namespace CustomIdentityApp.Controllers
 {
+    [ExceptionHandler]
     public class RolesController : Controller
     {
         RoleManager<Role> _roleManager;

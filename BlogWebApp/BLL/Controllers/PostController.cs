@@ -1,12 +1,14 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.DAL.Repositories.Interfaces;
+using BlogWebApp.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
     public class PostController : Controller
@@ -35,11 +37,15 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetPost/{Id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
+         
             var post = await _repo.GetPostById(id);
             if (post != null)
             {
+                
                 ShowPostAndCommentViewModel model = new ShowPostAndCommentViewModel { ShowPost = post, PostId=id };
                 _logger.LogInformation("Получаем статью с ID: "+ id.ToString());
+                
+
                 return View(model);
             }
             _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
@@ -60,7 +66,7 @@ namespace BlogWebApp.BLL.Controllers
             {
                 ShowPosts = posts
             };
-            _logger.LogInformation("Страница со ");
+            _logger.LogInformation("Показываем все статьи ");
             return View(model);
         }
 

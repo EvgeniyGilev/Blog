@@ -11,10 +11,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using BlogWebApp.BLL.Models.ViewModels.UserViews;
+using BlogWebApp.Handlers;
 
 namespace BlogWebApp.BLL.Controllers
 {
-
+    [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
     public class UserController : Controller
@@ -22,13 +23,17 @@ namespace BlogWebApp.BLL.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<UserController> _logger;
+        private readonly IPostRepository _repoposts;
+        private readonly ICommentRepository _repocomments;
 
 
-        public UserController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<UserController> logger)
+        public UserController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<UserController> logger, IPostRepository repoposts, ICommentRepository repocomments)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _repoposts = repoposts;
+            _repocomments = repocomments;
         }
 
         /// <summary>
@@ -196,13 +201,31 @@ namespace BlogWebApp.BLL.Controllers
 
             if (User.IsInRole("Администратор"))
             {
-
-
                 var user = await _userManager.FindByIdAsync(id); //await _repo.GetUserById(id);
                 if (user == null) { return RedirectToAction(nameof(Index)); }
                 else
                 {
-                    // await _repo.DelUser(user);
+                    //Если удаляем пользователя то нужно решать что делать с его Статьями и его комментариями.
+                    //В лоб удаляем статьи пользователя
+                   /* if (user.Posts != null)
+                    {
+                        foreach (var post in user.Posts)
+                        {
+                            await _repoposts.DelPost(post);
+                            _logger.LogInformation("Удаление статьей пользователя, id статьи: " + post.id + " название " + post.postName);
+                        }
+                    }
+                    // в лоб удаляем комментарии
+                    if (user.Comments != null)
+                    {
+                        foreach (var comment in user.Comments)
+                        {
+                            await _repocomments.DelComment(comment);
+                            _logger.LogInformation("Удаляем комментарий пользователя, id комментария: " + comment.id);
+                        }
+                    }
+                   */
+                    // Удаляем самого пользователя
                     await _userManager.DeleteAsync(user);
                     _logger.LogInformation("Пользователь удален Email: " + user.UserName);
                     return RedirectToAction("GetAllUsers");

@@ -14,8 +14,14 @@
             <span class="badge bg-info text-dark">@tag.tagText</span>
         }
         <p class="lh-sm">@Model.ShowPost.postText</p>
-        <p class="text-end">@Model.ShowPost.User.UserFirstName @Model.ShowPost.User.UserLastName</p>
-
+        @if (@Model.ShowPost.User != null)
+        {
+            <p class="text-end">@Model.ShowPost.User.UserFirstName @Model.ShowPost.User.UserLastName</p>
+        }
+        else
+        {
+            <p class="text-end">Автор данной статьи удален из блога</p>
+        }
         <hr class="mt-2 mb-3" />
 
         <h6>Комментарии к статье</h6>
@@ -24,13 +30,20 @@
             <p class="text-left">@com.commentTexte</p>
             @if (User.IsInRole("Администратор"))
             {
-                <form asp-action="Delete" asp-route-id="@com.id" asp-route-Postid =@Model.PostId asp-controller="Comment" method="post">
+                <form asp-action="Delete" asp-route-id="@com.id" asp-route-Postid=@Model.PostId asp-controller="Comment" method="post">
                     <button type="submit" class="btn btn-outline-danger btn-sm">
                         Удалить комментарий
                     </button>
                 </form>
             }
-            <p class="text-end">@com.User.UserFirstName @com.User.UserLastName</p>
+            @if (@com.User != null)
+            {
+                <p class="text-end">@com.User.UserFirstName @com.User.UserLastName</p>
+            }
+            else
+            {
+                <p class="text-end">Автор данного комментария удален из блога</p>
+            }
 
         }
         <hr class="mt-2 mb-3" />

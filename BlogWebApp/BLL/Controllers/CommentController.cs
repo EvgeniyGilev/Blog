@@ -1,12 +1,14 @@
 ﻿using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.DAL.Repositories.Interfaces;
+using BlogWebApp.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
     public class CommentController : Controller
@@ -51,13 +53,13 @@ namespace BlogWebApp.BLL.Controllers
                         await _repo.CreateComment(comment);
                         return RedirectToAction("GetPost", "Post", new { id = id });
                     }
-                    return RedirectToAction("InternalError", "Home");
+                    else return RedirectToAction("Error500", "Error");
                 }
-                return RedirectToAction("InternalError", "Home");
+                else return RedirectToAction("Error500", "Error");
             }
             else
             {
-                return RedirectToAction("InternalError", "Home");
+                return RedirectToAction("Error500", "Error");
             }
 
         }
