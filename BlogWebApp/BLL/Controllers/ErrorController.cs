@@ -48,6 +48,16 @@ namespace BlogWebApp.BLL.Controllers
             _logger.LogError("500 internal error");
             return View();
         }
+        /// <summary>
+        /// Внутренняя ошибка
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Error()
+        {
+            Response.StatusCode = 500;
+            _logger.LogError("Ошибка что-то пошло не так");
+            return View();
+        }
 
 
     }

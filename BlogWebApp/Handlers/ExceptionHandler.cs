@@ -13,11 +13,9 @@ namespace BlogWebApp.Handlers
 
             if (!context.ExceptionHandled)
             {
-                context.Result = new RedirectResult("/Error/Error500");
+                context.Result = new RedirectResult("/Error/Error");
                 context.ExceptionHandled = true;
             }
-
-
         }
 
     }
