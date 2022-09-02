@@ -80,7 +80,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("Edit/{Id}")]
+        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             var tag = await _repo.GetTagById(id);
@@ -101,7 +101,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <returns></returns>
         // GET: TagController/Edit
         [HttpPost]
-        [Route("Edit/{Id}")]
+        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditeTagViewModel newTag, [FromRoute] int id)
         {
             var tag = await _repo.GetTagById(id);
@@ -119,7 +119,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <returns></returns>
         // GET: TagController/Delete/5
         [HttpPost]
-        [Route("Delete/{Id}")]
+        [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 

@@ -151,7 +151,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <returns></returns>
         // GET: UserController/Edit/5
         [HttpPost]
-        [Route("Edit/{Id}")]
+        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditUserViewModel newUser, [FromRoute] string Id)
         {
             //await _repo.EditUser(newUser, Id);
@@ -184,6 +184,9 @@ namespace BlogWebApp.BLL.Controllers
                     }
                 }
             }
+           
+
+
 
             return RedirectToAction("GetAllUsers");
         }
@@ -195,7 +198,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("Delete/{Id}")]
+        [Route("Delete/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)
         {
 

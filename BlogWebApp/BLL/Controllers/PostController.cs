@@ -34,7 +34,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <returns></returns>
         // GET: PostController
         [HttpGet]
-        [Route("GetPost/{Id}")]
+        [Route("GetPost/{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
          
@@ -130,7 +130,7 @@ namespace BlogWebApp.BLL.Controllers
 
 
         [HttpGet]
-        [Route("Edit/{Id}")]
+        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             var post = await _repo.GetPostById(id);
@@ -157,7 +157,7 @@ namespace BlogWebApp.BLL.Controllers
         }
         // Put: PostController/Edit/5
         [HttpPost]
-        [Route("Edit/{Id}")]
+        [Route("Edit/{id})]
         public async Task<IActionResult> Edit([FromForm] EditPostViewModel newPost, [FromForm] List<string> postTags, [FromRoute] int id)
         {
 
@@ -187,7 +187,7 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: PostController/Delete/5
         [HttpPost]
-        [Route("Delete/{Id}")]
+        [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 

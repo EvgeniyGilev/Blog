@@ -121,7 +121,7 @@ namespace CustomIdentityApp.Controllers
             return NotFound();
         }
         [HttpGet]
-        [Route("EditRole/{Id}")]
+        [Route("EditRole/{id}")]
         public async Task<IActionResult> EditRole([FromRoute] string id)
         {
             Role role = await _roleManager.FindByIdAsync(id);
@@ -143,7 +143,7 @@ namespace CustomIdentityApp.Controllers
 
         // GET: TagController/Edit
         [HttpPost]
-        [Route("EditRole/{Id}")]
+        [Route("EditRole/{id}")]
         public async Task<IActionResult> EditRole([FromRoute] string id, [FromForm] EditeRoleViewModel newRole)
         {
             Role role = await _roleManager.FindByIdAsync(id);

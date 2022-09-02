@@ -30,7 +30,7 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: CommentController/Create
         [HttpPost]
-        [Route("Create/{Id}")]
+        [Route("Create/{id}")]
         public async Task<IActionResult> Create([FromForm] ShowPostAndCommentViewModel newComment, [FromRoute] int id)
         {
             if (User.Identity.IsAuthenticated)
@@ -67,7 +67,7 @@ namespace BlogWebApp.BLL.Controllers
 
         // GET: CommentController/Delete/5
         [HttpPost]
-        [Route("Delete/{Id}")]
+        [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id, int PostId)
         {
 
