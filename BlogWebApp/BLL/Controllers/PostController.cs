@@ -157,7 +157,7 @@ namespace BlogWebApp.BLL.Controllers
         }
         // Put: PostController/Edit/5
         [HttpPost]
-        [Route("Edit/{id})]
+        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostViewModel newPost, [FromForm] List<string> postTags, [FromRoute] int id)
         {
 
