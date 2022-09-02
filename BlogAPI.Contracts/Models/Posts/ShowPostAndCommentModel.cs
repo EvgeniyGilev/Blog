@@ -12,6 +12,14 @@ namespace BlogAPI.Contracts.Models.Posts
         public string Comment { get; set; }
         public int PostId { get; set; }
     }
+
+    public class ShowPostAndCommentModelJSON
+    {
+        public string ShowPostTitle { get; set; }
+        public string ShowPostText { get; set; }
+        public int PostId { get; set; }
+    }
+
 }
 
 

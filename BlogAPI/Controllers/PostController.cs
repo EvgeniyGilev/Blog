@@ -4,7 +4,7 @@ using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BlogAPI.Controllers
 {
@@ -42,11 +42,12 @@ namespace BlogAPI.Controllers
             var post = await _repo.GetPostById(id);
             if (post != null)
             {
-                
-                ShowPostAndCommentModel model = new ShowPostAndCommentModel { ShowPost = post, PostId=id };
+
+                ShowPostAndCommentModelJSON model = new ShowPostAndCommentModelJSON { ShowPostTitle = post.postName, ShowPostText = post.postText,PostId=id };
                 _logger.LogInformation("Получаем статью с ID: "+ id.ToString());
-                
-                string json = JsonSerializer.Serialize(model);
+
+
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(model);
 
                 return StatusCode(200, json);
             }
