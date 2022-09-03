@@ -37,13 +37,15 @@ namespace BlogAPI.Controllers
         /// получить статью по ID
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// /// <response code="200">Получаем статьи</response>
+        /// <response code="400">Статьи с таким id не существует!</response>
+        /// <response code="500">Произошла ошибка</response>
         // GET: PostController
         [HttpGet]
         [Route("GetPost/{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
-         
+
             var post = await _repo.GetPostById(id);
             if (post != null)
             {
@@ -59,7 +61,6 @@ namespace BlogAPI.Controllers
 
                 _logger.LogInformation("Получаем статью с ID: " + id.ToString());
 
-
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(resp);
 
                 return StatusCode(200, json);
@@ -67,7 +68,7 @@ namespace BlogAPI.Controllers
             else
             {
                 _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(new ErrorResponse {ErrorMessage= "Статьи с таким id не существует!", ErrorCode = 40001 });
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 });
                 return StatusCode(400, json);
             }
         }
@@ -155,7 +156,7 @@ namespace BlogAPI.Controllers
                     User = searchuser,
                     Tags = _posttags
                 };
-                
+
                 await _repo.CreatePost(post);
                 _logger.LogInformation("новая статья добавлена: " + post.postName);
             }
@@ -211,7 +212,7 @@ namespace BlogAPI.Controllers
             post.postText = newPost.PostText;
             post.Tags = _posttags;
 
-            
+
             await _repo.EditPost(post, id);
             _logger.LogInformation("Статья отредактирована: " + post.postName);
 

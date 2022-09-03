@@ -14,10 +14,12 @@ namespace BlogAPI
         /// </summary>
         public MappingProfile()
         {
-            CreateMap<Post, PostView>().ForMember(d => d.PostTitle,
+            CreateMap<Post, PostView>()
+            .ForMember(d => d.PostTitle,
                     opt => opt.MapFrom(r => r.postName))
                     .ForMember(d => d.AuthorEmail,
                     opt => opt.MapFrom(r => r.User.Email));
+
         }
     }
 }

@@ -29,7 +29,13 @@ builder.Host.UseNLog();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" }); });
+builder.Services.AddSwaggerGen(c => {
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" });
+
+    var filePath = Path.Combine(System.AppContext.BaseDirectory, "Documentation\\docApi.xml");
+    c.IncludeXmlComments(filePath);
+
+});
 
     // Подключаем автомаппинг
     var assembly = Assembly.GetAssembly(typeof(MappingProfile));

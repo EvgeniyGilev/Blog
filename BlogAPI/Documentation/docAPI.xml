@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BlogAPI</name>
+    </assembly>
+    <members>
+        <member name="M:BlogAPI.Controllers.ErrorController.Error404">
+            <summary>
+            Страница не найдена
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.ErrorController.Error403">
+            <summary>
+            Доступ запрещен
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.ErrorController.Error500">
+            <summary>
+            Внутренняя ошибка
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.ErrorController.Error">
+            <summary>
+            Внутренняя ошибка
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.PostController.GetPost(System.Int32)">
+            <summary>
+            получить статью по ID
+            </summary>
+            <param name="id"></param>
+            /// <response code="200">Получаем статьи</response>
+            <response code="400">Статьи с таким id не существует!</response>
+            <response code="500">Произошла ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.PostController.GetPosts">
+            <summary>
+            получить все статьи
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.PostController.GetPostsByUserId(System.String)">
+            
+             <summary>
+             получить все статьи одного пользователя
+             </summary>
+             <param name="id"></param>
+             <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.GetTags">
+            <summary>
+             получить все теги
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.GetTagById(System.Int32)">
+            <summary>
+            получить теги по id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.Create(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
+            <summary>
+            Создание нового тега
+            </summary>
+            <param name="newTag"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.Edit(System.Int32)">
+            <summary>
+            Форма редактирования тега по его id получаем текущий тег
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.Edit(BlogAPI.Contracts.Models.Tags.EditeTagModel,System.Int32)">
+            <summary>
+            редактируем тег по его id
+            </summary>
+            <param name="newTag"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.Delete(System.Int32)">
+            <summary>
+            Удаляем тег по его id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.GetAllUsers">
+            <summary>
+            получить всех пользователей
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.GetUserById(System.String)">
+            <summary>
+            получить одного пользователя
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Register">
+            <summary>
+            Создание пользователя (регистрация)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Register(BlogAPI.Contracts.Models.Users.CreateUserModel)">
+            <summary>
+            зарегистрировать пользователя
+            </summary>
+            <param name="newUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Edit(BlogAPI.Contracts.Models.Users.EditUserModel,System.String)">
+            <summary>
+            отредактировать пользователя по его id
+            </summary>
+            <param name="newUser"></param>
+            <param name="Id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.DeleteUser(System.String)">
+            <summary>
+            POST: UserController/Delete/Id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Login(BlogAPI.Contracts.Models.Users.LoginUserModel)">
+            <summary>
+            Аутентификация пользователя
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BlogAPI.Handlers.ExceptionHandler">
+            <summary>
+            обработчик исключений
+            </summary>
+        </member>
+        <member name="T:BlogAPI.MappingProfile">
+            <summary>
+            Настройки маппинга всех сущностей приложения
+            </summary>
+        </member>
+        <member name="M:BlogAPI.MappingProfile.#ctor">
+            <summary>
+            В конструкторе настроим соответствие сущностей при маппинге
+            </summary>
+        </member>
+    </members>
+</doc>
