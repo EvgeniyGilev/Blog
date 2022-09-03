@@ -1,4 +1,4 @@
-
+using BlogAPI;
 using BlogAPI.DATA.Context;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories;
@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
+using System.Reflection;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -30,8 +31,12 @@ builder.Host.UseNLog();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" }); });
 
+    // Подключаем автомаппинг
+    var assembly = Assembly.GetAssembly(typeof(MappingProfile));
+    builder.Services.AddAutoMapper(assembly);
 
-builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies").AddCookie("Cookies", options =>
+
+    builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies").AddCookie("Cookies", options =>
 {
     options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
     {
@@ -42,7 +47,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies")
         }
     };
 });
-
+    
 // регистрация сервиса репозитория
 builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<ITagRepository, TagRepository>();
@@ -87,6 +92,7 @@ builder.Services.AddIdentity<User, Role>(opts =>
 
     }
     //app.UseHttpsRedirection();
+
 
     app.UseAuthentication();    // подключение аутентификации
     app.UseAuthorization();

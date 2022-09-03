@@ -1,10 +1,13 @@
-﻿using BlogAPI.Contracts.Models.Posts;
+﻿using AutoMapper;
+using BlogAPI.Contracts.Models;
+using BlogAPI.Contracts.Models.Posts;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using static BlogAPI.Contracts.Models.Posts.GetPostsResponse;
 
 namespace BlogAPI.Controllers
 {
@@ -19,13 +22,15 @@ namespace BlogAPI.Controllers
         private readonly ITagRepository _repotags;
         private readonly ILogger<PostController> _logger;
         private readonly UserManager<User> _userManager;
+        private IMapper _mapper;
 
-        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger)
+        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger, IMapper mapper)
         {
             _repo = repo;
             _repotags = repotags;
             _userManager = userManager;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -43,16 +48,28 @@ namespace BlogAPI.Controllers
             if (post != null)
             {
 
-                ShowPostAndCommentModelJSON model = new ShowPostAndCommentModelJSON { ShowPostTitle = post.postName, ShowPostText = post.postText,PostId=id };
-                _logger.LogInformation("Получаем статью с ID: "+ id.ToString());
+                GetPostByIdResponse resp = new GetPostByIdResponse
+                {
+                    id = post.id,
+                    AuthorEmail = post.User.Email,
+                    PostTitle = post.postName,
+                    PostText = post.postText,
+                    CreateDate = DateTime.Parse(post.postCreateDate)
+                };
+
+                _logger.LogInformation("Получаем статью с ID: " + id.ToString());
 
 
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(model);
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(resp);
 
                 return StatusCode(200, json);
             }
-            _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-            return RedirectToAction("GetPosts");
+            else
+            {
+                _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(new ErrorResponse {ErrorMessage= "Статьи с таким id не существует!", ErrorCode = 40001 });
+                return StatusCode(400, json);
+            }
         }
 
         /// <summary>
@@ -64,15 +81,30 @@ namespace BlogAPI.Controllers
         [Route("GetPosts")]
         public async Task<IActionResult> GetPosts()
         {
-            var posts = await _repo.GetPosts();
-            ShowPostsModel model = new ShowPostsModel
+            try
             {
-                ShowPosts = posts
-            };
-            _logger.LogInformation("Показываем все статьи ");
-            return View(model);
+                var posts = await _repo.GetPosts();
+                GetPostsResponse resp = new GetPostsResponse
+                {
+                    PostsCount = posts.Length,
+                    Posts = _mapper.Map<Post[], PostView[]>(posts)
+                };
+
+                _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.PostsCount.ToString());
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(resp);
+
+                return StatusCode(200, json);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Возникла ошибка при получении статей " + ex.Message);
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(new ErrorResponse { ErrorMessage = "Возникла ошибка при получении статей " + ex.Message, ErrorCode = 40002 });
+                return StatusCode(400, json);
+            }
         }
 
+
+        ///
         /// <summary>
         /// получить все статьи одного пользователя
         /// </summary>
