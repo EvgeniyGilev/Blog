@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace BlogAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ExceptionHandler]
     public class HomeController : Controller
     {

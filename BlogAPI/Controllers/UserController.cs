@@ -38,6 +38,7 @@ namespace BlogAPI.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserController
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
@@ -73,6 +74,7 @@ namespace BlogAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: UserController
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(string id)
@@ -94,6 +96,7 @@ namespace BlogAPI.Controllers
         /// Создание пользователя (регистрация)
         /// </summary>
         /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("Register")]
         public IActionResult Register()
@@ -107,6 +110,7 @@ namespace BlogAPI.Controllers
         /// <param name="newUser"></param>
         /// <returns></returns>
         // POST: UserController/Register
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register([FromForm] CreateUserModel newUser)
@@ -146,6 +150,7 @@ namespace BlogAPI.Controllers
         /// <param name="Id"></param>
         /// <returns></returns>
         // GET: UserController/Edit/5
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditUserModel newUser, [FromRoute] string Id)
@@ -193,6 +198,7 @@ namespace BlogAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpDelete]
         [Route("Delete/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)

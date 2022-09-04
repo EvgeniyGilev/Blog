@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace BlogAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
