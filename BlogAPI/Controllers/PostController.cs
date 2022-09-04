@@ -1,13 +1,18 @@
-﻿using BlogAPI.Contracts.Models.Posts;
+﻿using AutoMapper;
+using BlogAPI.Contracts.Models;
+using BlogAPI.Contracts.Models.Posts;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
 
 namespace BlogAPI.Controllers
 {
+    /// <summary>
+    /// Действия со статьями блога
+    /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Produces("application/json")]
@@ -19,176 +24,209 @@ namespace BlogAPI.Controllers
         private readonly ITagRepository _repotags;
         private readonly ILogger<PostController> _logger;
         private readonly UserManager<User> _userManager;
+        private IMapper _mapper;
 
-        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger)
+        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger, IMapper mapper)
         {
             _repo = repo;
             _repotags = repotags;
             _userManager = userManager;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
-        /// получить статью по ID
+        /// Получить статью по ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Ответ будет в виде JSON (POST)
+        /// {
+        /// "id": 1,
+        /// "postTitle": "Название стати",
+        /// "postText": "Текст статьи",
+        /// "authorEmail": "example@gmail.com",
+        /// "createDate": "2022-09-03T13:40:11"
+        /// }
+        /// </remarks>
+        /// <param name="id"> номер (id) статьи</param>
+        /// <response code="200">Получаем статьи</response>
+        /// <response code="400">Статьи с таким id не существует!</response>
+        /// <response code="500">Произошла ошибка</response>
         // GET: PostController
         [HttpGet]
         [Route("GetPost/{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
-         
+
             var post = await _repo.GetPostById(id);
             if (post != null)
             {
-                
-                ShowPostAndCommentModel model = new ShowPostAndCommentModel { ShowPost = post, PostId=id };
-                _logger.LogInformation("Получаем статью с ID: "+ id.ToString());
-                
-                string json = JsonSerializer.Serialize(model);
 
-                return StatusCode(200, json);
+                GetPostByIdModel resp = new GetPostByIdModel
+                {
+                    id = post.id,
+                    AuthorEmail = post.User.Email,
+                    PostTitle = post.postName,
+                    PostText = post.postText,
+                    CreateDate = DateTime.Parse(post.postCreateDate)
+                };
+
+                _logger.LogInformation("Получаем статью с ID: " + id.ToString());
+
+                return Json(resp);
             }
-            _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-            return RedirectToAction("GetPosts");
+            else
+            {
+                _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
+               // var json = Newtonsoft.Json.JsonConvert.SerializeObject(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 });
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+            }
         }
 
         /// <summary>
-        /// получить все статьи
+        /// Получить все статьи
         /// </summary>
-        /// <returns></returns>
+        /// <response code="200">Получаем статьи</response>
+        /// <response code="400">Возникла ошибка при получении статей</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         // GET: PostController
         [HttpGet]
         [Route("GetPosts")]
         public async Task<IActionResult> GetPosts()
         {
-            var posts = await _repo.GetPosts();
-            ShowPostsModel model = new ShowPostsModel
+            try
             {
-                ShowPosts = posts
-            };
-            _logger.LogInformation("Показываем все статьи ");
-            return View(model);
+                var posts = await _repo.GetPosts();
+                GetPostsModel resp = new GetPostsModel
+                {
+                    PostsCount = posts.Length,
+                    Posts = _mapper.Map<Post[], PostView[]>(posts)
+                };
+
+                _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.PostsCount.ToString());
+
+                return Json(resp);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Возникла ошибка при получении статей " + ex.Message);
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Возникла ошибка при получении статей " + ex.Message, ErrorCode = 40002 }).Value);
+            }
         }
 
         /// <summary>
-        /// получить все статьи одного пользователя
+        /// Добавить статью
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        // GET: PostController
-        [HttpGet]
-        [Route("GetPostsByUserId")]
-        public async Task<IActionResult> GetPostsByUserId(string id)
-        {
-            var posts = await _repo.GetPostsByUserId(id);
-            _logger.LogInformation("Получить все статьи пользователя с id: " + id);
-            return View(posts);
-        }
-
-        [HttpGet]
-        [Route("Create")]
-        public async Task<IActionResult> Create()
-        {
-            CreatePostModel model = new CreatePostModel
-            {
-                PostTags = await _repotags.GetTags()
-            };
-            _logger.LogInformation("открываем страницу создания новой статьи");
-            return View(model);
-        }
-        // GET: PostController/Create
+        /// <response code="200">Добавление статью произошло успешно</response>
+        /// <response code="400">Добавить статью не удалось, так как автор статьи не найден</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> Create([FromForm] CreatePostModel newPost, [FromForm] List<string> postTags)
+        public async Task<IActionResult> Create([FromForm] CreatePostModel newPost)
         {
-            var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == newPost.PostAuthorEmail);
-            if (searchuser != null)
+            if (User.Identity.IsAuthenticated)
             {
-                List<Tag> _posttags = new List<Tag>();
-
-                foreach (var tag in postTags)
+                var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (searchuser != null)
                 {
-                    Tag newtag = await _repotags.GetTagByName(tag);
-                    if (newtag != null)
-                        _posttags.Add(newtag);
+
+                    Post post = new Post
+                    {
+                        postName = newPost.PostName,
+                        postText = newPost.PostText,
+                        User = searchuser
+                    };
+
+                    await _repo.CreatePost(post);
+                    _logger.LogInformation("новая статья добавлена: " + post.postName);
+                    //Если добавление прошло успешно получим id новой статьи
+                    var getpost = (Post)_repo.GetPosts().Result.FirstOrDefault(p => p.postName == post.postName);
+                    PostResponse resp = new()
+                    {
+                        id = getpost.id,
+                        PostTitle = getpost.postName,
+                        InfoMessage = "Статья успешно добавлена"
+                    };
+                    return Json(resp);
                 }
-
-                Post post = new Post
+                else
                 {
-                    postName = newPost.PostName,
-                    postText = newPost.PostText,
-                    User = searchuser,
-                    Tags = _posttags
-                };
-                
-                await _repo.CreatePost(post);
-                _logger.LogInformation("новая статья добавлена: " + post.postName);
-            }
-
-            return RedirectToAction("GetPosts");
-        }
-
-
-        [HttpGet]
-        [Route("Edit/{id}")]
-        public async Task<IActionResult> Edit([FromRoute] int id)
-        {
-            var post = await _repo.GetPostById(id);
-
-            //редактировать статью может только автор или администратор
-            if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
-            {
-
-                EditPostModel model = new EditPostModel
-                {
-                    PostName = post.postName,
-                    PostText = post.postText,
-                    PostTagsCurrent = post.Tags,
-                    PostTagsAll = await _repotags.GetTags(),
-                    PostId = id
-                };
-                _logger.LogInformation("Статья отредактирована: " + post.postName);
-                return View(model);
+                    _logger.LogInformation("Автор статьи не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Автор статьи не найден", ErrorCode = 40003 }).Value);
+                }
             }
             else
             {
-                return RedirectToAction("AccessDenied", "Home");
+                _logger.LogInformation("Автор статьи не найден");
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован", ErrorCode = 40004 }).Value);
             }
+
         }
-        // Put: PostController/Edit/5
-        [HttpPost]
+
+        /// <summary>
+        /// Редактируем статью по её id
+        /// </summary>
+        /// <param name="id"> номер (id) статьи</param>
+        /// <response code="200">Изменение статьи произошло успешно</response>
+        /// <response code="400">Изменить статью не удалось, так как статья не найдена/response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
+        // Patch: PostController/Edit/5
+        [HttpPatch]
         [Route("Edit/{id}")]
-        public async Task<IActionResult> Edit([FromForm] EditPostModel newPost, [FromForm] List<string> postTags, [FromRoute] int id)
+        public async Task<IActionResult> Edit([FromForm] EditPostModel newPost, [FromRoute] int id)
         {
-
-            List<Tag> _posttags = new List<Tag>();
-
-            foreach (var tag in postTags)
+            if (User.Identity.IsAuthenticated)
             {
-                Tag newtag = await _repotags.GetTagByName(tag);
-                if (newtag != null)
-                    _posttags.Add(newtag);
+                var post = await _repo.GetPostById(id);
+                if (post != null)
+                {
+                    if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+                    {
+                        post.postName = newPost.PostName;
+                        post.postText = newPost.PostText;
+
+
+                        await _repo.EditPost(post, id);
+                        _logger.LogInformation("Статья отредактирована: " + post.postName);
+
+                        PostResponse resp = new()
+                        {
+                            id = post.id,
+                            PostTitle = post.postName,
+                            InfoMessage = "Статья успешно отредактирована"
+                        };
+
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Статья не найдена");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+                }
+
             }
-
-            var post = await _repo.GetPostById(id);
-
-            post.postName = newPost.PostName;
-            post.postText = newPost.PostText;
-            post.Tags = _posttags;
-
-            
-            await _repo.EditPost(post, id);
-            _logger.LogInformation("Статья отредактирована: " + post.postName);
-
-            return RedirectToAction("GetPosts");
-
+            else
+            {
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
+            }
         }
 
 
-        // GET: PostController/Delete/5
-        [HttpPost]
+
+        /// <summary>
+        /// Удаляем статью по её id
+        /// </summary>
+        /// <param name="id"> номер (id) статьи</param>
+        /// <response code="200">Удаление статьи произошло успешно</response>
+        /// <response code="400">Удалить статью не удалось, так как автор статьи не авторизован или недостаточно прав</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
+        // Delete: PostController/Delete/5
+        [HttpDelete]
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -201,13 +239,20 @@ namespace BlogAPI.Controllers
                 else
                 {
                     await _repo.DelPost(post);
+
+                    PostResponse resp = new()
+                    {
+                        id = post.id,
+                        PostTitle = post.postName,
+                        InfoMessage = "Статья успешно удалена"
+                    };
                     _logger.LogInformation("Статья удалена: " + post.postName);
-                    return RedirectToAction("GetPosts");
+                    return Json(resp);
                 }
             }
             else
             {
-                return RedirectToAction("AccessDenied", "Home");
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004}).Value);
             }
 
         }

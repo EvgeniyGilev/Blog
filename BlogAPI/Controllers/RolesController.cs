@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ExceptionHandler]
     public class RolesController : Controller
     {

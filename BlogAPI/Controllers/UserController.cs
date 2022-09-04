@@ -1,4 +1,5 @@
-﻿using BlogAPI.Contracts.Models.Users;
+﻿using BlogAPI.Contracts.Models;
+using BlogAPI.Contracts.Models.Users;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
@@ -12,6 +13,7 @@ namespace BlogAPI.Controllers
 {
     [ExceptionHandler]
     [ApiController]
+    [Produces("application/json")]
     [Route("[controller]")]
     public class UserController : Controller
     {
@@ -36,6 +38,7 @@ namespace BlogAPI.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserController
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
@@ -59,10 +62,9 @@ namespace BlogAPI.Controllers
                     UserId = user.Id,
                     UserEmail = user.Email,
                     UserName = user.UserFirstName + " " + user.UserLastName,
-                    UserRoles = roles
                 });
             }
-            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + users.Count.ToString() );
+            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + users.Count.ToString());
             return View(model);
         }
 
@@ -72,6 +74,7 @@ namespace BlogAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: UserController
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(string id)
@@ -86,13 +89,14 @@ namespace BlogAPI.Controllers
                 UserLastName = user.UserLastName,
                 UserPassword = user.UserPassword
             };
-            _logger.LogInformation("Форма редактирования пользователя по его id: " + id + " Email: " +user.UserName);
+            _logger.LogInformation("Форма редактирования пользователя по его id: " + id + " Email: " + user.UserName);
             return View(model);
         }
         /// <summary>
         /// Создание пользователя (регистрация)
         /// </summary>
         /// <returns></returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("Register")]
         public IActionResult Register()
@@ -106,6 +110,7 @@ namespace BlogAPI.Controllers
         /// <param name="newUser"></param>
         /// <returns></returns>
         // POST: UserController/Register
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register([FromForm] CreateUserModel newUser)
@@ -145,6 +150,7 @@ namespace BlogAPI.Controllers
         /// <param name="Id"></param>
         /// <returns></returns>
         // GET: UserController/Edit/5
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditUserModel newUser, [FromRoute] string Id)
@@ -179,7 +185,7 @@ namespace BlogAPI.Controllers
                     }
                 }
             }
-           
+
 
 
 
@@ -192,7 +198,8 @@ namespace BlogAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpDelete]
         [Route("Delete/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)
         {
@@ -205,24 +212,24 @@ namespace BlogAPI.Controllers
                 {
                     //Если удаляем пользователя то нужно решать что делать с его Статьями и его комментариями.
                     //В лоб удаляем статьи пользователя
-                   /* if (user.Posts != null)
-                    {
-                        foreach (var post in user.Posts)
-                        {
-                            await _repoposts.DelPost(post);
-                            _logger.LogInformation("Удаление статьей пользователя, id статьи: " + post.id + " название " + post.postName);
-                        }
-                    }
-                    // в лоб удаляем комментарии
-                    if (user.Comments != null)
-                    {
-                        foreach (var comment in user.Comments)
-                        {
-                            await _repocomments.DelComment(comment);
-                            _logger.LogInformation("Удаляем комментарий пользователя, id комментария: " + comment.id);
-                        }
-                    }
-                   */
+                    /* if (user.Posts != null)
+                     {
+                         foreach (var post in user.Posts)
+                         {
+                             await _repoposts.DelPost(post);
+                             _logger.LogInformation("Удаление статьей пользователя, id статьи: " + post.id + " название " + post.postName);
+                         }
+                     }
+                     // в лоб удаляем комментарии
+                     if (user.Comments != null)
+                     {
+                         foreach (var comment in user.Comments)
+                         {
+                             await _repocomments.DelComment(comment);
+                             _logger.LogInformation("Удаляем комментарий пользователя, id комментария: " + comment.id);
+                         }
+                     }
+                    */
                     // Удаляем самого пользователя
                     await _userManager.DeleteAsync(user);
                     _logger.LogInformation("Пользователь удален Email: " + user.UserName);
@@ -236,62 +243,89 @@ namespace BlogAPI.Controllers
 
         }
 
-        [HttpGet]
-        [Route("Login")]
-        public IActionResult Login()
-        {
-            return View();
-        }
+
         /// <summary>
         /// Аутентификация пользователя
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
+        /// <param name="user"> Модель пользователя - логин (email) и пароль</param>
+        /// <response code="200">Пользователь успешно залогинился</response>
+        /// <response code="401">Ошибки при аутентификации</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         [Route("Login")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginUserModel user)
         {
 
-            if (ModelState.IsValid)
+            var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == user.Email);
+
+            if (searchuser != null)
             {
-                var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == user.Email);
+                var result = await _signInManager.PasswordSignInAsync(user.Email, user.Password, true, false);
 
-                if (searchuser != null)
+
+                if (result.Succeeded)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(user.Email, user.Password, true, false);
+                    _logger.LogInformation("Пользователь успешно залогинился Email: " + user.Email);
 
+                    ShowUserModel resp = new ShowUserModel
+                    {
+                        UserId = searchuser.Id,
+                        UserEmail = searchuser.Email,
+                        UserName = searchuser.UserName,
+                        InfoMessage = "Пользователь успешно залогинился"
+                    };
+                    return Json(resp);
+                }
+                else
+                {
+                    _logger.LogWarning("Неправильный пароль");
+                    return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Неправильный пароль", ErrorCode = 40005 }).Value);
 
-                    if (result.Succeeded)
-                    {
-                        _logger.LogInformation("Пользователь успешно залогинился Email: " + user.Email);
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Неправильный логин и (или) пароль");
-                        _logger.LogWarning("Неправильный логин и(или) пароль");
-                        return View();
-                    }
                 }
             }
-           
-            return RedirectToAction("Index", "Home");
+            else
+            {
+                _logger.LogWarning("Пользователь с таким логином не найден");
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Пользователь с таким логином не найден", ErrorCode = 40006 }).Value);
+
+            }
+
         }
 
+        /// <summary>
+        /// Выход пользователя
+        /// </summary>
+        /// <response code="200">Пользователь успешно разлогинился</response>
+        /// <response code="401">Ошибки при выходе</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         [Route("Logout")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            var username = User.Identity.Name;
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await _signInManager.SignOutAsync();
-            HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
+            if ((User.Identity.IsAuthenticated))
+            {
 
-            _logger.LogInformation("Пользователь успешно вышел Email: " + username);
+                var username = User.Identity.Name;
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                await _signInManager.SignOutAsync();
+                HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
 
-            return RedirectToAction("Index", "Home");
+                ShowUserModel resp = new ShowUserModel
+                {
+                    UserEmail = User.Identity.Name,
+                    InfoMessage = "Пользователь успешно разлогинился"
+                };
+
+                _logger.LogInformation("Пользователь успешно вышел Email: " + username);
+                
+
+                return Json(resp);
+            }
+            else {
+                _logger.LogWarning("Пользователь не залогинен, поэтому разлогиниться не получится");
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Пользователь не залогинен", ErrorCode = 40007 }).Value);
+
+            }
         }
 
 

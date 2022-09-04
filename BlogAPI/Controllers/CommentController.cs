@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace BlogAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
@@ -31,7 +32,7 @@ namespace BlogAPI.Controllers
         // GET: CommentController/Create
         [HttpPost]
         [Route("Create/{id}")]
-        public async Task<IActionResult> Create([FromForm] ShowPostAndCommentModel newComment, [FromRoute] int id)
+        public async Task<IActionResult> Create([FromForm] GetPostByIdModel newComment, [FromRoute] int id)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -46,7 +47,7 @@ namespace BlogAPI.Controllers
                     {
 
                         Comment comment = new Comment();
-                        comment.commentTexte = newComment.Comment;
+                        //comment.commentTexte = newComment.Comment;
                         comment.Post = post;
                         comment.User = user;
 

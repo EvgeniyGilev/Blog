@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
+using BlogAPI.Contracts.Models;
 
 namespace BlogAPI.Handlers
 {
@@ -11,12 +12,19 @@ namespace BlogAPI.Handlers
         public void OnException(ExceptionContext context)
         {
 
-            if (!context.ExceptionHandled)
+            var result = new ObjectResult(new
             {
-                context.Result = new RedirectResult("/Error/Error");
-                context.ExceptionHandled = true;
-            }
+                code = 500,
+                message = "Произошла ошибка: ",
+                detailedMessage = context.Exception.Message
+            });
+            result.StatusCode = 500;
+            context.Result = result;
+
         }
+
+
+
 
     }
 }

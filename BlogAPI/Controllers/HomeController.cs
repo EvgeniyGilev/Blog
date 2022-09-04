@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace BlogAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ExceptionHandler]
     public class HomeController : Controller
     {
@@ -45,12 +46,6 @@ namespace BlogAPI.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            _logger.LogError("Возникла ошибка");
-            return View(new ErrorModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
 
     }
 }
