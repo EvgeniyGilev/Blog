@@ -147,7 +147,6 @@ namespace BlogAPI.Controllers
                     PostTitle = getpost.postName,
                     InfoMessage ="Статья успешно добавлена"
                 };
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(resp);
                 return Json(resp);
             }
             else
