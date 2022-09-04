@@ -39,16 +39,14 @@ namespace BlogAPI.Controllers
         /// Получить статью по ID
         /// </summary>
         /// <remarks>
-        /// Ответ будет в виде JSON 
-        ///     POST 
-        ///     {
-        ///        "id": 123, -0 номер статьи,
-        ///        "PostTitle": "Название статьи",
-        ///        "PostText": "Текст самой статьи"
-        ///        AuthorEmail: "example@google.com", -- Email (логин) автора статьи в блоге
-        ///        CreateDate:      -- Дата создания статьи
-        ///     }
-        /// 
+        /// Ответ будет в виде JSON (POST)
+        /// {
+        /// "id": 1,
+        /// "postTitle": "Название стати",
+        /// "postText": "Текст статьи",
+        /// "authorEmail": "example@gmail.com",
+        /// "createDate": "2022-09-03T13:40:11"
+        /// }
         /// </remarks>
         /// <param name="id"> номер (id) статьи</param>
         /// <response code="200">Получаем статьи</response>
@@ -126,35 +124,43 @@ namespace BlogAPI.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreatePostModel newPost)
         {
-            var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == newPost.PostAuthorEmail);
-            if (searchuser != null)
+            if (User.Identity.IsAuthenticated)
             {
-
-                Post post = new Post
+                var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == User.Identity.Name);
+                if (searchuser != null)
                 {
-                    postName = newPost.PostName,
-                    postText = newPost.PostText,
-                    User = searchuser
-                };
 
-                await _repo.CreatePost(post);
-                _logger.LogInformation("новая статья добавлена: " + post.postName);
-                //Если добавление прошло успешно получим id новой статьи
-                var getpost = (Post)_repo.GetPosts().Result.FirstOrDefault(p => p.postName == post.postName);
-                PostResponse resp = new()
+                    Post post = new Post
+                    {
+                        postName = newPost.PostName,
+                        postText = newPost.PostText,
+                        User = searchuser
+                    };
+
+                    await _repo.CreatePost(post);
+                    _logger.LogInformation("новая статья добавлена: " + post.postName);
+                    //Если добавление прошло успешно получим id новой статьи
+                    var getpost = (Post)_repo.GetPosts().Result.FirstOrDefault(p => p.postName == post.postName);
+                    PostResponse resp = new()
+                    {
+                        id = getpost.id,
+                        PostTitle = getpost.postName,
+                        InfoMessage = "Статья успешно добавлена"
+                    };
+                    return Json(resp);
+                }
+                else
                 {
-                    id = getpost.id,
-                    PostTitle = getpost.postName,
-                    InfoMessage ="Статья успешно добавлена"
-                };
-                return Json(resp);
+                    _logger.LogInformation("Автор статьи не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Автор статьи не найден", ErrorCode = 40003 }).Value);
+                }
             }
             else
             {
                 _logger.LogInformation("Автор статьи не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Автор статьи не найден", ErrorCode = 40003 }).Value);
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован", ErrorCode = 40004 }).Value);
             }
-                  
+
         }
 
         /// <summary>
@@ -169,30 +175,44 @@ namespace BlogAPI.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostModel newPost, [FromRoute] int id)
         {
-
-            var post = await _repo.GetPostById(id);
-            if (post != null)
+            if (User.Identity.IsAuthenticated)
             {
-                post.postName = newPost.PostName;
-                post.postText = newPost.PostText;
-
-
-                await _repo.EditPost(post, id);
-                _logger.LogInformation("Статья отредактирована: " + post.postName);
-
-                PostResponse resp = new()
+                var post = await _repo.GetPostById(id);
+                if (post != null)
                 {
-                    id = post.id,
-                    PostTitle = post.postName,
-                    InfoMessage = "Статья успешно отредактирована"
-                };
+                    if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+                    {
+                        post.postName = newPost.PostName;
+                        post.postText = newPost.PostText;
 
-                return Json(resp);
+
+                        await _repo.EditPost(post, id);
+                        _logger.LogInformation("Статья отредактирована: " + post.postName);
+
+                        PostResponse resp = new()
+                        {
+                            id = post.id,
+                            PostTitle = post.postName,
+                            InfoMessage = "Статья успешно отредактирована"
+                        };
+
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Статья не найдена");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+                }
+
             }
             else
             {
-                _logger.LogInformation("Статья не найдена");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
             }
         }
 

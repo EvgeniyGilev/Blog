@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -19,28 +20,37 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-
-// NLog: Setup NLog for Dependency injection
-builder.Logging.ClearProviders();
-builder.Host.UseNLog();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1", Description = "Pet-проект API для блога",
-    Contact = new OpenApiContact
+    // Add services to the container.
+    //Добавляем опцию игнорирования в ответах JSON NULL значений объектов
+    builder.Services.AddControllers().AddJsonOptions(option =>
     {
-        Name = "Evgeniy Gilev",
-        Email = "euggil@ayndex.ru"
-    }
+        option.JsonSerializerOptions.DefaultIgnoreCondition =
+        JsonIgnoreCondition.WhenWritingNull;
     });
-    var filePath = Path.Combine(System.AppContext.BaseDirectory, "Documentation\\docApi.xml");
-    c.IncludeXmlComments(filePath);
 
-});
+    // NLog: Setup NLog for Dependency injection
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "BlogApi",
+            Version = "v1",
+            Description = "Pet-проект API для блога",
+            Contact = new OpenApiContact
+            {
+                Name = "Evgeniy Gilev",
+                Email = "euggil@ayndex.ru"
+            }
+        });
+        var filePath = Path.Combine(System.AppContext.BaseDirectory, "Documentation\\docApi.xml");
+        c.IncludeXmlComments(filePath);
+
+    });
 
     // Подключаем автомаппинг
     var assembly = Assembly.GetAssembly(typeof(MappingProfile));
@@ -58,28 +68,28 @@ builder.Services.AddSwaggerGen(c => {
         }
     };
 });
-    
-// регистрация сервиса репозитория
-builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
-builder.Services.AddSingleton<ITagRepository, TagRepository>();
-builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
-//задаем подключение к БД. Строку подключения берем из конфигурации
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
+    // регистрация сервиса репозитория
+    builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
+    builder.Services.AddSingleton<ITagRepository, TagRepository>();
+    builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
-builder.Services.AddIdentity<User, Role>(opts =>
-{
-    opts.Password.RequiredLength = 3;
-    opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequireLowercase = false;
-    opts.Password.RequireUppercase = false;
-    opts.Password.RequireDigit = false;
-    opts.Password.RequiredUniqueChars = 0;
-    opts.SignIn.RequireConfirmedAccount = false;
-    opts.SignIn.RequireConfirmedEmail = false;
-    opts.SignIn.RequireConfirmedPhoneNumber = false;
-}).AddEntityFrameworkStores<AppDBContext>();
+    //задаем подключение к БД. Строку подключения берем из конфигурации
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
+
+    builder.Services.AddIdentity<User, Role>(opts =>
+    {
+        opts.Password.RequiredLength = 3;
+        opts.Password.RequireNonAlphanumeric = false;
+        opts.Password.RequireLowercase = false;
+        opts.Password.RequireUppercase = false;
+        opts.Password.RequireDigit = false;
+        opts.Password.RequiredUniqueChars = 0;
+        opts.SignIn.RequireConfirmedAccount = false;
+        opts.SignIn.RequireConfirmedEmail = false;
+        opts.SignIn.RequireConfirmedPhoneNumber = false;
+    }).AddEntityFrameworkStores<AppDBContext>();
 
     var app = builder.Build();
 

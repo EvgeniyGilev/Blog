@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace BlogAPI.Contracts.Models.Users
 {
@@ -9,11 +11,14 @@ namespace BlogAPI.Contracts.Models.Users
         [EmailAddress(ErrorMessage = "Email введен некорректно")]
         [Display(Name = "Email")]
         public string Email { get; set; }
-
+        
+        
+        [JsonIgnore]
         [Required(ErrorMessage = "Поле \"Пароль\" обязательное для заполнения")]
         [StringLength(8, ErrorMessage = "{0} Должен быть минимум {2} символа", MinimumLength = 3)]
         [DataType(DataType.Password)]
         [Display(Name = "Пароль")]
         public string Password { get; set; }
+
     }
 }

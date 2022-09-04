@@ -38,16 +38,14 @@
             Получить статью по ID
             </summary>
             <remarks>
-            Ответ будет в виде JSON 
-                POST 
-                {
-                   "id": 123, -0 номер статьи,
-                   "PostTitle": "Название статьи",
-                   "PostText": "Текст самой статьи"
-                   AuthorEmail: "example@google.com", -- Email (логин) автора статьи в блоге
-                   CreateDate:      -- Дата создания статьи
-                }
-            
+            Ответ будет в виде JSON (POST)
+            {
+            "id": 1,
+            "postTitle": "Название стати",
+            "postText": "Текст статьи",
+            "authorEmail": "example@gmail.com",
+            "createDate": "2022-09-03T13:40:11"
+            }
             </remarks>
             <param name="id"> номер (id) статьи</param>
             <response code="200">Получаем статьи</response>
@@ -70,22 +68,14 @@
             <response code="400">Добавить статью не удалось, так как автор статьи не найден</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
-        <member name="M:BlogAPI.Controllers.PostController.Edit(BlogAPI.Contracts.Models.Posts.EditPostModel,System.Int32)">
-            <summary>
-            Редактируем статью по её id
-            </summary>
-            <param name="id"> номер (id) статьи</param>
-            <response code="200">Изменение статьи произошло успешно</response>
-            <response code="400">Изменить статью не удалось, так как автор статьи не найден</response>
-            <response code="500">Произошла непредвиденная ошибка</response>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:BlogAPI.Controllers.PostController.Edit(BlogAPI.Contracts.Models.Posts.EditPostModel,System.Int32)" -->
         <member name="M:BlogAPI.Controllers.PostController.Delete(System.Int32)">
             <summary>
             Удаляем статью по её id
             </summary>
             <param name="id"> номер (id) статьи</param>
             <response code="200">Удаление статьи произошло успешно</response>
-            <response code="400">Удалить статью не удалось, так как автор статьи не найден</response>
+            <response code="400">Удалить статью не удалось, так как автор статьи не авторизован или недостаточно прав</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTags">
@@ -175,8 +165,18 @@
             <summary>
             Аутентификация пользователя
             </summary>
-            <param name="user"></param>
-            <returns></returns>
+            <param name="user"> Модель пользователя - логин (email) и пароль</param>
+            <response code="200">Пользователь успешно залогинился</response>
+            <response code="401">Ошибки при аутентификации</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Logout">
+            <summary>
+            Выход пользователя
+            </summary>
+            <response code="200">Пользователь успешно разлогинился</response>
+            <response code="401">Ошибки при выходе</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="T:BlogAPI.Handlers.ExceptionHandler">
             <summary>

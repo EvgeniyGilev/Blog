@@ -11,8 +11,5 @@ namespace BlogAPI.Contracts.Models.Posts
         [Required(ErrorMessage = "Содержание Статьи должно быть заполнено")]
         public string PostText { get; set; }
 
-        [Required(ErrorMessage = "Для публикации статьи надо залогиниться")]
-        public string PostAuthorEmail { get; set; }
-
     }
 }
