@@ -13,7 +13,6 @@ namespace BlogAPI.Contracts.Models.Posts
 
         [Required(ErrorMessage = "Для публикации статьи надо залогиниться")]
         public string PostAuthorEmail { get; set; }
-        public List<Tag>? PostTags { get; set; }
 
     }
 }

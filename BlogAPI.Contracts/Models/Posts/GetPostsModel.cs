@@ -3,7 +3,7 @@
 namespace BlogAPI.Contracts.Models.Posts
 {
 
-    public class GetPostsResponse
+    public class GetPostsModel
     {
         public int PostsCount { get; set; }
         public PostView[] Posts { get; set; }

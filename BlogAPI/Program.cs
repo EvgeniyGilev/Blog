@@ -30,8 +30,13 @@ builder.Host.UseNLog();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1" });
-
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlogApi", Version = "v1", Description = "Pet-проект API для блога",
+    Contact = new OpenApiContact
+    {
+        Name = "Evgeniy Gilev",
+        Email = "euggil@ayndex.ru"
+    }
+    });
     var filePath = Path.Combine(System.AppContext.BaseDirectory, "Documentation\\docApi.xml");
     c.IncludeXmlComments(filePath);
 

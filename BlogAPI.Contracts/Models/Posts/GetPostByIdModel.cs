@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace BlogAPI.Contracts.Models.Posts
 {
 
-    public class GetPostByIdResponse
+    public class GetPostByIdModel
     {
         public int id { get; set; }
         public string PostTitle { get; set; }

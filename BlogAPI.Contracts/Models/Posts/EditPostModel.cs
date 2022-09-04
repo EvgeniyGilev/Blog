@@ -10,9 +10,6 @@ namespace BlogAPI.Contracts.Models.Posts
         public string PostName { get; set; }
         [Required(ErrorMessage = "Содержание Статьи должно быть заполнено")]
         public string PostText { get; set; }
-        public int PostId { get; set; }
-        public List<Tag>? PostTagsCurrent { get; set; }
-        public List<Tag>? PostTagsAll { get; set; }
 
     }
 }

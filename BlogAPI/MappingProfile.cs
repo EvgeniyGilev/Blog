@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BlogAPI.DATA.Models;
-using static BlogAPI.Contracts.Models.Posts.GetPostsResponse;
+using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
 
 namespace BlogAPI
 {
@@ -17,8 +17,10 @@ namespace BlogAPI
             CreateMap<Post, PostView>()
             .ForMember(d => d.PostTitle,
                     opt => opt.MapFrom(r => r.postName))
-                    .ForMember(d => d.AuthorEmail,
-                    opt => opt.MapFrom(r => r.User.Email));
+            .ForMember(d => d.AuthorEmail,
+                    opt => opt.MapFrom(r => r.User.Email))
+            .ForMember(d => d.CreateDate,
+                    opt => opt.MapFrom(r => DateTime.Parse(r.postCreateDate)));
 
         }
     }

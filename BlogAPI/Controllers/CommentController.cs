@@ -31,7 +31,7 @@ namespace BlogAPI.Controllers
         // GET: CommentController/Create
         [HttpPost]
         [Route("Create/{id}")]
-        public async Task<IActionResult> Create([FromForm] GetPostByIdResponse newComment, [FromRoute] int id)
+        public async Task<IActionResult> Create([FromForm] GetPostByIdModel newComment, [FromRoute] int id)
         {
             if (User.Identity.IsAuthenticated)
             {
