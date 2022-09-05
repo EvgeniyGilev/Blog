@@ -2,7 +2,7 @@
 {
     public class GetAllUsersModel
     {
-        public int UsersCount { get; set; }
+        public int Count { get; set; }
 
         public List<ShowUserModel> Users { get; set; }
 

@@ -99,11 +99,11 @@ namespace BlogAPI.Controllers
                 var posts = await _repo.GetPosts();
                 GetPostsModel resp = new GetPostsModel
                 {
-                    PostsCount = posts.Length,
+                    Count = posts.Length,
                     Posts = _mapper.Map<Post[], PostView[]>(posts)
                 };
 
-                _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.PostsCount.ToString());
+                _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.Count.ToString());
 
                 return Json(resp);
             }
@@ -141,12 +141,15 @@ namespace BlogAPI.Controllers
                     _logger.LogInformation("новая статья добавлена: " + post.postName);
                     //Если добавление прошло успешно получим id новой статьи
                     var getpost = (Post)_repo.GetPosts().Result.FirstOrDefault(p => p.postName == post.postName);
-                    PostResponse resp = new()
+
+                    SuccessResponse resp = new()
                     {
-                        id = getpost.id,
-                        PostTitle = getpost.postName,
-                        InfoMessage = "Статья успешно добавлена"
+                        code = 0,
+                        id = getpost.id.ToString(),
+                        name = getpost.postName,
+                        infoMessage = "Статья успешно добавлена"
                     };
+
                     return Json(resp);
                 }
                 else
@@ -188,11 +191,13 @@ namespace BlogAPI.Controllers
                         await _repo.EditPost(post, id);
                         _logger.LogInformation("Статья отредактирована: " + post.postName);
 
-                        PostResponse resp = new()
+
+                        SuccessResponse resp = new()
                         {
-                            id = post.id,
-                            PostTitle = post.postName,
-                            InfoMessage = "Статья успешно отредактирована"
+                            code = 0,
+                            id = post.id.ToString(),
+                            name = post.postName,
+                            infoMessage = "Статья успешно отредактирована"
                         };
 
                         return Json(resp);
@@ -240,12 +245,14 @@ namespace BlogAPI.Controllers
                 {
                     await _repo.DelPost(post);
 
-                    PostResponse resp = new()
+                    SuccessResponse resp = new()
                     {
-                        id = post.id,
-                        PostTitle = post.postName,
-                        InfoMessage = "Статья успешно удалена"
+                        code = 0,
+                        id = post.id.ToString(),
+                        name = post.postName,
+                        infoMessage = "Статья успешно удалена"
                     };
+
                     _logger.LogInformation("Статья удалена: " + post.postName);
                     return Json(resp);
                 }

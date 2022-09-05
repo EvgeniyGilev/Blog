@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.DATA.Models;
 using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
 
@@ -21,6 +22,8 @@ namespace BlogAPI
                     opt => opt.MapFrom(r => r.User.Email))
             .ForMember(d => d.CreateDate,
                     opt => opt.MapFrom(r => DateTime.Parse(r.postCreateDate)));
+
+            CreateMap<Tag, TagView>();
 
         }
     }

@@ -11,6 +11,9 @@ using System.Security.Claims;
 
 namespace BlogAPI.Controllers
 {
+    /// <summary>
+    /// Действия с пользователем
+    /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Produces("application/json")]
@@ -68,11 +71,11 @@ namespace BlogAPI.Controllers
 
             GetAllUsersModel resp = new()
             {
-                UsersCount = users.Count,
+                Count = users.Count,
                 Users = model
             };
 
-            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + resp.UsersCount.ToString());
+            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + resp.Count.ToString());
             return Json(resp);
         }
 
@@ -138,11 +141,13 @@ namespace BlogAPI.Controllers
                 {
                     _logger.LogInformation("Пользователь отредактирован Email: " + user.UserName);
 
-                    ShowUserModel resp = new()
+                    SuccessResponse resp = new()
                     {
-                        UserEmail = user.Email,
-                        InfoMessage = "Пользователь отредактирован"
+                        code = 0,
+                        name = user.Email,
+                        infoMessage = "Пользователь отредактирован"
                     };
+
                     return Json(resp);
                 }
                 else
@@ -204,11 +209,14 @@ namespace BlogAPI.Controllers
                     // Удаляем самого пользователя
                     await _userManager.DeleteAsync(user);
                     _logger.LogInformation("Пользователь удален Email: " + user.UserName);
-                    ShowUserModel resp = new()
+
+                    SuccessResponse resp = new()
                     {
-                        UserEmail = user.Email,
-                        InfoMessage = "Пользователь удален"
+                        code = 0,
+                        name = user.Email,
+                        infoMessage = "Пользователь удаленн"
                     };
+
                     return Json(resp);
                 }
                 else
@@ -257,10 +265,11 @@ namespace BlogAPI.Controllers
 
                 _logger.LogInformation("Пользователь зарегистрирован Email: " + user.UserName);
 
-                ShowUserModel resp = new()
+                SuccessResponse resp = new()
                 {
-                    UserEmail = user.Email,
-                    InfoMessage = "Пользователь зарегистрирован"
+                    code = 0,
+                    name = user.Email,
+                    infoMessage = "Пользователь зарегистрирован"
                 };
 
                 return Json(resp);
@@ -300,13 +309,13 @@ namespace BlogAPI.Controllers
                 {
                     _logger.LogInformation("Пользователь успешно залогинился Email: " + user.Email);
 
-                    ShowUserModel resp = new ShowUserModel
+                    SuccessResponse resp = new()
                     {
-                        UserId = searchuser.Id,
-                        UserEmail = searchuser.Email,
-                        UserName = searchuser.UserName,
-                        InfoMessage = "Пользователь успешно залогинился"
+                        code = 0,
+                        name = searchuser.Email,
+                        infoMessage = "Пользователь успешно залогинился"
                     };
+
                     return Json(resp);
                 }
                 else
@@ -342,11 +351,13 @@ namespace BlogAPI.Controllers
                 await _signInManager.SignOutAsync();
                 HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
 
-                ShowUserModel resp = new ShowUserModel
+                SuccessResponse resp = new()
                 {
-                    UserEmail = User.Identity.Name,
-                    InfoMessage = "Пользователь успешно разлогинился"
+                    code = 0,
+                    name = User.Identity.Name,
+                    infoMessage = "Пользователь успешно разлогинился"
                 };
+
 
                 _logger.LogInformation("Пользователь успешно вышел Email: " + username);
                 return Json(resp);

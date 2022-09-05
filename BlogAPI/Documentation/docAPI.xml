@@ -86,47 +86,58 @@
             <response code="400">Удалить статью не удалось, так как автор статьи не авторизован или недостаточно прав</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
+        <member name="T:BlogAPI.Controllers.TagController">
+            <summary>
+            Действия с тегами
+            </summary>
+        </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTags">
             <summary>
-             получить все теги
+            Получить все теги
             </summary>
-            <returns></returns>
+            <response code="200">Теги выведены</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTagById(System.Int32)">
             <summary>
-            получить теги по id
+            Получить теги по id
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id"> ID (int) тега </param>
+            <response code="200">Тег выведен</response>
+            <response code="400">Тег не найден </response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Create(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
             <summary>
             Создание нового тега
             </summary>
-            <param name="newTag"></param>
-            <returns></returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.TagController.Edit(System.Int32)">
-            <summary>
-            Форма редактирования тега по его id получаем текущий тег
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="newTag"> название тега</param>
+            <response code="200">Тег создан</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Edit(BlogAPI.Contracts.Models.Tags.EditeTagModel,System.Int32)">
             <summary>
-            редактируем тег по его id
+            Редактируем тег по его id
             </summary>
-            <param name="newTag"></param>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="newTag"> название тега</param>
+            <param name="id">Id (int) тега</param>
+            <response code="200">Тег создан</response>
+            <response code="400">Тег не найден </response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Delete(System.Int32)">
             <summary>
             Удаляем тег по его id
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id">Id (int) тега</param>
+            <response code="200">Тег удален</response>
+            <response code="400">Тег не найден </response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="T:BlogAPI.Controllers.UserController">
+            <summary>
+            Действия с пользователем
+            </summary>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.GetAllUsers">
             <summary>
