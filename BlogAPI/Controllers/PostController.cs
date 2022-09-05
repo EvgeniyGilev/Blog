@@ -10,8 +10,9 @@ using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
 
 namespace BlogAPI.Controllers
 {
+ 
     /// <summary>
-    /// Действия со статьями блога
+    /// Действия с статьями блога
     /// </summary>
     [ExceptionHandler]
     [ApiController]
@@ -78,7 +79,6 @@ namespace BlogAPI.Controllers
             else
             {
                 _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-               // var json = Newtonsoft.Json.JsonConvert.SerializeObject(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 });
                 return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
             }
         }
@@ -168,9 +168,8 @@ namespace BlogAPI.Controllers
         /// </summary>
         /// <param name="id"> номер (id) статьи</param>
         /// <response code="200">Изменение статьи произошло успешно</response>
-        /// <response code="400">Изменить статью не удалось, так как статья не найдена/response>
+        /// <response code="400">Изменить статью не удалось, так как статья не найдена</response>
         /// <response code="500">Произошла непредвиденная ошибка</response>
-        // Patch: PostController/Edit/5
         [HttpPatch]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostModel newPost, [FromRoute] int id)
@@ -212,6 +211,7 @@ namespace BlogAPI.Controllers
             }
             else
             {
+                _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
                 return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
             }
         }
@@ -252,6 +252,7 @@ namespace BlogAPI.Controllers
             }
             else
             {
+                _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
                 return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004}).Value);
             }
 

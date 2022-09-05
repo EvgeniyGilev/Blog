@@ -30,7 +30,7 @@
         </member>
         <member name="T:BlogAPI.Controllers.PostController">
             <summary>
-            Действия со статьями блога
+            Действия с статьями блога
             </summary>
         </member>
         <member name="M:BlogAPI.Controllers.PostController.GetPost(System.Int32)">
@@ -68,7 +68,15 @@
             <response code="400">Добавить статью не удалось, так как автор статьи не найден</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BlogAPI.Controllers.PostController.Edit(BlogAPI.Contracts.Models.Posts.EditPostModel,System.Int32)" -->
+        <member name="M:BlogAPI.Controllers.PostController.Edit(BlogAPI.Contracts.Models.Posts.EditPostModel,System.Int32)">
+            <summary>
+            Редактируем статью по её id
+            </summary>
+            <param name="id"> номер (id) статьи</param>
+            <response code="200">Изменение статьи произошло успешно</response>
+            <response code="400">Изменить статью не удалось, так как статья не найдена</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
         <member name="M:BlogAPI.Controllers.PostController.Delete(System.Int32)">
             <summary>
             Удаляем статью по её id
@@ -122,44 +130,47 @@
         </member>
         <member name="M:BlogAPI.Controllers.UserController.GetAllUsers">
             <summary>
-            получить всех пользователей
+            Получить всех пользователей
             </summary>
-            <returns></returns>
+            <response code="200">Пользователи выведены</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.GetUserById(System.String)">
             <summary>
-            получить одного пользователя
+            Получить одного пользователя по его ID
             </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.UserController.Register">
-            <summary>
-            Создание пользователя (регистрация)
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.UserController.Register(BlogAPI.Contracts.Models.Users.CreateUserModel)">
-            <summary>
-            зарегистрировать пользователя
-            </summary>
-            <param name="newUser"></param>
-            <returns></returns>
+            <param name="id"> GUID пользователя </param>
+            <response code="200">Пользователь выведен</response>
+            <response code="400">Пользователь не найден</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.Edit(BlogAPI.Contracts.Models.Users.EditUserModel,System.String)">
             <summary>
-            отредактировать пользователя по его id
+            Отредактировать пользователя по его id
             </summary>
-            <param name="newUser"></param>
-            <param name="Id"></param>
-            <returns></returns>
+            <param name="newUser"> Измененная форма пользователя </param>
+            <param name="Id"> GUID пользователя </param>
+            <response code="200"> Пользователь успешно изменен </response>
+            <response code="400"> Пользователь не изменен </response>
+            <response code="500"> Произошла непредвиденная ошибка </response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.DeleteUser(System.String)">
             <summary>
-            POST: UserController/Delete/Id
+            Получить одного пользователя по его ID
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id"> GUID пользователя </param>
+            <response code="200">Пользователь удален</response>
+            <response code="400">Пользователь не найден</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Register(BlogAPI.Contracts.Models.Users.CreateUserModel)">
+            <summary>
+            Регистрация нового пользователя
+            </summary>
+            <param name="newUser">Форма данных пользователя</param>
+            <response code="200">Пользователь зарегистрирован</response>
+            <response code="401">Пользователь не зарегистрирован</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.Login(BlogAPI.Contracts.Models.Users.LoginUserModel)">
             <summary>
