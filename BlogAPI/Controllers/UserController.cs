@@ -125,46 +125,53 @@ namespace BlogAPI.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditUserModel newUser, [FromRoute] string Id)
         {
-
-            User user = await _userManager.FindByIdAsync(Id);
-            if (user != null)
+            if (User.IsInRole("Администратор"))
             {
-                user.Email = newUser.Email;
-                user.UserName = newUser.Email;
-
-                user.UserLastName = newUser.UserLastName;
-                user.UserFirstName = newUser.UserFirstName;
-                user.UserPassword = newUser.UserPassword;
-
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
+                User user = await _userManager.FindByIdAsync(Id);
+                if (user != null)
                 {
-                    _logger.LogInformation("Пользователь отредактирован Email: " + user.UserName);
+                    user.Email = newUser.Email;
+                    user.UserName = newUser.Email;
 
-                    SuccessResponse resp = new()
+                    user.UserLastName = newUser.UserLastName;
+                    user.UserFirstName = newUser.UserFirstName;
+                    user.UserPassword = newUser.UserPassword;
+
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
                     {
-                        code = 0,
-                        name = user.Email,
-                        infoMessage = "Пользователь отредактирован"
-                    };
+                        _logger.LogInformation("Пользователь отредактирован Email: " + user.UserName);
 
-                    return Json(resp);
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            name = user.Email,
+                            infoMessage = "Пользователь отредактирован"
+                        };
+
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        string errorMessage = "";
+                        foreach (var er in result.Errors)
+                        {
+                            errorMessage = er.Code + " " + er.Description + ";";
+                        }
+                        _logger.LogWarning("Пользователь не изменен");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не изменен - " + errorMessage, ErrorCode = 40010 }).Value);
+                    }
                 }
                 else
                 {
-                    string errorMessage = "";
-                    foreach (var er in result.Errors)
-                    {
-                        errorMessage = er.Code + " " + er.Description + ";";
-                    }
-                    _logger.LogWarning("Пользователь не изменен");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не изменен - " + errorMessage, ErrorCode = 40010 }).Value);
+                    _logger.LogWarning("Пользователь не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40009 }).Value);
                 }
             }
             else
             {
-                _logger.LogWarning("Пользователь не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40009 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 

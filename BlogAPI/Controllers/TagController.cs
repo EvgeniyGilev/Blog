@@ -39,7 +39,7 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> GetTags()
         {
             var tags = await _repo.GetTags();
-           
+
             _logger.LogInformation("Получили все теги");
 
             GetTags resp = new()
@@ -94,24 +94,32 @@ namespace BlogAPI.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreateTagModel newTag)
         {
-            var tag = _repo.GetTagByName(newTag.tagText);
-            if (tag.Result == null)
+            if (User.IsInRole("Администратор"))
             {
-                await _repo.CreateTag(new Tag(newTag.tagText));
-                _logger.LogInformation("Создан новый тег" + newTag.tagText);
-
-                SuccessResponse resp = new()
+                var tag = _repo.GetTagByName(newTag.tagText);
+                if (tag.Result == null)
                 {
-                    code = 0,
-                    infoMessage = "Новый тег успешно создан - " + newTag.tagText
-                };
+                    await _repo.CreateTag(new Tag(newTag.tagText));
+                    _logger.LogInformation("Создан новый тег" + newTag.tagText);
 
-                return Json(resp);
+                    SuccessResponse resp = new()
+                    {
+                        code = 0,
+                        infoMessage = "Новый тег успешно создан - " + newTag.tagText
+                    };
+
+                    return Json(resp);
+                }
+                else
+                {
+                    _logger.LogInformation("Тег уже существует");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже существует", ErrorCode = 40003 }).Value);
+                }
             }
             else
             {
-                _logger.LogInformation("Тег уже существует");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже существует", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
@@ -128,30 +136,38 @@ namespace BlogAPI.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditeTagModel newTag, [FromRoute] int id)
         {
-            var tag = await _repo.GetTagById(id);
-            if (tag != null)
+            if (User.IsInRole("Администратор"))
             {
-                tag.tagText = newTag.tagText;
-
-                await _repo.EditTag(tag, id);
-                _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
-
-                SuccessResponse resp = new()
+                var tag = await _repo.GetTagById(id);
+                if (tag != null)
                 {
-                    code = 0,
-                    id= id.ToString(),
-                    name = tag.tagText,
-                    infoMessage = "Тег успешно изменен"
-                };
+                    tag.tagText = newTag.tagText;
 
-                return Json(resp);
+                    await _repo.EditTag(tag, id);
+                    _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
+
+                    SuccessResponse resp = new()
+                    {
+                        code = 0,
+                        id = id.ToString(),
+                        name = tag.tagText,
+                        infoMessage = "Тег успешно изменен"
+                    };
+
+                    return Json(resp);
 
 
+                }
+                else
+                {
+                    _logger.LogInformation("Тег не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                }
             }
             else
             {
-                _logger.LogInformation("Тег не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
@@ -167,28 +183,35 @@ namespace BlogAPI.Controllers
         [Route("Delete")]
         public async Task<IActionResult> Delete(int id)
         {
-
-            var tag = await _repo.GetTagById(id);
-            if (tag !=null)
-           
+            if (User.IsInRole("Администратор"))
             {
-                await _repo.DelTag(tag);
-                _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
-                
-                SuccessResponse resp = new()
-                {
-                    code = 0,
-                    id = id.ToString(),
-                    name = tag.tagText,
-                    infoMessage = "Тег успешно удален"
-                };
+                var tag = await _repo.GetTagById(id);
+                if (tag != null)
 
-                return Json(resp);
+                {
+                    await _repo.DelTag(tag);
+                    _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
+
+                    SuccessResponse resp = new()
+                    {
+                        code = 0,
+                        id = id.ToString(),
+                        name = tag.tagText,
+                        infoMessage = "Тег успешно удален"
+                    };
+
+                    return Json(resp);
+                }
+                else
+                {
+                    _logger.LogInformation("Тег не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                }
             }
             else
             {
-                _logger.LogInformation("Тег не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
     }

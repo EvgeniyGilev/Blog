@@ -64,29 +64,36 @@ namespace BlogAPI.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreateRoleView newRole)
         {
-
-            IdentityResult result = await _roleManager.CreateAsync(new Role { Name = newRole.Name, Description = newRole.Description });
-            if (result.Succeeded)
+            if (User.IsInRole("Администратор"))
             {
-                _logger.LogInformation("Новая роль добавлена: " + newRole.Name);
-
-                SuccessResponse resp = new()
+                IdentityResult result = await _roleManager.CreateAsync(new Role { Name = newRole.Name, Description = newRole.Description });
+                if (result.Succeeded)
                 {
-                    code = 0,
-                    infoMessage = "Новая роль добавлена: " + newRole.Name
-                };
+                    _logger.LogInformation("Новая роль добавлена: " + newRole.Name);
 
-                return Json(resp);
+                    SuccessResponse resp = new()
+                    {
+                        code = 0,
+                        infoMessage = "Новая роль добавлена: " + newRole.Name
+                    };
+
+                    return Json(resp);
+                }
+                else
+                {
+                    string errorMessage = "";
+                    foreach (var er in result.Errors)
+                    {
+                        errorMessage = er.Code + " " + er.Description + ";";
+                    }
+                    _logger.LogWarning("Роль не добавлена");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Новая роль не добавлена - " + errorMessage, ErrorCode = 40010 }).Value);
+                }
             }
             else
             {
-                string errorMessage = "";
-                foreach (var er in result.Errors)
-                {
-                    errorMessage = er.Code + " " + er.Description + ";";
-                }
-                _logger.LogWarning("Роль не добавлена");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Новая роль не добавлена - " + errorMessage, ErrorCode = 40010 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
@@ -102,38 +109,46 @@ namespace BlogAPI.Controllers
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            Role role = await _roleManager.FindByIdAsync(id);
-            if (role != null)
+            if (User.IsInRole("Администратор"))
             {
-                IdentityResult result = await _roleManager.DeleteAsync(role);
-                _logger.LogInformation("Роль удалена: " + role.Name);
-                if (result.Succeeded)
+                Role role = await _roleManager.FindByIdAsync(id);
+                if (role != null)
                 {
-                    SuccessResponse resp = new()
+                    IdentityResult result = await _roleManager.DeleteAsync(role);
+                    _logger.LogInformation("Роль удалена: " + role.Name);
+                    if (result.Succeeded)
                     {
-                        code = 0,
-                        id = id,
-                        name = role.Name,
-                        infoMessage = "Роль успешно удалена"
-                    };
-                    return Json(resp);
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            id = id,
+                            name = role.Name,
+                            infoMessage = "Роль успешно удалена"
+                        };
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        string errorMessage = "";
+                        foreach (var er in result.Errors)
+                        {
+                            errorMessage = er.Code + " " + er.Description + ";";
+                        }
+                        _logger.LogWarning("Роль не добавлена");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не удалена - " + errorMessage, ErrorCode = 40010 }).Value);
+                    }
+
                 }
                 else
                 {
-                    string errorMessage = "";
-                    foreach (var er in result.Errors)
-                    {
-                        errorMessage = er.Code + " " + er.Description + ";";
-                    }
-                    _logger.LogWarning("Роль не добавлена");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не удалена - " + errorMessage, ErrorCode = 40010 }).Value);
+                    _logger.LogInformation("Роль не найдена");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
                 }
-
             }
             else
             {
-                _logger.LogInformation("Роль не найдена");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
@@ -149,36 +164,44 @@ namespace BlogAPI.Controllers
         [Route("AddUserRole")]
         public async Task<IActionResult> AddUserRole(string userId, string roleid)
         {
-            // получаем пользователя
-            User user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
+            if (User.IsInRole("Администратор"))
             {
-                // получаем роль по id
-                var roleToAdd = await _roleManager.FindByIdAsync(roleid);
-
-                if (roleToAdd != null)
+                // получаем пользователя
+                User user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
                 {
+                    // получаем роль по id
+                    var roleToAdd = await _roleManager.FindByIdAsync(roleid);
 
-                    await _userManager.AddToRoleAsync(user, roleToAdd.Name);
-                    _logger.LogInformation("Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name);
-
-                    SuccessResponse resp = new()
+                    if (roleToAdd != null)
                     {
-                        code = 0,
-                        infoMessage = "Роль успешно добавлена для пользователя: " +user.Email +" имя роли: " + roleToAdd.Name
-                    };
-                    return Json(resp);
+
+                        await _userManager.AddToRoleAsync(user, roleToAdd.Name);
+                        _logger.LogInformation("Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name);
+
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            infoMessage = "Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name
+                        };
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Роль не найдена");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
+                    }
                 }
                 else
                 {
-                    _logger.LogInformation("Роль не найдена");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
+                    _logger.LogInformation("Пользователь не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40003 }).Value);
                 }
             }
             else
             {
-                _logger.LogInformation("Пользователь не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
@@ -194,36 +217,44 @@ namespace BlogAPI.Controllers
         [Route("RemoveUserRole")]
         public async Task<IActionResult> RemoveUserRole(string userId, string roleid)
         {
-            // получаем пользователя
-            User user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
+            if (User.IsInRole("Администратор"))
             {
-                // получаем роль по id
-                var roleToAdd = await _roleManager.FindByIdAsync(roleid);
-
-                if (roleToAdd != null)
+                // получаем пользователя
+                User user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
                 {
+                    // получаем роль по id
+                    var roleToAdd = await _roleManager.FindByIdAsync(roleid);
 
-                    await _userManager.RemoveFromRoleAsync(user, roleToAdd.Name);
-                    _logger.LogInformation("Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name);
-
-                    SuccessResponse resp = new()
+                    if (roleToAdd != null)
                     {
-                        code = 0,
-                        infoMessage = "Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name
-                    };
-                    return Json(resp);
+
+                        await _userManager.RemoveFromRoleAsync(user, roleToAdd.Name);
+                        _logger.LogInformation("Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name);
+
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            infoMessage = "Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name
+                        };
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Роль не найдена");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
+                    }
                 }
                 else
                 {
-                    _logger.LogInformation("Роль не найдена");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
+                    _logger.LogInformation("Пользователь не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40003 }).Value);
                 }
             }
             else
             {
-                _logger.LogInformation("Пользователь не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
@@ -238,41 +269,49 @@ namespace BlogAPI.Controllers
         [Route("EditRole")]
         public async Task<IActionResult> EditRole([FromForm] ShowRoleView newRole)
         {
-            Role role = await _roleManager.FindByIdAsync(newRole.id);
-            if (role != null)
+            if (User.IsInRole("Администратор"))
             {
-                role.Name = newRole.Name;
-                role.Description = newRole.Description;
-                IdentityResult result = await _roleManager.UpdateAsync(role);
-                if (result.Succeeded)
-                { 
-                _logger.LogInformation("изменили роль: " + role.Name);
-
-                SuccessResponse resp = new()
+                Role role = await _roleManager.FindByIdAsync(newRole.id);
+                if (role != null)
                 {
-                    code = 0,
-                    id = newRole.id,
-                    name = newRole.Name,
-                    infoMessage = "Роль успешно отредактирована"
-                };
-                return Json(resp);
+                    role.Name = newRole.Name;
+                    role.Description = newRole.Description;
+                    IdentityResult result = await _roleManager.UpdateAsync(role);
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("изменили роль: " + role.Name);
 
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            id = newRole.id,
+                            name = newRole.Name,
+                            infoMessage = "Роль успешно отредактирована"
+                        };
+                        return Json(resp);
+
+                    }
+                    else
+                    {
+                        string errorMessage = "";
+                        foreach (var er in result.Errors)
+                        {
+                            errorMessage = er.Code + " " + er.Description + ";";
+                        }
+                        _logger.LogWarning("Роль не изменена");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не изменена - " + errorMessage, ErrorCode = 40010 }).Value);
+                    }
                 }
                 else
                 {
-                    string errorMessage = "";
-                    foreach (var er in result.Errors)
-                    {
-                        errorMessage = er.Code + " " + er.Description + ";";
-                    }
-                    _logger.LogWarning("Роль не изменена");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не изменена - " + errorMessage, ErrorCode = 40010 }).Value);
+                    _logger.LogInformation("Роль не найдена");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
                 }
             }
             else
             {
-                _logger.LogInformation("Роль не найдена");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не найдена", ErrorCode = 40003 }).Value);
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
     }
