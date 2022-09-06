@@ -113,8 +113,17 @@ try
 
     }
     //app.UseHttpsRedirection();
+    // обработка ошибок HTTP
+     app.UseStatusCodePagesWithRedirects("/Error/Error{0}");
+    /*
+    app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 
-
+    app.Map("/error", ap => ap.Run(async context =>
+    {
+        //$"Err: {context.Request.Query["code"]}"
+        await context.Response.WriteAsync(JsonAttribute();
+    }));
+    */
     app.UseAuthentication();    // подключение аутентификации
     app.UseAuthorization();
 
