@@ -69,9 +69,18 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Create([FromForm] CreateTagViewModel newTag)
         {
             Tag tag = new Tag(newTag.tagText);
-            await _repo.CreateTag(tag);
-            _logger.LogInformation("Создан новый тег" + tag.tagText);
-            return RedirectToAction("GetTags");
+            var searchtag = _repo.GetTagByName(newTag.tagText);
+            if (searchtag.Result == null)
+            {
+                await _repo.CreateTag(tag);
+                _logger.LogInformation("Создан новый тег" + tag.tagText);
+                return RedirectToAction("GetTags");
+            }
+            else
+            {
+                _logger.LogInformation("тег уже существует " + tag.tagText);
+                return RedirectToAction("GetTags");
+            }
         }
 
         /// <summary>

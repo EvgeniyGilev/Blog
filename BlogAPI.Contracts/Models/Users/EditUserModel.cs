@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BlogAPI.Contracts.Models.Users
 {
@@ -20,6 +21,7 @@ namespace BlogAPI.Contracts.Models.Users
         [RegularExpression(@"^[a-zA-Zа-яА-Я'][a-zA-Zа-яА-Я-' ]+[a-zA-Zа-яА-Я']?$", ErrorMessage = "Некорректная фамилия")]
         public string UserLastName { get; set; }
 
+        [JsonIgnore]
         [Required(ErrorMessage = "Поле \"Пароль\" обязательное для заполнения")]
         [StringLength(8, ErrorMessage = "{0} Должен быть минимум {2} символа", MinimumLength = 3)]
         [DataType(DataType.Password)]

@@ -11,6 +11,9 @@ using System.Security.Claims;
 
 namespace BlogAPI.Controllers
 {
+    /// <summary>
+    /// Действия с пользователем
+    /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Produces("application/json")]
@@ -34,11 +37,11 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// получить всех пользователей
+        /// Получить всех пользователей
         /// </summary>
-        /// <returns></returns>
+        /// <response code="200">Пользователи выведены</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         // GET: UserController
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
@@ -59,105 +62,70 @@ namespace BlogAPI.Controllers
 
                 model.Add(new ShowUserModel
                 {
-                    UserId = user.Id,
-                    UserEmail = user.Email,
-                    UserName = user.UserFirstName + " " + user.UserLastName,
+                    id = user.Id,
+                    Email = user.Email,
+                    Name = user.UserFirstName + " " + user.UserLastName,
+                    Roles = roles
                 });
             }
-            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + users.Count.ToString());
-            return View(model);
+
+            GetAllUsersModel resp = new()
+            {
+                Count = users.Count,
+                Users = model
+            };
+
+            _logger.LogInformation("Форма отображения всех пользователей, всего пользователей: " + resp.Count.ToString());
+            return Json(resp);
         }
 
         /// <summary>
-        /// получить одного пользователя
+        /// Получить одного пользователя по его ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id"> GUID пользователя </param>
+        /// <response code="200">Пользователь выведен</response>
+        /// <response code="400">Пользователь не найден</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         // GET: UserController
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-
-            EditUserModel model = new()
+            if (user != null)
             {
-                Id = user.Id,
-                Email = user.Email,
-                UserFirstName = user.UserFirstName,
-                UserLastName = user.UserLastName,
-                UserPassword = user.UserPassword
-            };
-            _logger.LogInformation("Форма редактирования пользователя по его id: " + id + " Email: " + user.UserName);
-            return View(model);
-        }
-        /// <summary>
-        /// Создание пользователя (регистрация)
-        /// </summary>
-        /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        [Route("Register")]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        /// <summary>
-        /// зарегистрировать пользователя
-        /// </summary>
-        /// <param name="newUser"></param>
-        /// <returns></returns>
-        // POST: UserController/Register
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
-        [Route("Register")]
-        public async Task<IActionResult> Register([FromForm] CreateUserModel newUser)
-        {
-            User user = new()
-            {
-                Email = newUser.Email,
-                UserName = newUser.Email,
-                UserCreateDate = DateTime.Now.ToString(),
-                UserFirstName = newUser.UserFirstName,
-                UserLastName = newUser.UserLastName,
-                UserPassword = newUser.UserPassword
-            };
-
-
-            //по умолчанию права пользователя
-
-            var result = await _userManager.CreateAsync(user, newUser.UserPassword);
-            if (result.Succeeded)
-            {
-                //добавляем роль по умолчанию Пользователь
-                await _userManager.AddToRoleAsync(user, "Пользователь");
-                if (!User.Identity.IsAuthenticated)
+                EditUserModel model = new()
                 {
-                    await _signInManager.SignInAsync(user, false);
-                }
-                _logger.LogInformation("Пользователь зарегистрирован Email: " + user.UserName);
-                // await _repo.AddUser(newUser);
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserFirstName = user.UserFirstName,
+                    UserLastName = user.UserLastName
+                };
+                _logger.LogInformation("Форма пользователя по его id: " + id + " Email: " + user.UserName);
+                return Json(model);
             }
-            return RedirectToAction("GetAllUsers");
+            else
+            {
+                _logger.LogWarning("Пользователь не найден");
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40009 }).Value);
+
+            }
         }
 
         /// <summary>
-        /// отредактировать пользователя по его id
+        /// Отредактировать пользователя по его id
         /// </summary>
-        /// <param name="newUser"></param>
-        /// <param name="Id"></param>
-        /// <returns></returns>
+        /// <param name="newUser"> Измененная форма пользователя </param>
+        /// <param name="Id"> GUID пользователя </param>
+        /// <response code="200"> Пользователь успешно изменен </response>
+        /// <response code="400"> Пользователь не изменен </response>
+        /// <response code="500"> Произошла непредвиденная ошибка </response>
         // GET: UserController/Edit/5
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost]
+        [HttpPatch]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditUserModel newUser, [FromRoute] string Id)
         {
-            //await _repo.EditUser(newUser, Id);
-
-            if (ModelState.IsValid)
+            if (User.IsInRole("Администратор"))
             {
                 User user = await _userManager.FindByIdAsync(Id);
                 if (user != null)
@@ -173,32 +141,48 @@ namespace BlogAPI.Controllers
                     if (result.Succeeded)
                     {
                         _logger.LogInformation("Пользователь отредактирован Email: " + user.UserName);
-                        return RedirectToAction("GetAllUsers");
+
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            name = user.Email,
+                            infoMessage = "Пользователь отредактирован"
+                        };
+
+                        return Json(resp);
                     }
                     else
                     {
-                        foreach (var error in result.Errors)
+                        string errorMessage = "";
+                        foreach (var er in result.Errors)
                         {
-                            ModelState.AddModelError(string.Empty, error.Description);
+                            errorMessage = er.Code + " " + er.Description + ";";
                         }
-                        _logger.LogWarning("При редактировании пользователя возникли ошибки " + user.UserName);
+                        _logger.LogWarning("Пользователь не изменен");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не изменен - " + errorMessage, ErrorCode = 40010 }).Value);
                     }
                 }
+                else
+                {
+                    _logger.LogWarning("Пользователь не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40009 }).Value);
+                }
             }
-
-
-
-
-            return RedirectToAction("GetAllUsers");
+            else
+            {
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
+            }
         }
 
 
         /// <summary>
-        /// POST: UserController/Delete/Id
+        /// Получить одного пользователя по его ID
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [ApiExplorerSettings(IgnoreApi = true)]
+        /// <param name="id"> GUID пользователя </param>
+        /// <response code="200">Пользователь удален</response>
+        /// <response code="400">Пользователь не найден</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
         [HttpDelete]
         [Route("Delete/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)
@@ -207,8 +191,7 @@ namespace BlogAPI.Controllers
             if (User.IsInRole("Администратор"))
             {
                 var user = await _userManager.FindByIdAsync(id); //await _repo.GetUserById(id);
-                if (user == null) { return RedirectToAction(nameof(Index)); }
-                else
+                if (user != null)
                 {
                     //Если удаляем пользователя то нужно решать что делать с его Статьями и его комментариями.
                     //В лоб удаляем статьи пользователя
@@ -233,16 +216,82 @@ namespace BlogAPI.Controllers
                     // Удаляем самого пользователя
                     await _userManager.DeleteAsync(user);
                     _logger.LogInformation("Пользователь удален Email: " + user.UserName);
-                    return RedirectToAction("GetAllUsers");
+
+                    SuccessResponse resp = new()
+                    {
+                        code = 0,
+                        name = user.Email,
+                        infoMessage = "Пользователь удаленн"
+                    };
+
+                    return Json(resp);
+                }
+                else
+                {
+                    _logger.LogWarning("Пользователь не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не найден", ErrorCode = 40009 }).Value);
                 }
             }
             else
             {
-                return RedirectToAction("AccessDenied", "Home");
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
 
         }
 
+        /// <summary>
+        /// Регистрация нового пользователя
+        /// </summary>
+        /// <param name="newUser">Форма данных пользователя</param>
+        /// <response code="200">Пользователь зарегистрирован</response>
+        /// <response code="401">Пользователь не зарегистрирован</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
+        // POST: UserController/Register
+        [HttpPost]
+        [Route("Register")]
+        public async Task<IActionResult> Register([FromForm] CreateUserModel newUser)
+        {
+            User user = new()
+            {
+                Email = newUser.Email,
+                UserName = newUser.Email,
+                UserCreateDate = DateTime.Now.ToString(),
+                UserFirstName = newUser.UserFirstName,
+                UserLastName = newUser.UserLastName,
+                UserPassword = newUser.UserPassword
+            };
+
+            //по умолчанию права пользователя
+
+            var result = await _userManager.CreateAsync(user, newUser.UserPassword);
+            if (result.Succeeded)
+            {
+                //добавляем роль по умолчанию Пользователь
+                await _userManager.AddToRoleAsync(user, "Пользователь");
+
+                _logger.LogInformation("Пользователь зарегистрирован Email: " + user.UserName);
+
+                SuccessResponse resp = new()
+                {
+                    code = 0,
+                    name = user.Email,
+                    infoMessage = "Пользователь зарегистрирован"
+                };
+
+                return Json(resp);
+            }
+            else
+            {
+                string errorMessage = "";
+                foreach (var er in result.Errors)
+                {
+                    errorMessage = er.Code + " " + er.Description + ";";
+                }
+                _logger.LogWarning("Пользователь не зарегистрирован");
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Пользователь не зарегистрирован - " + errorMessage, ErrorCode = 40008 }).Value);
+            }
+        }
 
         /// <summary>
         /// Аутентификация пользователя
@@ -267,13 +316,13 @@ namespace BlogAPI.Controllers
                 {
                     _logger.LogInformation("Пользователь успешно залогинился Email: " + user.Email);
 
-                    ShowUserModel resp = new ShowUserModel
+                    SuccessResponse resp = new()
                     {
-                        UserId = searchuser.Id,
-                        UserEmail = searchuser.Email,
-                        UserName = searchuser.UserName,
-                        InfoMessage = "Пользователь успешно залогинился"
+                        code = 0,
+                        name = searchuser.Email,
+                        infoMessage = "Пользователь успешно залогинился"
                     };
+
                     return Json(resp);
                 }
                 else
@@ -302,32 +351,29 @@ namespace BlogAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            if ((User.Identity.IsAuthenticated))
+            if (User.Identity.IsAuthenticated)
             {
-
                 var username = User.Identity.Name;
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await _signInManager.SignOutAsync();
                 HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
 
-                ShowUserModel resp = new ShowUserModel
+                SuccessResponse resp = new()
                 {
-                    UserEmail = User.Identity.Name,
-                    InfoMessage = "Пользователь успешно разлогинился"
+                    code = 0,
+                    name = User.Identity.Name,
+                    infoMessage = "Пользователь успешно разлогинился"
                 };
 
-                _logger.LogInformation("Пользователь успешно вышел Email: " + username);
-                
 
+                _logger.LogInformation("Пользователь успешно вышел Email: " + username);
                 return Json(resp);
             }
-            else {
+            else
+            {
                 _logger.LogWarning("Пользователь не залогинен, поэтому разлогиниться не получится");
                 return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Пользователь не залогинен", ErrorCode = 40007 }).Value);
-
             }
         }
-
-
     }
 }

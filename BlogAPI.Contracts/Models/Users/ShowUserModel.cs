@@ -2,10 +2,10 @@
 {
     public class ShowUserModel
     {
-        public string UserId { get; set; }
-        public string UserEmail { get; set; }
-        public string UserName { get; set; }
-        public string InfoMessage { get; set; }
+        public string id { get; set; }
+        public string Email { get; set; }
+        public string Name { get; set; }
+        public IList<string> Roles { get; set; }
 
     }
 }

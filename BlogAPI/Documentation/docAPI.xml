@@ -4,6 +4,29 @@
         <name>BlogAPI</name>
     </assembly>
     <members>
+        <member name="T:BlogAPI.Controllers.CommentController">
+            <summary>
+            Действия с комментариями
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Controllers.CommentController.Create(BlogAPI.Contracts.Models.Comments.CreateCommentModel)">
+            <summary>
+            Создаем комментарий у статьи, требуется аутентификация пользователя.
+            </summary>
+            <param name="newComment"> Форма комментария, указывается ID статьи и тело комментария</param>
+            <response code="200">Комментарий успешно добавлен</response>
+            <response code="400">Комментарий добавить не удалось</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.CommentController.Delete(System.Int32)">
+            <summary>
+            Удалить комментарий по ID (int)
+            </summary>
+            <param name="id"> ID (int) комментария</param>
+            <response code="200">Комментарий успешно удален</response>
+            <response code="400">Комментарий удалить не удалось</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
         <member name="M:BlogAPI.Controllers.ErrorController.Error404">
             <summary>
             Страница не найдена
@@ -30,7 +53,7 @@
         </member>
         <member name="T:BlogAPI.Controllers.PostController">
             <summary>
-            Действия со статьями блога
+            Действия с статьями блога
             </summary>
         </member>
         <member name="M:BlogAPI.Controllers.PostController.GetPost(System.Int32)">
@@ -52,6 +75,15 @@
             <response code="400">Статьи с таким id не существует!</response>
             <response code="500">Произошла ошибка</response>
         </member>
+        <member name="M:BlogAPI.Controllers.PostController.GetPostFull(System.Int32)">
+            <summary>
+            Получить статью по ID со всеми комментариями и тегами
+            </summary>
+            <param name="id"> номер (id) статьи</param>
+            <response code="200">Получаем статьи</response>
+            <response code="400">Статьи с таким id не существует!</response>
+            <response code="500">Произошла ошибка</response>
+        </member>
         <member name="M:BlogAPI.Controllers.PostController.GetPosts">
             <summary>
             Получить все статьи
@@ -68,7 +100,15 @@
             <response code="400">Добавить статью не удалось, так как автор статьи не найден</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:BlogAPI.Controllers.PostController.Edit(BlogAPI.Contracts.Models.Posts.EditPostModel,System.Int32)" -->
+        <member name="M:BlogAPI.Controllers.PostController.Edit(BlogAPI.Contracts.Models.Posts.EditPostModel,System.Int32)">
+            <summary>
+            Редактируем статью по её id
+            </summary>
+            <param name="id"> номер (id) статьи</param>
+            <response code="200">Изменение статьи произошло успешно</response>
+            <response code="400">Изменить статью не удалось, так как статья не найдена</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
         <member name="M:BlogAPI.Controllers.PostController.Delete(System.Int32)">
             <summary>
             Удаляем статью по её id
@@ -78,88 +118,177 @@
             <response code="400">Удалить статью не удалось, так как автор статьи не авторизован или недостаточно прав</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
+        <member name="M:BlogAPI.Controllers.PostController.AddTag(System.Int32,System.Int32)">
+            <summary>
+            добавление тега к статье
+            </summary>
+            <param name="tagid"> id тега</param>
+            <param name="postid"> id статьи</param>
+            <response code="200">Тег добавлен</response>
+            <response code="400">не удалось добавить тег</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.PostController.RemoveTag(System.Int32,System.Int32)">
+            <summary>
+            удалить тег у статьи
+            </summary>
+            <param name="tagid"> id тега</param>
+            <param name="postid"> id статьи</param>
+            <response code="200">Тег удален</response>
+            <response code="400">не удалось удалить тег</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.GetRoles">
+            <summary>
+            Получить все роли
+            </summary>
+            <response code="200"> Роли успешно выведены</response>
+            <response code="400"> Роли не найдены, создайте роль </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.Create(BlogAPI.Contracts.Models.Roles.CreateRoleView)">
+            <summary>
+            Создать новую роль
+            </summary>
+            <response code="200"> Роль успешно создана</response>
+            <response code="400"> Роль не создана </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.Delete(System.String)">
+            <summary>
+            Удалить роль
+            </summary>
+            <param name="id">Id (GUID) роли</param>
+            <response code="200"> Роль успешно удалена</response>
+            <response code="400"> Роль не удалена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+            
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.AddUserRole(System.String,System.String)">
+            <summary>
+            Добавить роль пользователю
+            </summary>
+            <param name="userId">Id (GUID) пользователя</param>
+            <param name="roleid">Id (GUID) роли</param>
+            <response code="200"> Роль успешно добавлена пользователю</response>
+            <response code="400"> Роль не добавлена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.RemoveUserRole(System.String,System.String)">
+            <summary>
+            Добавить роль пользователю
+            </summary>
+            <param name="userId">Id (GUID) пользователя</param>
+            <param name="roleid">Id (GUID) роли</param>
+            <response code="200"> Роль успешно удалена у пользователя</response>
+            <response code="400"> Роль не удалена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.EditRole(BlogAPI.Contracts.Models.Roles.ShowRoleView)">
+            <summary>
+            Изменение имени или описания роли
+            </summary>
+            <param name="newRole"> модель роли - имя и описание</param>
+            <response code="200"> Роль успешно удалена у пользователя</response>
+            <response code="400"> Роль не удалена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="T:BlogAPI.Controllers.TagController">
+            <summary>
+            Действия с тегами
+            </summary>
+        </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTags">
             <summary>
-             получить все теги
+            Получить все теги
             </summary>
-            <returns></returns>
+            <response code="200">Теги выведены</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTagById(System.Int32)">
             <summary>
-            получить теги по id
+            Получить теги по id
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id"> ID (int) тега </param>
+            <response code="200">Тег выведен</response>
+            <response code="400">Тег не найден </response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Create(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
             <summary>
             Создание нового тега
             </summary>
-            <param name="newTag"></param>
-            <returns></returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.TagController.Edit(System.Int32)">
-            <summary>
-            Форма редактирования тега по его id получаем текущий тег
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="newTag"> название тега</param>
+            <response code="200">Тег создан</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Edit(BlogAPI.Contracts.Models.Tags.EditeTagModel,System.Int32)">
             <summary>
-            редактируем тег по его id
+            Редактируем тег по его id
             </summary>
-            <param name="newTag"></param>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="newTag"> название тега</param>
+            <param name="id">Id (int) тега</param>
+            <response code="200">Тег отредактирован</response>
+            <response code="400">Тег не найден </response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Delete(System.Int32)">
             <summary>
             Удаляем тег по его id
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id">Id (int) тега</param>
+            <response code="200">Тег удален</response>
+            <response code="400">Тег не найден </response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="T:BlogAPI.Controllers.UserController">
+            <summary>
+            Действия с пользователем
+            </summary>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.GetAllUsers">
             <summary>
-            получить всех пользователей
+            Получить всех пользователей
             </summary>
-            <returns></returns>
+            <response code="200">Пользователи выведены</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.GetUserById(System.String)">
             <summary>
-            получить одного пользователя
+            Получить одного пользователя по его ID
             </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.UserController.Register">
-            <summary>
-            Создание пользователя (регистрация)
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.UserController.Register(BlogAPI.Contracts.Models.Users.CreateUserModel)">
-            <summary>
-            зарегистрировать пользователя
-            </summary>
-            <param name="newUser"></param>
-            <returns></returns>
+            <param name="id"> GUID пользователя </param>
+            <response code="200">Пользователь выведен</response>
+            <response code="400">Пользователь не найден</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.Edit(BlogAPI.Contracts.Models.Users.EditUserModel,System.String)">
             <summary>
-            отредактировать пользователя по его id
+            Отредактировать пользователя по его id
             </summary>
-            <param name="newUser"></param>
-            <param name="Id"></param>
-            <returns></returns>
+            <param name="newUser"> Измененная форма пользователя </param>
+            <param name="Id"> GUID пользователя </param>
+            <response code="200"> Пользователь успешно изменен </response>
+            <response code="400"> Пользователь не изменен </response>
+            <response code="500"> Произошла непредвиденная ошибка </response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.DeleteUser(System.String)">
             <summary>
-            POST: UserController/Delete/Id
+            Получить одного пользователя по его ID
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="id"> GUID пользователя </param>
+            <response code="200">Пользователь удален</response>
+            <response code="400">Пользователь не найден</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.UserController.Register(BlogAPI.Contracts.Models.Users.CreateUserModel)">
+            <summary>
+            Регистрация нового пользователя
+            </summary>
+            <param name="newUser">Форма данных пользователя</param>
+            <response code="200">Пользователь зарегистрирован</response>
+            <response code="401">Пользователь не зарегистрирован</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
         </member>
         <member name="M:BlogAPI.Controllers.UserController.Login(BlogAPI.Contracts.Models.Users.LoginUserModel)">
             <summary>
