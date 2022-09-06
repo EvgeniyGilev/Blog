@@ -40,7 +40,7 @@ try
         {
             Title = "BlogApi",
             Version = "v1",
-            Description = "Pet-проект API для блога",
+            Description = "Pet-проект API для блога, учетка администратора - логин admin@gmail.com пароль 123",
             Contact = new OpenApiContact
             {
                 Name = "Evgeniy Gilev",

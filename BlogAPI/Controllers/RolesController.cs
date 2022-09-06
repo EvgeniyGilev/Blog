@@ -114,28 +114,36 @@ namespace BlogAPI.Controllers
                 Role role = await _roleManager.FindByIdAsync(id);
                 if (role != null)
                 {
-                    IdentityResult result = await _roleManager.DeleteAsync(role);
-                    _logger.LogInformation("Роль удалена: " + role.Name);
-                    if (result.Succeeded)
+                    if ((role.Name != "Администратор") && (role.Name != "Пользователь"))
                     {
-                        SuccessResponse resp = new()
+                        IdentityResult result = await _roleManager.DeleteAsync(role);
+                        _logger.LogInformation("Роль удалена: " + role.Name);
+                        if (result.Succeeded)
                         {
-                            code = 0,
-                            id = id,
-                            name = role.Name,
-                            infoMessage = "Роль успешно удалена"
-                        };
-                        return Json(resp);
+                            SuccessResponse resp = new()
+                            {
+                                code = 0,
+                                id = id,
+                                name = role.Name,
+                                infoMessage = "Роль успешно удалена"
+                            };
+                            return Json(resp);
+                        }
+                        else
+                        {
+                            string errorMessage = "";
+                            foreach (var er in result.Errors)
+                            {
+                                errorMessage = er.Code + " " + er.Description + ";";
+                            }
+                            _logger.LogWarning("Роль не добавлена");
+                            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не удалена - " + errorMessage, ErrorCode = 40010 }).Value);
+                        }
                     }
                     else
                     {
-                        string errorMessage = "";
-                        foreach (var er in result.Errors)
-                        {
-                            errorMessage = er.Code + " " + er.Description + ";";
-                        }
-                        _logger.LogWarning("Роль не добавлена");
-                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не удалена - " + errorMessage, ErrorCode = 40010 }).Value);
+                        _logger.LogInformation("Нельзя удалить роль Пользователя и роль Администратора");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Нельзя удалить роль Пользователя и роль Администратора", ErrorCode = 40003 }).Value);
                     }
 
                 }
@@ -274,32 +282,40 @@ namespace BlogAPI.Controllers
                 Role role = await _roleManager.FindByIdAsync(newRole.id);
                 if (role != null)
                 {
-                    role.Name = newRole.Name;
-                    role.Description = newRole.Description;
-                    IdentityResult result = await _roleManager.UpdateAsync(role);
-                    if (result.Succeeded)
+                    if ((role.Name != "Администратор") && (role.Name != "Пользователь"))
                     {
-                        _logger.LogInformation("изменили роль: " + role.Name);
-
-                        SuccessResponse resp = new()
+                        role.Name = newRole.Name;
+                        role.Description = newRole.Description;
+                        IdentityResult result = await _roleManager.UpdateAsync(role);
+                        if (result.Succeeded)
                         {
-                            code = 0,
-                            id = newRole.id,
-                            name = newRole.Name,
-                            infoMessage = "Роль успешно отредактирована"
-                        };
-                        return Json(resp);
+                            _logger.LogInformation("изменили роль: " + role.Name);
 
+                            SuccessResponse resp = new()
+                            {
+                                code = 0,
+                                id = newRole.id,
+                                name = newRole.Name,
+                                infoMessage = "Роль успешно отредактирована"
+                            };
+                            return Json(resp);
+
+                        }
+                        else
+                        {
+                            string errorMessage = "";
+                            foreach (var er in result.Errors)
+                            {
+                                errorMessage = er.Code + " " + er.Description + ";";
+                            }
+                            _logger.LogWarning("Роль не изменена");
+                            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не изменена - " + errorMessage, ErrorCode = 40010 }).Value);
+                        }
                     }
                     else
                     {
-                        string errorMessage = "";
-                        foreach (var er in result.Errors)
-                        {
-                            errorMessage = er.Code + " " + er.Description + ";";
-                        }
-                        _logger.LogWarning("Роль не изменена");
-                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не изменена - " + errorMessage, ErrorCode = 40010 }).Value);
+                        _logger.LogInformation("Нельзя редактировать роль Пользователя и роль Администратора");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Нельзя удалить роль Пользователя и роль Администратора", ErrorCode = 40003 }).Value);
                     }
                 }
                 else
