@@ -12,7 +12,7 @@ using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
 
 namespace BlogAPI.Controllers
 {
- 
+
     /// <summary>
     /// Действия с статьями блога
     /// </summary>
@@ -303,10 +303,124 @@ namespace BlogAPI.Controllers
             else
             {
                 _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
-                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004}).Value);
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
             }
 
         }
+
+        /// <summary>
+        /// добавление тега к статье
+        /// </summary>
+        /// <param name="tagid"> id тега</param>
+        /// <param name="postid"> id статьи</param>
+        /// <response code="200">Тег добавлен</response>
+        /// <response code="400">не удалось добавить тег</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
+        // GET: TagController/Create
+        [HttpPatch]
+        [Route("AddTag")]
+        public async Task<IActionResult> AddTag(int tagid, int postid)
+        {
+
+            var post = await _repo.GetPostById(postid);
+            if (post != null)
+            {
+                var tag = await _repotags.GetTagById(tagid);
+                if (tag != null)
+                {
+
+                    bool needAdd = true;
+                    foreach (var tagpost in post.Tags)
+                    {
+                        if (tag.tagText == tagpost.tagText)
+                        {
+                            needAdd = false;
+                            break;
+                        }
+                    }
+                    if (needAdd)
+                    {
+
+                        post.Tags.Add(tag);
+
+                        await _repo.EditPost(post, postid);
+
+                        _logger.LogInformation("К статье " + post.id.ToString() + " добавлен тег " + tag.tagText);
+
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            infoMessage = "К статье " + post.id.ToString() + " добавлен тег " + tag.tagText
+                        };
+
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Тег уже добавлен");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже добавлен", ErrorCode = 40003 }).Value);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Тег не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Статья не найдена");
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+            }
+        }
+
+        /// <summary>
+        /// удалить тег у статьи
+        /// </summary>
+        /// <param name="tagid"> id тега</param>
+        /// <param name="postid"> id статьи</param>
+        /// <response code="200">Тег удален</response>
+        /// <response code="400">не удалось удалить тег</response>
+        /// <response code="500">Произошла непредвиденная ошибка</response>
+        // GET: TagController/Create
+        [HttpPatch]
+        [Route("RemoveTag")]
+        public async Task<IActionResult> RemoveTag(int tagid, int postid)
+        {
+
+            var post = await _repo.GetPostById(postid);
+            if (post != null)
+            {
+                var tag = await _repotags.GetTagById(tagid);
+                if (tag != null)
+                {
+                        post.Tags.Remove(tag);
+                        await _repo.EditPost(post, postid);
+
+                        _logger.LogInformation("У статьи " + post.id.ToString() + " Удален тег " + tag.tagText);
+
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            infoMessage = "У статьи " + post.id.ToString() + " Удален тег " + tag.tagText
+                        };
+
+                        return Json(resp);
+                }
+                else
+                {
+                    _logger.LogInformation("Тег не найден");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Статья не найдена");
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+            }
+        }
+
+
 
     }
 }

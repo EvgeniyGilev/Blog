@@ -94,16 +94,25 @@ namespace BlogAPI.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreateTagModel newTag)
         {
-            await _repo.CreateTag(new Tag(newTag.tagText));
-            _logger.LogInformation("Создан новый тег" + newTag.tagText);
-
-            SuccessResponse resp = new()
+            var tag = _repo.GetTagByName(newTag.tagText);
+            if (tag.Result == null)
             {
-                code = 0,
-                infoMessage = "Новый тег успешно создан - " + newTag.tagText
-            };
+                await _repo.CreateTag(new Tag(newTag.tagText));
+                _logger.LogInformation("Создан новый тег" + newTag.tagText);
 
-            return Json(resp);
+                SuccessResponse resp = new()
+                {
+                    code = 0,
+                    infoMessage = "Новый тег успешно создан - " + newTag.tagText
+                };
+
+                return Json(resp);
+            }
+            else
+            {
+                _logger.LogInformation("Тег уже существует");
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже существует", ErrorCode = 40003 }).Value);
+            }
         }
 
         /// <summary>
@@ -155,8 +164,8 @@ namespace BlogAPI.Controllers
         /// <response code="500">Произошла непредвиденная ошибка</response>
         // GET: TagController/Delete/5
         [HttpDelete]
-        [Route("Delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        [Route("Delete")]
+        public async Task<IActionResult> Delete(int id)
         {
 
             var tag = await _repo.GetTagById(id);

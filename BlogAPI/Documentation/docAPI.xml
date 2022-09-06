@@ -118,6 +118,26 @@
             <response code="400">Удалить статью не удалось, так как автор статьи не авторизован или недостаточно прав</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
+        <member name="M:BlogAPI.Controllers.PostController.AddTag(System.Int32,System.Int32)">
+            <summary>
+            добавление тега к статье
+            </summary>
+            <param name="tagid"> id тега</param>
+            <param name="postid"> id статьи</param>
+            <response code="200">Тег добавлен</response>
+            <response code="400">не удалось добавить тег</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.PostController.RemoveTag(System.Int32,System.Int32)">
+            <summary>
+            удалить тег у статьи
+            </summary>
+            <param name="tagid"> id тега</param>
+            <param name="postid"> id статьи</param>
+            <response code="200">Тег удален</response>
+            <response code="400">не удалось удалить тег</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
         <member name="M:BlogAPI.Controllers.RolesController.GetRoles">
             <summary>
             Получить все роли
