@@ -74,7 +74,7 @@ namespace BlogWebApp.DAL.Repositories
         // найти конкретную статью по Id
         public async Task<Post?> GetPostById(int id)
         {
-            var postById = await _context.Post.Include(u =>u.User).Include(c => c.Comments).ThenInclude(cu =>cu.User).Where(p => p.id == id).FirstOrDefaultAsync();
+            var postById = await _context.Post.Include(t => t.Tags).Include(u =>u.User).Include(c => c.Comments).ThenInclude(cu =>cu.User).Where(p => p.id == id).FirstOrDefaultAsync();
 
             return postById;
         }

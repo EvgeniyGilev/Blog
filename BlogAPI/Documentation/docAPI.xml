@@ -4,6 +4,29 @@
         <name>BlogAPI</name>
     </assembly>
     <members>
+        <member name="T:BlogAPI.Controllers.CommentController">
+            <summary>
+            Действия с комментариями
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Controllers.CommentController.Create(BlogAPI.Contracts.Models.Comments.CreateCommentModel)">
+            <summary>
+            Создаем комментарий у статьи, требуется аутентификация пользователя.
+            </summary>
+            <param name="newComment"> Форма комментария, указывается ID статьи и тело комментария</param>
+            <response code="200">Комментарий успешно добавлен</response>
+            <response code="400">Комментарий добавить не удалось</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.CommentController.Delete(System.Int32)">
+            <summary>
+            Удалить комментарий по ID (int)
+            </summary>
+            <param name="id"> ID (int) комментария</param>
+            <response code="200">Комментарий успешно удален</response>
+            <response code="400">Комментарий удалить не удалось</response>
+            <response code="500">Произошла непредвиденная ошибка</response>
+        </member>
         <member name="M:BlogAPI.Controllers.ErrorController.Error404">
             <summary>
             Страница не найдена
@@ -47,6 +70,15 @@
             "createDate": "2022-09-03T13:40:11"
             }
             </remarks>
+            <param name="id"> номер (id) статьи</param>
+            <response code="200">Получаем статьи</response>
+            <response code="400">Статьи с таким id не существует!</response>
+            <response code="500">Произошла ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.PostController.GetPostFull(System.Int32)">
+            <summary>
+            Получить статью по ID со всеми комментариями и тегами
+            </summary>
             <param name="id"> номер (id) статьи</param>
             <response code="200">Получаем статьи</response>
             <response code="400">Статьи с таким id не существует!</response>

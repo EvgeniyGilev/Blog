@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BlogAPI.Contracts.Models;
+using BlogAPI.Contracts.Models.Comments;
 using BlogAPI.Contracts.Models.Posts;
+using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
@@ -82,6 +84,47 @@ namespace BlogAPI.Controllers
                 return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
             }
         }
+
+        /// <summary>
+        /// Получить статью по ID со всеми комментариями и тегами
+        /// </summary>
+        /// <param name="id"> номер (id) статьи</param>
+        /// <response code="200">Получаем статьи</response>
+        /// <response code="400">Статьи с таким id не существует!</response>
+        /// <response code="500">Произошла ошибка</response>
+        // GET: PostController
+        [HttpGet]
+        [Route("GetPostFull/{id}")]
+        public async Task<IActionResult> GetPostFull([FromRoute] int id)
+        {
+
+            var post = await _repo.GetPostById(id);
+            if (post != null)
+            {
+
+                GetPostFullByIdModel resp = new()
+                {
+                    id = post.id,
+                    AuthorEmail = post.User.Email,
+                    PostTitle = post.postName,
+                    PostText = post.postText,
+                    CreateDate = DateTime.Parse(post.postCreateDate),
+                    Tags = _mapper.Map<List<Tag>, List<TagView>>(post.Tags),
+                    Comments = _mapper.Map<List<Comment>, List<CommentView>>(post.Comments)
+
+                };
+
+                _logger.LogInformation("Получаем статью с ID: " + id.ToString());
+
+                return Json(resp);
+            }
+            else
+            {
+                _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+            }
+        }
+
 
         /// <summary>
         /// Получить все статьи
