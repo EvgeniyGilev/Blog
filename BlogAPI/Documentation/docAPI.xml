@@ -86,6 +86,61 @@
             <response code="400">Удалить статью не удалось, так как автор статьи не авторизован или недостаточно прав</response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>
+        <member name="M:BlogAPI.Controllers.RolesController.GetRoles">
+            <summary>
+            Получить все роли
+            </summary>
+            <response code="200"> Роли успешно выведены</response>
+            <response code="400"> Роли не найдены, создайте роль </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.Create(BlogAPI.Contracts.Models.Roles.CreateRoleView)">
+            <summary>
+            Создать новую роль
+            </summary>
+            <response code="200"> Роль успешно создана</response>
+            <response code="400"> Роль не создана </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.Delete(System.String)">
+            <summary>
+            Удалить роль
+            </summary>
+            <param name="id">Id (GUID) роли</param>
+            <response code="200"> Роль успешно удалена</response>
+            <response code="400"> Роль не удалена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+            
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.AddUserRole(System.String,System.String)">
+            <summary>
+            Добавить роль пользователю
+            </summary>
+            <param name="userId">Id (GUID) пользователя</param>
+            <param name="roleid">Id (GUID) роли</param>
+            <response code="200"> Роль успешно добавлена пользователю</response>
+            <response code="400"> Роль не добавлена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.RemoveUserRole(System.String,System.String)">
+            <summary>
+            Добавить роль пользователю
+            </summary>
+            <param name="userId">Id (GUID) пользователя</param>
+            <param name="roleid">Id (GUID) роли</param>
+            <response code="200"> Роль успешно удалена у пользователя</response>
+            <response code="400"> Роль не удалена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
+        <member name="M:BlogAPI.Controllers.RolesController.EditRole(BlogAPI.Contracts.Models.Roles.ShowRoleView)">
+            <summary>
+            Изменение имени или описания роли
+            </summary>
+            <param name="newRole"> модель роли - имя и описание</param>
+            <response code="200"> Роль успешно удалена у пользователя</response>
+            <response code="400"> Роль не удалена </response>
+            <response code="500"> Произошла непредвиденная ошибка</response>
+        </member>
         <member name="T:BlogAPI.Controllers.TagController">
             <summary>
             Действия с тегами
@@ -121,7 +176,7 @@
             </summary>
             <param name="newTag"> название тега</param>
             <param name="id">Id (int) тега</param>
-            <response code="200">Тег создан</response>
+            <response code="200">Тег отредактирован</response>
             <response code="400">Тег не найден </response>
             <response code="500">Произошла непредвиденная ошибка</response>
         </member>

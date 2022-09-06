@@ -62,10 +62,10 @@ namespace BlogAPI.Controllers
 
                 model.Add(new ShowUserModel
                 {
-                    UserId = user.Id,
-                    UserEmail = user.Email,
-                    UserName = user.UserFirstName + " " + user.UserLastName,
-                    UserRoles = roles
+                    id = user.Id,
+                    Email = user.Email,
+                    Name = user.UserFirstName + " " + user.UserLastName,
+                    Roles = roles
                 });
             }
 

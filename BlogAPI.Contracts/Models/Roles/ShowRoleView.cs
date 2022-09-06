@@ -2,12 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace BlogAPI.Contracts.Models.Roles
-
 {
 
-    public class EditeRoleModel
+    public class ShowRoleView
     {
-        public string Id { get; set; }
+        // GUID роли
+        public string id { get; set; }
 
         [Required(ErrorMessage = "Требуется заполнить \"Название Роли\" ")]
         public string Name { get; set; }
