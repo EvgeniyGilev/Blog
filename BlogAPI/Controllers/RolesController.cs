@@ -8,14 +8,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogAPI.Controllers
 {
+    /// <summary>
+    /// The roles controller.
+    /// </summary>
     [ExceptionHandler]
     public class RolesController : Controller
     {
-        RoleManager<Role> _roleManager;
-        UserManager<User> _userManager;
         private readonly ILogger<RolesController> _logger;
+        private RoleManager<Role> _roleManager;
+        private UserManager<User> _userManager;
         private IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RolesController"/> class.
+        /// </summary>
+        /// <param name="roleManager">RoleManager AspNetCore.Identity.</param>
+        /// <param name="userManager">UserManager AspNetCore.Identity.</param>
+        /// <param name="logger">NLOG logger.</param>
+        /// <param name="mapper">Automapper.</param>
         public RolesController(RoleManager<Role> roleManager, UserManager<User> userManager, ILogger<RolesController> logger, IMapper mapper)
         {
             _roleManager = roleManager;
@@ -25,11 +35,12 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Получить все роли
+        /// Получить все роли.
         /// </summary>
-        /// <response code="200"> Роли успешно выведены</response>
-        /// <response code="400"> Роли не найдены, создайте роль </response>
-        /// <response code="500"> Произошла непредвиденная ошибка</response>
+        /// <response code="200"> Роли успешно выведены.</response>
+        /// <response code="400"> Роли не найдены, создайте роль.</response>
+        /// <response code="500"> Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает существующие роли.</returns>
         [HttpGet]
         [Route("GetRoles")]
         public IActionResult GetRoles()
@@ -38,10 +49,10 @@ namespace BlogAPI.Controllers
 
             if (roles.Count != 0)
             {
-                GetRolesModel resp = new()
+                GetRolesModel resp = new ()
                 {
                     Count = roles.Count,
-                    Roles = _mapper.Map<List<Role>, List<ShowRoleView>>(roles)
+                    Roles = _mapper.Map<List<Role>, List<ShowRoleView>>(roles),
                 };
 
                 _logger.LogInformation("Показываем все доступные роли");
@@ -55,11 +66,13 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Создать новую роль
+        /// Создать новую роль.
         /// </summary>
-        /// <response code="200"> Роль успешно создана</response>
-        /// <response code="400"> Роль не создана </response>
-        /// <response code="500"> Произошла непредвиденная ошибка</response>
+        /// <param name="newRole">Данные для создания новой роли.</param>
+        /// <response code="200">Роль успешно создана.</response>
+        /// <response code="400">Роль не создана.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом создания роли, JSON.</returns>
         [HttpPost]
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreateRoleView newRole)
@@ -71,21 +84,22 @@ namespace BlogAPI.Controllers
                 {
                     _logger.LogInformation("Новая роль добавлена: " + newRole.Name);
 
-                    SuccessResponse resp = new()
+                    SuccessResponse resp = new ()
                     {
                         code = 0,
-                        infoMessage = "Новая роль добавлена: " + newRole.Name
+                        infoMessage = "Новая роль добавлена: " + newRole.Name,
                     };
 
                     return Json(resp);
                 }
                 else
                 {
-                    string errorMessage = "";
+                    string errorMessage = string.Empty;
                     foreach (var er in result.Errors)
                     {
                         errorMessage = er.Code + " " + er.Description + ";";
                     }
+
                     _logger.LogWarning("Роль не добавлена");
                     return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Новая роль не добавлена - " + errorMessage, ErrorCode = 40010 }).Value);
                 }
@@ -98,13 +112,13 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Удалить роль
+        /// Удалить роль.
         /// </summary>
-        /// <param name="id">Id (GUID) роли</param>
-        /// <response code="200"> Роль успешно удалена</response>
-        /// <response code="400"> Роль не удалена </response>
-        /// <response code="500"> Произошла непредвиденная ошибка</response>
-        /// 
+        /// <param name="id">Id (GUID) роли.</param>
+        /// <response code="200"> Роль успешно удалена.</response>
+        /// <response code="400"> Роль не удалена.</response>
+        /// <response code="500"> Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом удаления, JSON.</returns>
         [HttpDelete]
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete(string id)
@@ -120,22 +134,23 @@ namespace BlogAPI.Controllers
                         _logger.LogInformation("Роль удалена: " + role.Name);
                         if (result.Succeeded)
                         {
-                            SuccessResponse resp = new()
+                            SuccessResponse resp = new ()
                             {
                                 code = 0,
                                 id = id,
                                 name = role.Name,
-                                infoMessage = "Роль успешно удалена"
+                                infoMessage = "Роль успешно удалена",
                             };
                             return Json(resp);
                         }
                         else
                         {
-                            string errorMessage = "";
+                            string errorMessage = string.Empty;
                             foreach (var er in result.Errors)
                             {
                                 errorMessage = er.Code + " " + er.Description + ";";
                             }
+
                             _logger.LogWarning("Роль не добавлена");
                             return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не удалена - " + errorMessage, ErrorCode = 40010 }).Value);
                         }
@@ -145,7 +160,6 @@ namespace BlogAPI.Controllers
                         _logger.LogInformation("Нельзя удалить роль Пользователя и роль Администратора");
                         return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Нельзя удалить роль Пользователя и роль Администратора", ErrorCode = 40003 }).Value);
                     }
-
                 }
                 else
                 {
@@ -161,13 +175,14 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Добавить роль пользователю
+        /// Добавить роль пользователю.
         /// </summary>
-        /// <param name="userId">Id (GUID) пользователя</param>
-        /// <param name="roleid">Id (GUID) роли</param>
-        /// <response code="200"> Роль успешно добавлена пользователю</response>
-        /// <response code="400"> Роль не добавлена </response>
-        /// <response code="500"> Произошла непредвиденная ошибка</response>
+        /// <param name="userId">Id (GUID) пользователя.</param>
+        /// <param name="roleid">Id (GUID) роли.</param>
+        /// <response code="200"> Роль успешно добавлена пользователю.</response>
+        /// <response code="400"> Роль не добавлена.</response>
+        /// <response code="500"> Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         [HttpPatch]
         [Route("AddUserRole")]
         public async Task<IActionResult> AddUserRole(string userId, string roleid)
@@ -183,14 +198,13 @@ namespace BlogAPI.Controllers
 
                     if (roleToAdd != null)
                     {
-
                         await _userManager.AddToRoleAsync(user, roleToAdd.Name);
                         _logger.LogInformation("Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name);
 
-                        SuccessResponse resp = new()
+                        SuccessResponse resp = new ()
                         {
                             code = 0,
-                            infoMessage = "Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name
+                            infoMessage = "Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name,
                         };
                         return Json(resp);
                     }
@@ -214,13 +228,14 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Добавить роль пользователю
+        /// Добавить роль пользователю.
         /// </summary>
-        /// <param name="userId">Id (GUID) пользователя</param>
-        /// <param name="roleid">Id (GUID) роли</param>
-        /// <response code="200"> Роль успешно удалена у пользователя</response>
-        /// <response code="400"> Роль не удалена </response>
-        /// <response code="500"> Произошла непредвиденная ошибка</response>
+        /// <param name="userId">Id (GUID) пользователя.</param>
+        /// <param name="roleid">Id (GUID) роли.</param>
+        /// <response code="200"> Роль успешно удалена у пользователя.</response>
+        /// <response code="400"> Роль не удалена.</response>
+        /// <response code="500"> Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         [HttpPatch]
         [Route("RemoveUserRole")]
         public async Task<IActionResult> RemoveUserRole(string userId, string roleid)
@@ -236,14 +251,13 @@ namespace BlogAPI.Controllers
 
                     if (roleToAdd != null)
                     {
-
                         await _userManager.RemoveFromRoleAsync(user, roleToAdd.Name);
                         _logger.LogInformation("Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name);
 
-                        SuccessResponse resp = new()
+                        SuccessResponse resp = new ()
                         {
                             code = 0,
-                            infoMessage = "Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name
+                            infoMessage = "Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name,
                         };
                         return Json(resp);
                     }
@@ -267,12 +281,13 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Изменение имени или описания роли
+        /// Изменение имени или описания роли.
         /// </summary>
-        /// <param name="newRole"> модель роли - имя и описание</param>
-        /// <response code="200"> Роль успешно удалена у пользователя</response>
-        /// <response code="400"> Роль не удалена </response>
-        /// <response code="500"> Произошла непредвиденная ошибка</response>
+        /// <param name="newRole"> модель роли - имя и описание.</param>
+        /// <response code="200"> Роль успешно удалена у пользователя.</response>
+        /// <response code="400"> Роль не удалена.</response>
+        /// <response code="500"> Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом изменения роли, JSON.</returns>
         [HttpPatch]
         [Route("EditRole")]
         public async Task<IActionResult> EditRole([FromForm] ShowRoleView newRole)
@@ -291,23 +306,23 @@ namespace BlogAPI.Controllers
                         {
                             _logger.LogInformation("изменили роль: " + role.Name);
 
-                            SuccessResponse resp = new()
+                            SuccessResponse resp = new ()
                             {
                                 code = 0,
                                 id = newRole.id,
                                 name = newRole.Name,
-                                infoMessage = "Роль успешно отредактирована"
+                                infoMessage = "Роль успешно отредактирована",
                             };
                             return Json(resp);
-
                         }
                         else
                         {
-                            string errorMessage = "";
+                            string errorMessage = string.Empty;
                             foreach (var er in result.Errors)
                             {
                                 errorMessage = er.Code + " " + er.Description + ";";
                             }
+
                             _logger.LogWarning("Роль не изменена");
                             return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Роль не изменена - " + errorMessage, ErrorCode = 40010 }).Value);
                         }

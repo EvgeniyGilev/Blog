@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Text.Json.Serialization;
 using BlogAPI;
 using BlogAPI.DATA.Context;
 using BlogAPI.DATA.Models;
@@ -7,21 +9,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
-using System.Reflection;
-using System.Text.Json.Serialization;
 
-var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
 logger.Debug("Старт приложения");
 
 try
 {
-
-
     var builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
-    //Добавляем опцию игнорирования в ответах JSON NULL значений объектов
+    // Добавляем опцию игнорирования в ответах JSON NULL значений объектов
     builder.Services.AddControllers().AddJsonOptions(option =>
     {
         option.JsonSerializerOptions.DefaultIgnoreCondition =
@@ -44,19 +42,16 @@ try
             Contact = new OpenApiContact
             {
                 Name = "Evgeniy Gilev",
-                Email = "euggil@ayndex.ru"
-            }
+                Email = "euggil@ayndex.ru",
+            },
         });
-        var filePath = Path.Combine(System.AppContext.BaseDirectory, "Documentation\\docApi.xml");
+        var filePath = Path.Combine(AppContext.BaseDirectory, "Documentation\\docApi.xml");
         c.IncludeXmlComments(filePath);
-
     });
 
     // Подключаем автомаппинг
     var assembly = Assembly.GetAssembly(typeof(MappingProfile));
     builder.Services.AddAutoMapper(assembly);
-
-
     builder.Services.AddAuthentication(options => options.DefaultScheme = "Cookies").AddCookie("Cookies", options =>
 {
     options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
@@ -65,7 +60,7 @@ try
         {
             redirectContext.HttpContext.Response.StatusCode = 401;
             return Task.CompletedTask;
-        }
+        },
     };
 });
 
@@ -74,7 +69,7 @@ try
     builder.Services.AddSingleton<ITagRepository, TagRepository>();
     builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
-    //задаем подключение к БД. Строку подключения берем из конфигурации
+    // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
 
@@ -96,46 +91,32 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
-
-        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-        //app.UseHsts();
-
         app.UseSwagger();
         app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlogApi v1"));
-
     }
     else
     {
         // обработка ошибок HTTP
         app.UseStatusCodePagesWithRedirects("/Error/Error{0}");
+
         // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
-
     }
-    //app.UseHttpsRedirection();
-    // обработка ошибок HTTP
-     app.UseStatusCodePagesWithRedirects("/Error/Error{0}");
-    /*
-    app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 
-    app.Map("/error", ap => ap.Run(async context =>
-    {
-        //$"Err: {context.Request.Query["code"]}"
-        await context.Response.WriteAsync(JsonAttribute();
-    }));
-    */
-    app.UseAuthentication();    // подключение аутентификации
-    app.UseAuthorization();
+    // обработка ошибок HTTP
+    app.UseStatusCodePagesWithRedirects("/Error/Error{0}");
 
     app.UseRouting();
+
+    // подключение аутентификации
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     // Сопоставляем маршруты с контроллерами
     app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-
     app.MapControllers();
 
     app.Run();
-
 }
 catch (Exception exception)
 {
@@ -146,5 +127,5 @@ catch (Exception exception)
 finally
 {
     // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    NLog.LogManager.Shutdown();
+    LogManager.Shutdown();
 }

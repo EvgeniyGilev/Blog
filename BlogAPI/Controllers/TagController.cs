@@ -9,18 +9,23 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlogAPI.Controllers
 {
     /// <summary>
-    /// Действия с тегами
+    /// Действия с тегами.
     /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
     public class TagController : Controller
     {
-
         private readonly ITagRepository _repo;
         private readonly ILogger<TagController> _logger;
         private IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagController"/> class.
+        /// </summary>
+        /// <param name="repo">The repo.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="mapper">The mapper.</param>
         public TagController(ITagRepository repo, ILogger<TagController> logger, IMapper mapper)
         {
             _repo = repo;
@@ -29,10 +34,11 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Получить все теги
+        /// Получить все теги.
         /// </summary>
-        /// <response code="200">Теги выведены</response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <response code="200">Теги выведены.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает все теги, JSON.</returns>
         // GET: TagController
         [HttpGet]
         [Route("GetTags")]
@@ -42,23 +48,23 @@ namespace BlogAPI.Controllers
 
             _logger.LogInformation("Получили все теги");
 
-            GetTags resp = new()
+            GetTags resp = new ()
             {
                 Count = tags.Count,
-                Tags = _mapper.Map<List<Tag>, List<TagView>>(tags)
+                Tags = _mapper.Map<List<Tag>, List<TagView>>(tags),
             };
 
             return Json(resp);
         }
 
-
         /// <summary>
-        /// Получить теги по id
+        /// Получить тег по id.
         /// </summary>
-        /// <param name="id"> ID (int) тега </param>
-        /// <response code="200">Тег выведен</response>
-        /// <response code="400">Тег не найден </response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <param name="id"> ID (int) тега.</param>
+        /// <response code="200">Тег выведен.</response>
+        /// <response code="400">Тег не найден.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает тег,JSON.</returns>
         // GET: TagController
         [HttpGet]
         [Route("GetTagById")]
@@ -67,10 +73,10 @@ namespace BlogAPI.Controllers
             var tag = await _repo.GetTagById(id);
             if (tag != null)
             {
-                TagView resp = new()
+                TagView resp = new ()
                 {
                     id = id,
-                    tagText = tag.tagText
+                    tagText = tag.tagText,
                 };
 
                 _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
@@ -84,11 +90,12 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Создание нового тега
+        /// Создание нового тега.
         /// </summary>
-        /// <param name="newTag"> название тега</param>
-        /// <response code="200">Тег создан</response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <param name="newTag"> название тега.</param>
+        /// <response code="200">Тег создан.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         // GET: TagController/Create
         [HttpPost]
         [Route("Create")]
@@ -102,10 +109,10 @@ namespace BlogAPI.Controllers
                     await _repo.CreateTag(new Tag(newTag.tagText));
                     _logger.LogInformation("Создан новый тег" + newTag.tagText);
 
-                    SuccessResponse resp = new()
+                    SuccessResponse resp = new ()
                     {
                         code = 0,
-                        infoMessage = "Новый тег успешно создан - " + newTag.tagText
+                        infoMessage = "Новый тег успешно создан - " + newTag.tagText,
                     };
 
                     return Json(resp);
@@ -124,13 +131,14 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Редактируем тег по его id
+        /// Редактируем тег по его id.
         /// </summary>
-        /// <param name="newTag"> название тега</param>
-        /// <param name="id">Id (int) тега</param>
-        /// <response code="200">Тег отредактирован</response>
-        /// <response code="400">Тег не найден </response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <param name="newTag"> название тега.</param>
+        /// <param name="id">Id (int) тега.</param>
+        /// <response code="200">Тег отредактирован.</response>
+        /// <response code="400">Тег не найден.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом редактирования, JSON.</returns>
         // GET: TagController/Edit
         [HttpPatch]
         [Route("Edit/{id}")]
@@ -146,17 +154,15 @@ namespace BlogAPI.Controllers
                     await _repo.EditTag(tag, id);
                     _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
 
-                    SuccessResponse resp = new()
+                    SuccessResponse resp = new ()
                     {
                         code = 0,
                         id = id.ToString(),
                         name = tag.tagText,
-                        infoMessage = "Тег успешно изменен"
+                        infoMessage = "Тег успешно изменен",
                     };
 
                     return Json(resp);
-
-
                 }
                 else
                 {
@@ -172,12 +178,13 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Удаляем тег по его id
+        /// Удаляем тег по его id.
         /// </summary>
-        /// <param name="id">Id (int) тега</param>
-        /// <response code="200">Тег удален</response>
-        /// <response code="400">Тег не найден </response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <param name="id">Id (int) тега.</param>
+        /// <response code="200">Тег удален.</response>
+        /// <response code="400">Тег не найден.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом удаления, JSON.</returns>
         // GET: TagController/Delete/5
         [HttpDelete]
         [Route("Delete")]
@@ -187,17 +194,16 @@ namespace BlogAPI.Controllers
             {
                 var tag = await _repo.GetTagById(id);
                 if (tag != null)
-
                 {
                     await _repo.DelTag(tag);
                     _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
 
-                    SuccessResponse resp = new()
+                    SuccessResponse resp = new ()
                     {
                         code = 0,
                         id = id.ToString(),
                         name = tag.tagText,
-                        infoMessage = "Тег успешно удален"
+                        infoMessage = "Тег успешно удален",
                     };
 
                     return Json(resp);

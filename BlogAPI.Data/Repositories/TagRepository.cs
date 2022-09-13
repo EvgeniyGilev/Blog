@@ -3,45 +3,67 @@ using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace BlogAPI.DATA.Repositories
 {
+    /// <summary>
+    /// The tag repository.
+    /// </summary>
     public class TagRepository : ITagRepository
     {
         // ссылка на контекст
         private readonly AppDBContext _context;
 
-        // Метод-конструктор для инициализации
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagRepository"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
         public TagRepository(AppDBContext context)
         {
             _context = context;
         }
 
-        //Добавляем тег
+        /// <summary>
+        /// Creates the tag.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns>A Task.</returns>
         public async Task CreateTag(Tag tag)
         {
             var entry = _context.Entry(tag);
             if (entry.State == EntityState.Detached)
+            {
                 await _context.Tag.AddAsync(tag);
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
-        
-        //Удаляем тег
+
+        /// <summary>
+        /// Del the tag.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns>A Task.</returns>
         public async Task DelTag(Tag tag)
         {
 
             // Удаление тега
             var dbtag = _context.Tag.Where(u => u.tagText == tag.tagText).First();
             if (dbtag != null)
+            {
                 _context.Tag.Remove(dbtag);
+            }
 
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
 
-        //редактируем тег
+        /// <summary>
+        /// Edits the tag.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <param name="id">The id.</param>
+        /// <returns>A Task.</returns>
         public async Task EditTag(Tag tag, int id)
         {
             // изменение тега
@@ -54,7 +76,12 @@ namespace BlogAPI.DATA.Repositories
             // Сохранение изменений
             await _context.SaveChangesAsync();
         }
-        //получаем тег по идентификатору
+
+        /// <summary>
+        /// Gets the tag by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>A Task.</returns>
         public async Task<Tag?> GetTagById(int id)
         {
             var tagById = await _context.Tag.FindAsync(id);
@@ -62,13 +89,21 @@ namespace BlogAPI.DATA.Repositories
             return tagById;
         }
 
+        /// <summary>
+        /// Gets the tags.
+        /// </summary>
+        /// <returns>A Task.</returns>
         public async Task<List<Tag>> GetTags()
         {
             // Получим все статьи
             return await _context.Tag.Include(t => t.Posts).ToListAsync();
         }
 
-        //получаем тег по имени
+        /// <summary>
+        /// Gets the tag by name.
+        /// </summary>
+        /// <param name="Name">The name.</param>
+        /// <returns>A Task.</returns>
         public async Task<Tag?> GetTagByName(string Name)
         {
             var tagByName = await _context.Tag.FirstOrDefaultAsync(t => t.tagText == Name);

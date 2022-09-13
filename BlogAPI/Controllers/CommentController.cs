@@ -1,6 +1,5 @@
 ﻿using BlogAPI.Contracts.Models;
 using BlogAPI.Contracts.Models.Comments;
-using BlogAPI.Contracts.Models.Posts;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
@@ -11,7 +10,7 @@ using System.Security.Claims;
 namespace BlogAPI.Controllers
 {
     /// <summary>
-    /// Действия с комментариями
+    /// Действия с комментариями.
     /// </summary>
     [ExceptionHandler]
     [ApiController]
@@ -23,6 +22,13 @@ namespace BlogAPI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ILogger<CommentController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommentController"/> class.
+        /// </summary>
+        /// <param name="repo">репозиторий комментариев.</param>
+        /// <param name="repoposts">репозиторий статей.</param>
+        /// <param name="userManager">UserManager AspNetCore.Identity.</param>
+        /// <param name="logger">NLOG logger.</param>
         public CommentController(ICommentRepository repo, IPostRepository repoposts, UserManager<User> userManager, ILogger<CommentController> logger)
         {
             _repo = repo;
@@ -31,14 +37,14 @@ namespace BlogAPI.Controllers
             _logger = logger;
         }
 
-
         /// <summary>
         /// Создаем комментарий у статьи, требуется аутентификация пользователя.
         /// </summary>
-        /// <param name="newComment"> Форма комментария, указывается ID статьи и тело комментария</param>
-        /// <response code="200">Комментарий успешно добавлен</response>
-        /// <response code="400">Комментарий добавить не удалось</response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <param name="newComment"> Форма комментария, указывается ID статьи и тело комментария.</param>
+        /// <response code="200">Комментарий успешно добавлен.</response>
+        /// <response code="400">Комментарий добавить не удалось.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращается сообщение со статусом создания комментария в формате JSON.</returns>
         // GET: CommentController/Create
         [HttpPost]
         [Route("Create")]
@@ -55,19 +61,17 @@ namespace BlogAPI.Controllers
                     var post = await _repoposts.GetPostById(newComment.PostId);
                     if (post != null)
                     {
-
                         Comment comment = new Comment();
-                        
                         comment.commentTexte = newComment.CommentText;
                         comment.Post = post;
                         comment.User = user;
 
                         await _repo.CreateComment(comment);
 
-                        SuccessResponse resp = new()
+                        SuccessResponse resp = new ()
                         {
                             code = 0,
-                            infoMessage = "Комментарий успешно добавлен к статье: \"" + post.postName + "\" пользователем: " + user.Email
+                            infoMessage = "Комментарий успешно добавлен к статье: \"" + post.postName + "\" пользователем: " + user.Email,
                         };
 
                         return Json(resp);
@@ -89,17 +93,16 @@ namespace BlogAPI.Controllers
                 _logger.LogWarning("Чтобы оставить комментарий требуется залогиниться");
                 return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Чтобы оставить комментарий требуется залогиниться", ErrorCode = 40011 }).Value);
             }
-
         }
 
-
         /// <summary>
-        /// Удалить комментарий по ID (int)
+        /// Удалить комментарий по ID (int).
         /// </summary>
-        /// <param name="id"> ID (int) комментария</param>
-        /// <response code="200">Комментарий успешно удален</response>
-        /// <response code="400">Комментарий удалить не удалось</response>
-        /// <response code="500">Произошла непредвиденная ошибка</response>
+        /// <param name="id"> ID (int) комментария.</param>
+        /// <response code="200">Комментарий успешно удален.</response>
+        /// <response code="400">Комментарий удалить не удалось.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращается сообщение со статусом удаления, JSON.</returns>
         // GET: CommentController/Delete/5
         [HttpDelete]
         [Route("Delete")]
@@ -111,10 +114,10 @@ namespace BlogAPI.Controllers
                 if (comment != null)
                 {
                     await _repo.DelComment(comment);
-                    SuccessResponse resp = new()
+                    SuccessResponse resp = new ()
                     {
                         code = 0,
-                        infoMessage = "Комментарий успешно удален"
+                        infoMessage = "Комментарий успешно удален",
                     };
 
                     return Json(resp);
