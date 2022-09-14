@@ -1,13 +1,14 @@
 using System.Reflection;
 using BlogWebApp;
-using BlogWebApp.BLL.Models.Entities;
-using BlogWebApp.DAL.Context;
-using BlogWebApp.DAL.Repositories;
-using BlogWebApp.DAL.Repositories.Interfaces;
+using BlogAPI.DATA.Context;
+using BlogAPI.DATA.Repositories;
+using BlogAPI.DATA.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
+using BlogAPI.DATA.Models;
+using Microsoft.EntityFrameworkCore;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -50,7 +51,9 @@ try
     builder.Services.AddSingleton<ITagRepository, TagRepository>();
     builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
-    builder.Services.AddDbContext<AppDBContext>(ServiceLifetime.Singleton);
+    // задаем подключение к БД. Строку подключения берем из конфигурации
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
 
     builder.Services.AddIdentity<User, Role>(opts =>
     {

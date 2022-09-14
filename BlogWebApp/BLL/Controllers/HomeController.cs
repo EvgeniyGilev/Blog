@@ -2,10 +2,10 @@
 using BlogWebApp.BLL.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
-using BlogWebApp.BLL.Models.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using BlogWebApp.Handlers;
+using BlogAPI.DATA.Models;
 
 namespace BlogWebApp.BLL.Controllers
 {

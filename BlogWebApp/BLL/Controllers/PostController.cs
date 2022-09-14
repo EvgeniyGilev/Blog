@@ -1,6 +1,6 @@
-﻿using BlogWebApp.BLL.Models.Entities;
+﻿using BlogAPI.DATA.Models;
+using BlogAPI.DATA.Repositories.Interfaces;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
-using BlogWebApp.DAL.Repositories.Interfaces;
 using BlogWebApp.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

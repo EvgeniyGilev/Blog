@@ -16,11 +16,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogAPI.Contracts", "BlogAP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogAPI.Data", "BlogAPI.Data\BlogAPI.Data.csproj", "{84621AD3-A580-43FF-9D5E-239F4F3F7C17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogApi.Tests", "BlogApi.Tests\BlogApi.Tests.csproj", "{C993E057-821B-468B-B696-1F069410546E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlogApi.Tests", "BlogApi.Tests\BlogApi.Tests.csproj", "{C993E057-821B-468B-B696-1F069410546E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0DB95DF-E50E-4D1A-AD0F-9A72E9831C60}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.MockData", "Blog.MockData\Blog.MockData.csproj", "{9C21091A-B581-4926-A34E-EA5EEE40DB75}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84621AD3-A580-43FF-9D5E-239F4F3F7C17} = {84621AD3-A580-43FF-9D5E-239F4F3F7C17}
 	EndProjectSection
 EndProject
 Global
@@ -49,6 +54,10 @@ Global
 		{C993E057-821B-468B-B696-1F069410546E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C993E057-821B-468B-B696-1F069410546E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C993E057-821B-468B-B696-1F069410546E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C21091A-B581-4926-A34E-EA5EEE40DB75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C21091A-B581-4926-A34E-EA5EEE40DB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C21091A-B581-4926-A34E-EA5EEE40DB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C21091A-B581-4926-A34E-EA5EEE40DB75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,7 +65,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8FAFDDA2-3687-465E-98E9-8B2D00D9C52F} = {BB845EFE-0466-4477-B178-DA1EEBBF9587}
 		{D01ECB42-13DE-4D32-9DEC-71B6F42C232F} = {BB845EFE-0466-4477-B178-DA1EEBBF9587}
-		{84621AD3-A580-43FF-9D5E-239F4F3F7C17} = {BB845EFE-0466-4477-B178-DA1EEBBF9587}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE3AD72D-DE78-4AF9-B554-5F0FB5FC7EA6}
