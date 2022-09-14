@@ -1,22 +1,19 @@
 ﻿using AutoMapper;
-using BlogWebApp.BLL.Models.Entities;
-using Microsoft.Extensions.Hosting;
-using System.Net;
 
 namespace BlogWebApp
 {
     /// <summary>
-    /// Настройки маппинга всех сущностей приложения
+    /// Настройки маппинга всех сущностей приложения.
     /// </summary>
     public class MappingProfile : Profile
     {
-/// <summary>
-/// В конструкторе настроим соответствие сущностей при маппинге
-/// </summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MappingProfile"/> class.
+        /// В конструкторе настроим соответствие сущностей при маппинге.
+        /// </summary>
         public MappingProfile()
-{
-     //здесь можно подключить маппинг автомаппера, но пока сопоставляем модели с вьюмоделями руками
-
+        {
+            // здесь можно подключить маппинг автомаппера, но пока сопоставляем модели с вьюмоделями руками.
         }
     }
 }

@@ -6,6 +6,9 @@ using BlogWebApp.Handlers;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    /// <summary>
+    /// The tag controller.
+    /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
@@ -15,6 +18,11 @@ namespace BlogWebApp.BLL.Controllers
         private readonly ITagRepository _repo;
         private readonly ILogger<TagController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagController"/> class.
+        /// </summary>
+        /// <param name="repo">The repo.</param>
+        /// <param name="logger">The logger.</param>
         public TagController(ITagRepository repo, ILogger<TagController> logger)
         {
             _repo = repo;
@@ -22,9 +30,9 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         /// <summary>
-        ///  получить все теги
+        ///  получить все теги.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An IActionResult.</returns>
         // GET: TagController
         [HttpGet]
         [Route("GetTags")]
@@ -35,12 +43,11 @@ namespace BlogWebApp.BLL.Controllers
             return View(tags);
         }
 
-
         /// <summary>
-        /// получить теги по id
+        /// получить теги по id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id тега.</param>
+        /// <returns>An IActionResult.</returns>
         // GET: TagController
         [HttpGet]
         [Route("GetTagById")]
@@ -51,6 +58,10 @@ namespace BlogWebApp.BLL.Controllers
             return View(tag);
         }
 
+        /// <summary>
+        /// Creates the.
+        /// </summary>
+        /// <returns>An IActionResult.</returns>
         [HttpGet]
         [Route("Create")]
         public IActionResult Create()
@@ -59,10 +70,10 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         /// <summary>
-        /// Создание нового тега
+        /// Создание нового тега.
         /// </summary>
-        /// <param name="newTag"></param>
-        /// <returns></returns>
+        /// <param name="newTag"> форма ввода данных для нового тега</param>
+        /// <returns>An IActionResult.</returns>
         // GET: TagController/Create
         [HttpPost]
         [Route("Create")]
@@ -84,10 +95,10 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         /// <summary>
-        /// Форма редактирования тега по его id получаем текущий тег
+        /// Форма редактирования тега по его id получаем текущий тег.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id тега.</param>
+        /// <returns>An IActionResult.</returns>
         [HttpGet]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
@@ -97,17 +108,19 @@ namespace BlogWebApp.BLL.Controllers
             EditeTagViewModel model = new EditeTagViewModel
             {
                 id = id,
-                tagText = tag.tagText
+                tagText = tag.tagText,
             };
+
             _logger.LogInformation("Открыли форму изменения тега по id: " + id.ToString() + " имя тега: " + tag.tagText);
             return View(model);
         }
+
         /// <summary>
-        /// редактируем тег по его id
+        /// редактируем тег по его id.
         /// </summary>
-        /// <param name="newTag"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="newTag">данные тега.</param>
+        /// <param name="id">id тега.</param>
+        /// <returns>An IActionResult.</returns>
         // GET: TagController/Edit
         [HttpPost]
         [Route("Edit/{id}")]
@@ -122,10 +135,10 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         /// <summary>
-        /// Удаляем тег по его id
+        /// Удаляем тег по его id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id тега</param>
+        /// <returns>An IActionResult.</returns>
         // GET: TagController/Delete/5
         [HttpPost]
         [Route("Delete/{id}")]

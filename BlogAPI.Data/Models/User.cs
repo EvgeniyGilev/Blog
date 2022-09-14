@@ -2,25 +2,52 @@
 
 namespace BlogAPI.DATA.Models
 {
-    public class User: IdentityUser
+    /// <summary>
+    /// The user.
+    /// </summary>
+    public class User : IdentityUser
     {
-       // public string Id { get; set; }
-        public string ?UserFirstName { get; set; }
-        public string ?UserLastName { get; set; }
+        /// <summary>
+        /// Gets or sets the user first name.
+        /// </summary>
+        public string? UserFirstName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user last name.
+        /// </summary>
+        public string? UserLastName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user password.
+        /// </summary>
         public string UserPassword { get; set; }
-        
-        //email
+
+        /// <summary>
+        /// Gets or sets the email.
+        /// </summary>
         public string Email { get; set; }
-        public string ?UserCreateDate { get; set; }
 
-        //ссылка на роли
-        public virtual List<Role> Roles { get; set; } = new();
+        /// <summary>
+        /// Gets or sets the user create date.
+        /// </summary>
+        public string? UserCreateDate { get; set; }
 
-        //ссылка на статьи
-        public virtual List<Post> Posts { get; set; } = new();
+        /// <summary>
+        /// Gets or sets the roles.
+        /// ссылка на роли.
+        /// </summary>
+        public virtual List<Role> Roles { get; set; } = new ();
 
-        //ссылка на комментарии
-        public virtual List<Comment> Comments { get; set; } = new();
+        /// <summary>
+        /// Gets or sets the posts.
+        /// ссылка на статьи.
+        /// </summary>
+        public virtual List<Post> Posts { get; set; } = new ();
 
+        /// <summary>
+        /// Gets or sets the comments.
+        /// ссылка на комментарии.
+        /// </summary>
+        public virtual List<Comment> Comments { get; set; } = new ();
     }
 }
