@@ -1,4 +1,4 @@
-﻿using BlogWebApp.BLL.Models.Entities;
+﻿using BlogAPI.DATA.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlogWebApp.BLL.Models.ViewModels.PostViews

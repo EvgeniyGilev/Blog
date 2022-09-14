@@ -1,8 +1,8 @@
-﻿using BlogWebApp.BLL.Models.Entities;
-using BlogWebApp.DAL.Repositories.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using BlogWebApp.BLL.Models.ViewModels.TagViews;
 using BlogWebApp.Handlers;
+using BlogAPI.DATA.Repositories.Interfaces;
+using BlogAPI.DATA.Models;
 
 namespace BlogWebApp.BLL.Controllers
 {

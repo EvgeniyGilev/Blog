@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.BLL.Models.ViewModels.RoleViews;
 using BlogWebApp.Handlers;
+using BlogAPI.DATA.Models;
 
 namespace CustomIdentityApp.Controllers
 {

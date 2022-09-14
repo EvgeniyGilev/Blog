@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BlogWebApp.DAL.Repositories.Interfaces;
-using BlogWebApp.BLL.Models.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using BlogWebApp.BLL.Models.ViewModels.UserViews;
 using BlogWebApp.Handlers;
+using BlogAPI.DATA.Repositories.Interfaces;
+using BlogAPI.DATA.Models;
 
 namespace BlogWebApp.BLL.Controllers
 {

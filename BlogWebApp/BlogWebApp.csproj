@@ -35,7 +35,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="DAL\DB\blog.db">
+    <ProjectReference Include="..\BlogAPI.Data\BlogAPI.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DB\blog.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
