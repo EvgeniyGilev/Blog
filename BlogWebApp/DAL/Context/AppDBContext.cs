@@ -4,54 +4,60 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BlogWebApp.DAL.Context
 {
+    /// <summary>
+    /// DBContext.
+    /// </summary>
     public class AppDBContext : IdentityDbContext<User>
     {
-        // Объекты таблицы Users
+        /// <summary>
+        /// Объекты таблицы Users.
+        /// </summary>
         public DbSet<User> User { get; set; }
 
-        // Объекты таблицы Post
+        /// <summary>
+        /// Объекты таблицы Post.
+        /// </summary>
         public DbSet<Post> Post { get; set; }
 
-        //Объекты таблицы Role
+        /// <summary>
+        /// Объекты таблицы Role.
+        /// </summary>
         public DbSet<Role> Role { get; set; }
 
-        //Объекты таблицы Comment
+        /// <summary>
+        /// Объекты таблицы Comment.
+        /// </summary>
         public DbSet<Comment> Comment { get; set; }
 
-        //Объекты таблицы Comment
+        /// <summary>
+        /// Объекты таблицы Comment.
+        /// </summary>
         public DbSet<Tag> Tag { get; set; }
 
-        public AppDBContext(DbContextOptions<AppDBContext> options): base(options)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppDBContext"/> class.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        public AppDBContext(DbContextOptions<AppDBContext> options) : base(options)
         {
-            //Database.EnsureDeleted();
-
+            // Database.EnsureDeleted();
             Database.EnsureCreated();
-
         }
 
-
-        // The following configures EF to create a Sqlite database file in the
-        // special "local" folder for your platform.
+        /// <summary>
+        /// Ons the configuring.
+        /// </summary>
+        /// <param name="options">The options.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source = DAL/DB/blog.db");
-        /*
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            optionsBuilder.UseSqlServer(connectionString);
-        }
-        */
+        /// <summary>
+        /// Ons the model creating.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            //builder.Entity<Room>().ToTable("Rooms");
-            //builder.Entity<Device>().ToTable("Devices");
         }
     }
 }

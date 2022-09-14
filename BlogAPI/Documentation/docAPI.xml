@@ -410,12 +410,13 @@
         </member>
         <member name="T:BlogAPI.MappingProfile">
             <summary>
-            Настройки маппинга всех сущностей приложения
+            Настройки маппинга всех сущностей приложения.
             </summary>
         </member>
         <member name="M:BlogAPI.MappingProfile.#ctor">
             <summary>
-            В конструкторе настроим соответствие сущностей при маппинге
+            Initializes a new instance of the <see cref="T:BlogAPI.MappingProfile"/> class.
+            В конструкторе настроим соответствие сущностей при маппинге.
             </summary>
         </member>
     </members>

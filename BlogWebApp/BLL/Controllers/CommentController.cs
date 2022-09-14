@@ -1,13 +1,16 @@
-﻿using BlogWebApp.BLL.Models.Entities;
+﻿using System.Security.Claims;
+using BlogWebApp.BLL.Models.Entities;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using BlogWebApp.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    /// <summary>
+    /// The comment controller.
+    /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
@@ -18,6 +21,13 @@ namespace BlogWebApp.BLL.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ILogger<CommentController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommentController"/> class.
+        /// </summary>
+        /// <param name="repo">The repo.</param>
+        /// <param name="repoposts">The repoposts.</param>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="logger">The logger.</param>
         public CommentController(ICommentRepository repo, IPostRepository repoposts, UserManager<User> userManager, ILogger<CommentController> logger)
         {
             _repo = repo;
@@ -26,9 +36,13 @@ namespace BlogWebApp.BLL.Controllers
             _logger = logger;
         }
 
-
-
         // GET: CommentController/Create
+        /// <summary>
+        /// Creates the.
+        /// </summary>
+        /// <param name="newComment">The new comment.</param>
+        /// <param name="id">The id.</param>
+        /// <returns>A Task.</returns>
         [HttpPost]
         [Route("Create/{id}")]
         public async Task<IActionResult> Create([FromForm] ShowPostAndCommentViewModel newComment, [FromRoute] int id)
@@ -53,19 +67,29 @@ namespace BlogWebApp.BLL.Controllers
                         await _repo.CreateComment(comment);
                         return RedirectToAction("GetPost", "Post", new { id = id });
                     }
-                    else return RedirectToAction("Error500", "Error");
+                    else
+                    {
+                        return RedirectToAction("Error500", "Error");
+                    }
                 }
-                else return RedirectToAction("Error500", "Error");
+                else
+                {
+                    return RedirectToAction("Error500", "Error");
+                }
             }
             else
             {
                 return RedirectToAction("Error500", "Error");
             }
-
         }
 
-
         // GET: CommentController/Delete/5
+        /// <summary>
+        /// Deletes the.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="PostId">The post id.</param>
+        /// <returns>A Task.</returns>
         [HttpPost]
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id, int PostId)

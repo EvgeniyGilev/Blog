@@ -2,12 +2,14 @@
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.DAL.Repositories.Interfaces;
 using BlogWebApp.Handlers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.BLL.Controllers
 {
+    /// <summary>
+    /// The post controller.
+    /// </summary>
     [ExceptionHandler]
     [ApiController]
     [Route("[controller]")]
@@ -19,6 +21,13 @@ namespace BlogWebApp.BLL.Controllers
         private readonly ILogger<PostController> _logger;
         private readonly UserManager<User> _userManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostController"/> class.
+        /// </summary>
+        /// <param name="repo">The repo.</param>
+        /// <param name="repotags">The repotags.</param>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="logger">The logger.</param>
         public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger)
         {
             _repo = repo;
@@ -28,34 +37,32 @@ namespace BlogWebApp.BLL.Controllers
         }
 
         /// <summary>
-        /// получить статью по ID
+        /// получить статью по ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id статьи.</param>
+        /// <returns>An IActionResult.</returns>
         // GET: PostController
         [HttpGet]
         [Route("GetPost/{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
-         
             var post = await _repo.GetPostById(id);
             if (post != null)
             {
-                
                 ShowPostAndCommentViewModel model = new ShowPostAndCommentViewModel { ShowPost = post, PostId=id };
-                _logger.LogInformation("Получаем статью с ID: "+ id.ToString());
-                
+                _logger.LogInformation("Получаем статью с ID: " + id.ToString());
 
                 return View(model);
             }
+
             _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
             return RedirectToAction("GetPosts");
         }
 
         /// <summary>
-        /// получить все статьи
+        /// получить все статьи.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An IActionResult.</returns>
         // GET: PostController
         [HttpGet]
         [Route("GetPosts")]
@@ -64,17 +71,17 @@ namespace BlogWebApp.BLL.Controllers
             var posts = await _repo.GetPosts();
             ShowPostsViewModel model = new ShowPostsViewModel
             {
-                ShowPosts = posts
+                ShowPosts = posts,
             };
             _logger.LogInformation("Показываем все статьи ");
             return View(model);
         }
 
         /// <summary>
-        /// получить все статьи одного пользователя
+        /// получить все статьи одного пользователя.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id пользователя.</param>
+        /// <returns>An IActionResult.</returns>
         // GET: PostController
         [HttpGet]
         [Route("GetPostsByUserId")]
@@ -85,18 +92,29 @@ namespace BlogWebApp.BLL.Controllers
             return View(posts);
         }
 
+        /// <summary>
+        /// Creates the.
+        /// </summary>
+        /// <returns>A Task.</returns>
         [HttpGet]
         [Route("Create")]
         public async Task<IActionResult> Create()
         {
             CreatePostViewModel model = new CreatePostViewModel
             {
-                PostTags = await _repotags.GetTags()
+                PostTags = await _repotags.GetTags(),
             };
             _logger.LogInformation("открываем страницу создания новой статьи");
             return View(model);
         }
-        // GET: PostController/Create
+
+        /// <summary>
+        /// Creates the.
+        /// </summary>
+        /// <param name="newPost">The new post.</param>
+        /// <param name="postTags">The post tags.</param>
+        /// <returns>A Task.</returns>
+        /// GET: PostController/Create
         [HttpPost]
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreatePostViewModel newPost, [FromForm] List<string> postTags)
@@ -110,7 +128,9 @@ namespace BlogWebApp.BLL.Controllers
                 {
                     Tag newtag = await _repotags.GetTagByName(tag);
                     if (newtag != null)
+                    {
                         _posttags.Add(newtag);
+                    }
                 }
 
                 Post post = new Post
@@ -118,9 +138,9 @@ namespace BlogWebApp.BLL.Controllers
                     postName = newPost.PostName,
                     postText = newPost.PostText,
                     User = searchuser,
-                    Tags = _posttags
+                    Tags = _posttags,
                 };
-                
+
                 await _repo.CreatePost(post);
                 _logger.LogInformation("новая статья добавлена: " + post.postName);
             }
@@ -128,14 +148,18 @@ namespace BlogWebApp.BLL.Controllers
             return RedirectToAction("GetPosts");
         }
 
-
+        /// <summary>
+        /// Edits the.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>A Task.</returns>
         [HttpGet]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             var post = await _repo.GetPostById(id);
 
-            //редактировать статью может только автор или администратор
+            // редактировать статью может только автор или администратор
             if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
             {
 
@@ -145,8 +169,9 @@ namespace BlogWebApp.BLL.Controllers
                     PostText = post.postText,
                     PostTagsCurrent = post.Tags,
                     PostTagsAll = await _repotags.GetTags(),
-                    PostId = id
+                    PostId = id,
                 };
+
                 _logger.LogInformation("Статья отредактирована: " + post.postName);
                 return View(model);
             }
@@ -155,7 +180,15 @@ namespace BlogWebApp.BLL.Controllers
                 return RedirectToAction("AccessDenied", "Home");
             }
         }
+
         // Put: PostController/Edit/5
+        /// <summary>
+        /// Edits the.
+        /// </summary>
+        /// <param name="newPost">The new post.</param>
+        /// <param name="postTags">The post tags.</param>
+        /// <param name="id">The id.</param>
+        /// <returns>A Task.</returns>
         [HttpPost]
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostViewModel newPost, [FromForm] List<string> postTags, [FromRoute] int id)
@@ -167,7 +200,9 @@ namespace BlogWebApp.BLL.Controllers
             {
                 Tag newtag = await _repotags.GetTagByName(tag);
                 if (newtag != null)
+                {
                     _posttags.Add(newtag);
+                }
             }
 
             var post = await _repo.GetPostById(id);
@@ -176,23 +211,25 @@ namespace BlogWebApp.BLL.Controllers
             post.postText = newPost.PostText;
             post.Tags = _posttags;
 
-            
             await _repo.EditPost(post, id);
             _logger.LogInformation("Статья отредактирована: " + post.postName);
 
             return RedirectToAction("GetPosts");
-
         }
 
-
         // GET: PostController/Delete/5
+        /// <summary>
+        /// Deletes the.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>A Task.</returns>
         [HttpPost]
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-
             var post = await _repo.GetPostById(id);
-            //удалить статью может только автор или администратор
+
+            // удалить статью может только автор или администратор
             if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
             {
                 if (post == null) { return RedirectToAction(nameof(Index)); }
@@ -207,8 +244,6 @@ namespace BlogWebApp.BLL.Controllers
             {
                 return RedirectToAction("AccessDenied", "Home");
             }
-
         }
-
     }
 }
