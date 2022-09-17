@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using BlogAPI;
+using BlogAPI.Data.Repositories.Interfaces;
+using BlogAPI.Data.Repositories;
 using BlogAPI.DATA.Context;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories;
@@ -68,6 +70,8 @@ try
     builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
     builder.Services.AddSingleton<ITagRepository, TagRepository>();
     builder.Services.AddSingleton<IPostRepository, PostRepository>();
+
+    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
     // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
