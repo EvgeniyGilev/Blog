@@ -267,16 +267,9 @@
             <param name="repo">The repo.</param>
             <param name="logger">The logger.</param>
             <param name="mapper">The mapper.</param>
+            /// <param name="tagService"> бизнес логика работы с tag</param>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTags">
-            <summary>
-            Получить все теги.
-            </summary>
-            <response code="200">Теги выведены.</response>
-            <response code="500">Произошла непредвиденная ошибка.</response>
-            <returns>Возвращает все теги, JSON.</returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.TagController.GetTags2">
             <summary>
             Получить все теги.
             </summary>
@@ -293,6 +286,15 @@
             <response code="400">Тег не найден.</response>
             <response code="500">Произошла непредвиденная ошибка.</response>
             <returns>Возвращает тег,JSON.</returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.Create2(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
+            <summary>
+            Создание нового тега.
+            </summary>
+            <param name="newTag"> название тега.</param>
+            <response code="200">Тег создан.</response>
+            <response code="500">Произошла непредвиденная ошибка.</response>
+            <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Create(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
             <summary>
@@ -426,6 +428,38 @@
             Initializes a new instance of the <see cref="T:BlogAPI.MappingProfile"/> class.
             В конструкторе настроим соответствие сущностей при маппинге.
             </summary>
+        </member>
+        <member name="T:BlogAPI.Services.TagService">
+            <summary>
+            The tag service.
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Services.TagService.#ctor(BlogAPI.DATA.Repositories.Interfaces.ITagRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork,Microsoft.Extensions.Logging.ILogger{BlogAPI.Services.TagService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:BlogAPI.Services.TagService"/> class.
+            </summary>
+            <param name="tagRepository"></param>
+            <param name="unitOfWork"></param>
+        </member>
+        <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#ListAsync">
+            <summary>
+            Get List Tags.
+            </summary>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#GetTagById(System.Int32)">
+            <summary>
+            Get Tag by Id.
+            </summary>
+            <param name="id">id tag, int.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task`1"/> representing the result of the asynchronous operation.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#CreateTag(System.String)">
+            <summary>
+            Create new tag.
+            <param name="name">name tag, string.</param>
+            </summary>
+            <returns>true or false.</returns>
         </member>
     </members>
 </doc>

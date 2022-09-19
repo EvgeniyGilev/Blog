@@ -5,7 +5,9 @@ using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
 using BlogAPI.Interfaces.Services;
+using BlogAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Xml.Linq;
 
 namespace BlogAPI.Controllers
 {
@@ -28,6 +30,7 @@ namespace BlogAPI.Controllers
         /// <param name="repo">The repo.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="mapper">The mapper.</param>
+        /// /// <param name="tagService"> бизнес логика работы с tag</param>
         public TagController(ITagRepository repo, ILogger<TagController> logger, IMapper mapper, ITagService tagService)
         {
             _repo = repo;
@@ -73,7 +76,7 @@ namespace BlogAPI.Controllers
         [Route("GetTagById")]
         public async Task<IActionResult> GetTagById(int id)
         {
-            var tag = await _repo.GetTagById(id);
+            var tag = await _tagService.GetTagById(id);
             if (tag != null)
             {
                 TagView resp = new ()
@@ -89,6 +92,51 @@ namespace BlogAPI.Controllers
             {
                 _logger.LogInformation("Тег не найден");
                 return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+            }
+        }
+
+        /// <summary>
+        /// Создание нового тега.
+        /// </summary>
+        /// <param name="newTag"> название тега.</param>
+        /// <response code="200">Тег создан.</response>
+        /// <response code="500">Произошла непредвиденная ошибка.</response>
+        /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
+        // GET: TagController/Create
+        [HttpPost]
+        [Route("Create2")]
+        public async Task<IActionResult> Create2([FromForm] CreateTagModel newTag)
+        {
+            if (User.IsInRole("Администратор"))
+            {
+                try
+                {
+                    var isTagCreate = await _tagService.CreateTag(newTag.tagText);
+                    if (isTagCreate == true)
+                    {
+                        SuccessResponse resp = new ()
+                        {
+                            code = 0,
+                            infoMessage = "Новый тег успешно создан - " + newTag.tagText,
+                        };
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Тег уже существует");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже существует", ErrorCode = 40003 }).Value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation("Произошла ошибка при создании нового тега " + ex.Message);
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при создании нового тега", ErrorCode = 40003 }).Value);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Доступ запрещен");
+                return StatusCode(403, Json(new ErrorResponse { ErrorMessage = "Доступ запрещен, нужны права Администратора", ErrorCode = 40011 }).Value);
             }
         }
 
