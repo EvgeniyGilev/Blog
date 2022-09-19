@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BlogAPI.Data.Repositories.Interfaces
+﻿namespace BlogAPI.DATA.Repositories.Interfaces
 {
     /// <summary>
     /// The Unit of Work Pattern interface.

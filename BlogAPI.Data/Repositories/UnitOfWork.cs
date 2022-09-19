@@ -1,7 +1,7 @@
-﻿using BlogAPI.Data.Repositories.Interfaces;
+﻿using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.DATA.Context;
 
-namespace BlogAPI.Data.Repositories
+namespace BlogAPI.DATA.Repositories
 {
     /// <summary>
     /// The Unit of Work Pattern class.

@@ -8,18 +8,15 @@ namespace BlogAPI.DATA.Repositories
     /// <summary>
     /// The tag repository.
     /// </summary>
-    public class TagRepository : ITagRepository
+    public class TagRepository : BaseRepository, ITagRepository
     {
-        // ссылка на контекст
-        private readonly AppDBContext _context;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TagRepository"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         public TagRepository(AppDBContext context)
+         : base(context)
         {
-            _context = context;
         }
 
         /// <summary>
@@ -34,9 +31,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 await _context.Tag.AddAsync(tag);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -53,9 +47,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 _context.Tag.Remove(dbtag);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -72,9 +63,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 dbtag.tagText = tag.tagText;
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>

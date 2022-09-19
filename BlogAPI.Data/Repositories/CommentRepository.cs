@@ -8,18 +8,15 @@ namespace BlogAPI.DATA.Repositories
     /// <summary>
     /// The comment repository.
     /// </summary>
-    public class CommentRepository : ICommentRepository
+    public class CommentRepository : BaseRepository, ICommentRepository
     {
-        // ссылка на контекст
-        private readonly AppDBContext _context;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentRepository"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         public CommentRepository(AppDBContext context)
+            : base(context)
         {
-            _context = context;
         }
 
         /// <summary>
@@ -36,9 +33,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 await _context.Comment.AddAsync(comment);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -54,9 +48,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 _context.Comment.Remove(dbcomment);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -71,9 +62,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 _context.Comment.Update(comment);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>

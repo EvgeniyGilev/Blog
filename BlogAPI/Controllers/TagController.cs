@@ -4,6 +4,7 @@ using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
+using BlogAPI.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogAPI.Controllers
@@ -18,7 +19,8 @@ namespace BlogAPI.Controllers
     {
         private readonly ITagRepository _repo;
         private readonly ILogger<TagController> _logger;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
+        private readonly ITagService _tagService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagController"/> class.
@@ -26,11 +28,12 @@ namespace BlogAPI.Controllers
         /// <param name="repo">The repo.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="mapper">The mapper.</param>
-        public TagController(ITagRepository repo, ILogger<TagController> logger, IMapper mapper)
+        public TagController(ITagRepository repo, ILogger<TagController> logger, IMapper mapper, ITagService tagService)
         {
             _repo = repo;
             _logger = logger;
             _mapper = mapper;
+            _tagService = tagService;
         }
 
         /// <summary>
@@ -44,14 +47,14 @@ namespace BlogAPI.Controllers
         [Route("GetTags")]
         public async Task<IActionResult> GetTags()
         {
-            var tags = await _repo.GetTags();
+            var tags = await _tagService.ListAsync();
 
             _logger.LogInformation("Получили все теги");
 
-            GetTags resp = new ()
+            GetTags resp = new()
             {
-                Count = tags.Count,
-                Tags = _mapper.Map<List<Tag>, List<TagView>>(tags),
+                Count = tags.Count(),
+                Tags = _mapper.Map<IEnumerable<Tag>, List<TagView>>(tags),
             };
 
             return Json(resp);

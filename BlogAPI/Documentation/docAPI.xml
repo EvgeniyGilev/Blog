@@ -260,7 +260,7 @@
             Действия с тегами.
             </summary>
         </member>
-        <member name="M:BlogAPI.Controllers.TagController.#ctor(BlogAPI.DATA.Repositories.Interfaces.ITagRepository,Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.TagController},AutoMapper.IMapper)">
+        <member name="M:BlogAPI.Controllers.TagController.#ctor(BlogAPI.DATA.Repositories.Interfaces.ITagRepository,Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.TagController},AutoMapper.IMapper,BlogAPI.Interfaces.Services.ITagService)">
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.TagController"/> class.
             </summary>
@@ -269,6 +269,14 @@
             <param name="mapper">The mapper.</param>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.GetTags">
+            <summary>
+            Получить все теги.
+            </summary>
+            <response code="200">Теги выведены.</response>
+            <response code="500">Произошла непредвиденная ошибка.</response>
+            <returns>Возвращает все теги, JSON.</returns>
+        </member>
+        <member name="M:BlogAPI.Controllers.TagController.GetTags2">
             <summary>
             Получить все теги.
             </summary>

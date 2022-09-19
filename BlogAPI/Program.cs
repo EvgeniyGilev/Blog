@@ -1,12 +1,12 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using BlogAPI;
-using BlogAPI.Data.Repositories.Interfaces;
-using BlogAPI.Data.Repositories;
 using BlogAPI.DATA.Context;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories;
 using BlogAPI.DATA.Repositories.Interfaces;
+using BlogAPI.Interfaces.Services;
+using BlogAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog;
@@ -66,12 +66,15 @@ try
     };
 });
 
-    // регистрация сервиса репозитория
-    builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
-    builder.Services.AddSingleton<ITagRepository, TagRepository>();
-    builder.Services.AddSingleton<IPostRepository, PostRepository>();
+    // регистрация сервиса репозитория (и его жизненного цикла scoped, singleton..)
+    builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+    builder.Services.AddScoped<ITagRepository, TagRepository>();
+    builder.Services.AddScoped<IPostRepository, PostRepository>();
 
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+    builder.Services.AddScoped<ITagService, TagService>();
+
 
     // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
