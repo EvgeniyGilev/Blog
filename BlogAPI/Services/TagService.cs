@@ -21,9 +21,9 @@ namespace BlogAPI.Services
         /// <param name="unitOfWork"></param>
         public TagService(ITagRepository tagRepository, IUnitOfWork unitOfWork, ILogger<TagService> logger)
         {
-            this._tagRepository = tagRepository;
-            this._unitOfWork = unitOfWork;
-            this._logger = logger;
+            _tagRepository = tagRepository;
+            _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace BlogAPI.Services
 
         /// <summary>
         /// Create new tag.
-        /// <param name="name">name tag, string.</param>
         /// </summary>
+        /// <param name="name">name tag, string.</param>
         /// <returns>true or false.</returns>
         async Task<bool> ITagService.CreateTag(string name)
         {
@@ -76,6 +76,57 @@ namespace BlogAPI.Services
             else
             {
                 _logger.LogInformation("Тег уже существует");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Edit tag by Id.
+        /// </summary>
+        /// <param name="id">id tag, int.</param>
+        /// <param name="newTag">new tag, Tag.</param>
+        /// <returns>true or false.</returns>
+        async Task<bool> ITagService.EditTag(int id, Tag newTag)
+        {
+            var tag = await _tagRepository.GetTagById(id);
+            if (tag != null)
+            {
+                tag.tagText = newTag.tagText;
+
+                await _tagRepository.EditTag(tag, id);
+                await _unitOfWork.CompleteAsync();
+
+                _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + newTag.tagText);
+
+                return true;
+            }
+            else
+            {
+                _logger.LogInformation("Тег не найден");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Delete tag by Id.
+        /// </summary>
+        /// <param name="id">id tag, int.</param>
+        /// <returns>true or false.</returns>
+        async Task<bool> ITagService.DeleteTag(int id)
+        {
+            var tag = await _tagRepository.GetTagById(id);
+            if (tag != null)
+            {
+                await _tagRepository.DelTag(tag);
+                await _unitOfWork.CompleteAsync();
+
+                _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
+
+                return true;
+            }
+            else
+            {
+                _logger.LogInformation("Тег не найден");
                 return false;
             }
         }

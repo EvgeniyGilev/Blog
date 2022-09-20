@@ -3,6 +3,7 @@ using BlogAPI.Contracts.Models.Comments;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
+using BlogAPI.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -17,10 +18,10 @@ namespace BlogAPI.Controllers
     [Route("[controller]")]
     public class CommentController : Controller
     {
-        private readonly ICommentRepository _repo;
-        private readonly IPostRepository _repoposts;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<CommentController> _logger;
+        private readonly ICommentService _commentService;
+        private readonly IPostService _postService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentController"/> class.
@@ -29,12 +30,12 @@ namespace BlogAPI.Controllers
         /// <param name="repoposts">репозиторий статей.</param>
         /// <param name="userManager">UserManager AspNetCore.Identity.</param>
         /// <param name="logger">NLOG logger.</param>
-        public CommentController(ICommentRepository repo, IPostRepository repoposts, UserManager<User> userManager, ILogger<CommentController> logger)
+        public CommentController(UserManager<User> userManager, ILogger<CommentController> logger,ICommentService commentService, IPostService postService)
         {
-            _repo = repo;
-            _repoposts = repoposts;
             _userManager = userManager;
             _logger = logger;
+            _commentService = commentService;
+            _postService = postService;
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace BlogAPI.Controllers
                 var user = await _userManager.FindByIdAsync(currentUserID);
                 if (user != null)
                 {
-                    var post = await _repoposts.GetPostById(newComment.PostId);
+                    var post = await _postService.GetPostById(newComment.PostId);
                     if (post != null)
                     {
                         Comment comment = new Comment();
@@ -66,15 +67,22 @@ namespace BlogAPI.Controllers
                         comment.Post = post;
                         comment.User = user;
 
-                        await _repo.CreateComment(comment);
-
-                        SuccessResponse resp = new ()
+                        var isCommentCreate = await _commentService.CreateComment(comment);
+                        if (isCommentCreate)
                         {
-                            code = 0,
-                            infoMessage = "Комментарий успешно добавлен к статье: \"" + post.postName + "\" пользователем: " + user.Email,
-                        };
+                            SuccessResponse resp = new ()
+                            {
+                                code = 0,
+                                infoMessage = "Комментарий успешно добавлен к статье: \"" + post.postName + "\" пользователем: " + user.Email,
+                            };
 
-                        return Json(resp);
+                            return Json(resp);
+                        }
+                        else
+                        {
+                            _logger.LogError("Ошибка при добавлении комментария");
+                            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Ошибка при добавлении комментария", ErrorCode = 40001 }).Value);
+                        }
                     }
                     else
                     {
@@ -110,17 +118,25 @@ namespace BlogAPI.Controllers
         {
             if (User.IsInRole("Администратор"))
             {
-                var comment = await _repo.GetCommentById(id);
+                var comment = await _commentService.GetCommentById(id);
                 if (comment != null)
                 {
-                    await _repo.DelComment(comment);
-                    SuccessResponse resp = new ()
+                    var isCommentDelete = await _commentService.DeleteComment(comment);
+                    if (isCommentDelete)
                     {
-                        code = 0,
-                        infoMessage = "Комментарий успешно удален",
-                    };
+                        SuccessResponse resp = new ()
+                        {
+                            code = 0,
+                            infoMessage = "Комментарий успешно удален",
+                        };
 
-                    return Json(resp);
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogError("Ошибка при удалении комментария");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Ошибка при удалении комментария", ErrorCode = 40001 }).Value);
+                    }
                 }
                 else
                 {

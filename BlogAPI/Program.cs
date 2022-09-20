@@ -74,7 +74,8 @@ try
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
     builder.Services.AddScoped<ITagService, TagService>();
-
+    builder.Services.AddScoped<IPostService, PostService>();
+    builder.Services.AddScoped<ICommentService, CommentService>();
 
     // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

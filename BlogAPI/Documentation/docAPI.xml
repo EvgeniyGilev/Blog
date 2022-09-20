@@ -9,7 +9,7 @@
             Действия с комментариями.
             </summary>
         </member>
-        <member name="M:BlogAPI.Controllers.CommentController.#ctor(BlogAPI.DATA.Repositories.Interfaces.ICommentRepository,BlogAPI.DATA.Repositories.Interfaces.IPostRepository,Microsoft.AspNetCore.Identity.UserManager{BlogAPI.DATA.Models.User},Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.CommentController})">
+        <member name="M:BlogAPI.Controllers.CommentController.#ctor(Microsoft.AspNetCore.Identity.UserManager{BlogAPI.DATA.Models.User},Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.CommentController},BlogAPI.Interfaces.Services.ICommentService,BlogAPI.Interfaces.Services.IPostService)">
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.CommentController"/> class.
             </summary>
@@ -78,7 +78,7 @@
             Действия с статьями блога.
             </summary>
         </member>
-        <member name="M:BlogAPI.Controllers.PostController.#ctor(BlogAPI.DATA.Repositories.Interfaces.IPostRepository,BlogAPI.DATA.Repositories.Interfaces.ITagRepository,Microsoft.AspNetCore.Identity.UserManager{BlogAPI.DATA.Models.User},Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.PostController},AutoMapper.IMapper)">
+        <member name="M:BlogAPI.Controllers.PostController.#ctor(Microsoft.AspNetCore.Identity.UserManager{BlogAPI.DATA.Models.User},Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.PostController},AutoMapper.IMapper,BlogAPI.Interfaces.Services.IPostService,BlogAPI.Interfaces.Services.ITagService)">
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.PostController"/> class.
             </summary>
@@ -87,6 +87,7 @@
             <param name="userManager">UserManager AspNetCore.Identity.</param>
             <param name="logger">NLOG logger.</param>
             <param name="mapper">Automapper.</param>
+            <param name="postService">Бизнес логика получения данных по статьям.</param>
         </member>
         <member name="M:BlogAPI.Controllers.PostController.GetPost(System.Int32)">
             <summary>
@@ -260,7 +261,7 @@
             Действия с тегами.
             </summary>
         </member>
-        <member name="M:BlogAPI.Controllers.TagController.#ctor(BlogAPI.DATA.Repositories.Interfaces.ITagRepository,Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.TagController},AutoMapper.IMapper,BlogAPI.Interfaces.Services.ITagService)">
+        <member name="M:BlogAPI.Controllers.TagController.#ctor(Microsoft.Extensions.Logging.ILogger{BlogAPI.Controllers.TagController},AutoMapper.IMapper,BlogAPI.Interfaces.Services.ITagService)">
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.TagController"/> class.
             </summary>
@@ -286,15 +287,6 @@
             <response code="400">Тег не найден.</response>
             <response code="500">Произошла непредвиденная ошибка.</response>
             <returns>Возвращает тег,JSON.</returns>
-        </member>
-        <member name="M:BlogAPI.Controllers.TagController.Create2(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
-            <summary>
-            Создание нового тега.
-            </summary>
-            <param name="newTag"> название тега.</param>
-            <response code="200">Тег создан.</response>
-            <response code="500">Произошла непредвиденная ошибка.</response>
-            <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         </member>
         <member name="M:BlogAPI.Controllers.TagController.Create(BlogAPI.Contracts.Models.Tags.CreateTagModel)">
             <summary>
@@ -418,6 +410,112 @@
             </summary>
             <param name="context">The context.</param>
         </member>
+        <member name="T:BlogAPI.Interfaces.Services.ICommentService">
+            <summary>
+            The comment service.
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ICommentService.GetCommentById(System.Int32)">
+            <summary>
+            получить комментарий по его id.
+            </summary>
+            <param name="id">id комментария.</param>
+            <returns>comment.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ICommentService.CreateComment(BlogAPI.DATA.Models.Comment)">
+            <summary>
+            Создание комментария.
+            </summary>
+            <param name="newComment">Новый комментарий.</param>
+            <returns>Boolean - true - success or false - failure.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ICommentService.DeleteComment(BlogAPI.DATA.Models.Comment)">
+            <summary>
+            Удаление комментария.
+            </summary>
+            <param name="Comment">комментарий, который будет удален.</param>
+            <returns>Boolean - true - success or false - failure..</returns>
+        </member>
+        <member name="T:BlogAPI.Interfaces.Services.IPostService">
+            <summary>
+            The post service.
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.IPostService.ListAsync">
+            <summary>
+            вывести список статей.
+            </summary>
+            <returns>List of Posts.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.IPostService.GetPostById(System.Int32)">
+            <summary>
+            Вывод статьи по её id.
+            </summary>
+            <param name="id">id статьи.</param>
+            <returns>Post.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.IPostService.CreatePost(BlogAPI.DATA.Models.Post)">
+            <summary>
+            Создание статьи.
+            </summary>
+            <param name="newpost">Данные для новой статьи.</param>
+            <returns>id  - номер новой статьи или 0, если статью не удалось добавить.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.IPostService.EditPost(System.Int32,BlogAPI.DATA.Models.Post)">
+            <summary>
+            редактирование существующей статьи.
+            </summary>
+            <param name="id">id статьи.</param>
+            <param name="newpost"> данные новой статьи.</param>
+            <returns>Boolean - true - success or false - failure.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.IPostService.DeletePost(System.Int32)">
+            <summary>
+            Удаление статьи по её id.
+            </summary>
+            <param name="id">id статьи.</param>
+            <returns>Boolean - true - success or false - failure.</returns>
+        </member>
+        <member name="T:BlogAPI.Interfaces.Services.ITagService">
+            <summary>
+            The tag service.
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ITagService.ListAsync">
+            <summary>
+            Вывод списка тегов.
+            </summary>
+            <returns>List of Tags.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ITagService.GetTagById(System.Int32)">
+            <summary>
+            Вывод тега по его id.
+            </summary>
+            <param name="id">id тега.</param>
+            <returns>Tag.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ITagService.CreateTag(System.String)">
+            <summary>
+            Создание тега.
+            </summary>
+            <param name="name">Имя нового тега.</param>
+            <returns>Boolean - true - success or false - failure.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ITagService.EditTag(System.Int32,BlogAPI.DATA.Models.Tag)">
+            <summary>
+            редактирование существующего тега.
+            </summary>
+            <param name="id">id тега.</param>
+            <param name="newTag"> новый тег.</param>
+            <returns>Boolean - true - success or false - failure.</returns>
+        </member>
+        <member name="M:BlogAPI.Interfaces.Services.ITagService.DeleteTag(System.Int32)">
+            <summary>
+            Удаление тега по его id.
+            </summary>
+            <param name="id">id тега.</param>
+            <returns>Boolean - true - success or false - failure..</returns>
+        </member>
         <member name="T:BlogAPI.MappingProfile">
             <summary>
             Настройки маппинга всех сущностей приложения.
@@ -428,6 +526,86 @@
             Initializes a new instance of the <see cref="T:BlogAPI.MappingProfile"/> class.
             В конструкторе настроим соответствие сущностей при маппинге.
             </summary>
+        </member>
+        <member name="T:BlogAPI.Services.CommentService">
+            <summary>
+            The comment service.
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Services.CommentService.#ctor(BlogAPI.DATA.Repositories.Interfaces.ICommentRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork,Microsoft.Extensions.Logging.ILogger{BlogAPI.Services.CommentService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:BlogAPI.Services.CommentService"/> class.
+            </summary>
+            <param name="_commentRepository"></param>
+            <param name="unitOfWork"></param>
+        </member>
+        <member name="M:BlogAPI.Services.CommentService.BlogAPI#Interfaces#Services#ICommentService#CreateComment(BlogAPI.DATA.Models.Comment)">
+            <summary>
+            Create the comment.
+            </summary>
+            <param name="newComment">The new comment.</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.CommentService.BlogAPI#Interfaces#Services#ICommentService#DeleteComment(BlogAPI.DATA.Models.Comment)">
+            <summary>
+            Deletes the comment.
+            </summary>
+            <param name="id">The id comment.</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.CommentService.BlogAPI#Interfaces#Services#ICommentService#GetCommentById(System.Int32)">
+            <summary>
+            Gets the comment by id.
+            </summary>
+            <param name="id">The id comment.</param>
+            <returns>Comment.</returns>
+        </member>
+        <member name="T:BlogAPI.Services.PostService">
+            <summary>
+            The post service.
+            </summary>
+        </member>
+        <member name="M:BlogAPI.Services.PostService.#ctor(BlogAPI.DATA.Repositories.Interfaces.IPostRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork,Microsoft.Extensions.Logging.ILogger{BlogAPI.Services.PostService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:BlogAPI.Services.PostService"/> class.
+            </summary>
+            <param name="postRepository"></param>
+            <param name="unitOfWork"></param>
+        </member>
+        <member name="M:BlogAPI.Services.PostService.BlogAPI#Interfaces#Services#IPostService#CreatePost(BlogAPI.DATA.Models.Post)">
+            <summary>
+            Creates the post.
+            </summary>
+            <param name="newpost">The newpost.</param>
+            <returns>номер новой статьи.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.PostService.BlogAPI#Interfaces#Services#IPostService#DeletePost(System.Int32)">
+            <summary>
+            Deletes the post.
+            </summary>
+            <param name="id">номер статьи</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.PostService.BlogAPI#Interfaces#Services#IPostService#EditPost(System.Int32,BlogAPI.DATA.Models.Post)">
+            <summary>
+            Edits the post.
+            </summary>
+            <param name="id">номер статьи.</param>
+            <param name="newpost">данные для редактирования статьи.</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.PostService.BlogAPI#Interfaces#Services#IPostService#GetPostById(System.Int32)">
+            <summary>
+            Gets the post by id.
+            </summary>
+            <param name="id">The id post.</param>
+            <returns>Post.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.PostService.BlogAPI#Interfaces#Services#IPostService#ListAsync">
+            <summary>
+            Get List posts.
+            </summary>
+            <returns>Lists the posts</returns>
         </member>
         <member name="T:BlogAPI.Services.TagService">
             <summary>
@@ -457,8 +635,23 @@
         <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#CreateTag(System.String)">
             <summary>
             Create new tag.
-            <param name="name">name tag, string.</param>
             </summary>
+            <param name="name">name tag, string.</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#EditTag(System.Int32,BlogAPI.DATA.Models.Tag)">
+            <summary>
+            Edit tag by Id.
+            </summary>
+            <param name="id">id tag, int.</param>
+            <param name="newTag">new tag, Tag.</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#DeleteTag(System.Int32)">
+            <summary>
+            Delete tag by Id.
+            </summary>
+            <param name="id">id tag, int.</param>
             <returns>true or false.</returns>
         </member>
     </members>
