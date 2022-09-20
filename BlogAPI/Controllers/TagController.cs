@@ -2,8 +2,8 @@
 using BlogAPI.Contracts.Models;
 using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
+using BlogAPI.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogAPI.Controllers
@@ -16,9 +16,9 @@ namespace BlogAPI.Controllers
     [Route("[controller]")]
     public class TagController : Controller
     {
-        private readonly ITagRepository _repo;
         private readonly ILogger<TagController> _logger;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
+        private readonly ITagService _tagService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagController"/> class.
@@ -26,11 +26,12 @@ namespace BlogAPI.Controllers
         /// <param name="repo">The repo.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="mapper">The mapper.</param>
-        public TagController(ITagRepository repo, ILogger<TagController> logger, IMapper mapper)
+        /// /// <param name="tagService"> бизнес логика работы с tag</param>
+        public TagController(ILogger<TagController> logger, IMapper mapper, ITagService tagService)
         {
-            _repo = repo;
             _logger = logger;
             _mapper = mapper;
+            _tagService = tagService;
         }
 
         /// <summary>
@@ -44,14 +45,14 @@ namespace BlogAPI.Controllers
         [Route("GetTags")]
         public async Task<IActionResult> GetTags()
         {
-            var tags = await _repo.GetTags();
+            var tags = await _tagService.ListAsync();
 
             _logger.LogInformation("Получили все теги");
 
-            GetTags resp = new ()
+            GetTags resp = new()
             {
-                Count = tags.Count,
-                Tags = _mapper.Map<List<Tag>, List<TagView>>(tags),
+                Count = tags.Count(),
+                Tags = _mapper.Map<IEnumerable<Tag>, List<TagView>>(tags),
             };
 
             return Json(resp);
@@ -70,7 +71,7 @@ namespace BlogAPI.Controllers
         [Route("GetTagById")]
         public async Task<IActionResult> GetTagById(int id)
         {
-            var tag = await _repo.GetTagById(id);
+            var tag = await _tagService.GetTagById(id);
             if (tag != null)
             {
                 TagView resp = new ()
@@ -103,24 +104,28 @@ namespace BlogAPI.Controllers
         {
             if (User.IsInRole("Администратор"))
             {
-                var tag = _repo.GetTagByName(newTag.tagText);
-                if (tag.Result == null)
+                try
                 {
-                    await _repo.CreateTag(new Tag(newTag.tagText));
-                    _logger.LogInformation("Создан новый тег" + newTag.tagText);
-
-                    SuccessResponse resp = new ()
+                    var isTagCreate = await _tagService.CreateTag(newTag.tagText);
+                    if (isTagCreate == true)
                     {
-                        code = 0,
-                        infoMessage = "Новый тег успешно создан - " + newTag.tagText,
-                    };
-
-                    return Json(resp);
+                        SuccessResponse resp = new ()
+                        {
+                            code = 0,
+                            infoMessage = "Новый тег успешно создан - " + newTag.tagText,
+                        };
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Тег уже существует");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже существует", ErrorCode = 40003 }).Value);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogInformation("Тег уже существует");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже существует", ErrorCode = 40003 }).Value);
+                    _logger.LogInformation("Произошла ошибка при создании нового тега " + ex.Message);
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при создании нового тега", ErrorCode = 40003 }).Value);
                 }
             }
             else
@@ -146,28 +151,31 @@ namespace BlogAPI.Controllers
         {
             if (User.IsInRole("Администратор"))
             {
-                var tag = await _repo.GetTagById(id);
-                if (tag != null)
+                try
                 {
-                    tag.tagText = newTag.tagText;
-
-                    await _repo.EditTag(tag, id);
-                    _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
-
-                    SuccessResponse resp = new ()
+                    var isTagEdite = await _tagService.EditTag(id, new Tag(newTag.tagText));
+                    if (isTagEdite == true)
                     {
-                        code = 0,
-                        id = id.ToString(),
-                        name = tag.tagText,
-                        infoMessage = "Тег успешно изменен",
-                    };
+                        SuccessResponse resp = new ()
+                        {
+                            code = 0,
+                            id = id.ToString(),
+                            name = newTag.tagText,
+                            infoMessage = "Тег успешно изменен",
+                        };
 
-                    return Json(resp);
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Тег не найден");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogInformation("Тег не найден");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                    _logger.LogInformation("Произошла ошибка при редактировании тега " + ex.Message);
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при редактировании тега", ErrorCode = 40003 }).Value);
                 }
             }
             else
@@ -192,26 +200,30 @@ namespace BlogAPI.Controllers
         {
             if (User.IsInRole("Администратор"))
             {
-                var tag = await _repo.GetTagById(id);
-                if (tag != null)
+                try
                 {
-                    await _repo.DelTag(tag);
-                    _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
-
-                    SuccessResponse resp = new ()
+                    var isTagDelete = await _tagService.DeleteTag(id);
+                    if (isTagDelete == true)
                     {
-                        code = 0,
-                        id = id.ToString(),
-                        name = tag.tagText,
-                        infoMessage = "Тег успешно удален",
-                    };
+                        SuccessResponse resp = new ()
+                        {
+                            code = 0,
+                            id = id.ToString(),
+                            infoMessage = "Тег успешно удален",
+                        };
 
-                    return Json(resp);
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Тег не найден");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogInformation("Тег не найден");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                    _logger.LogInformation("Произошла ошибка при удалении тега " + ex.Message);
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при удалении тега", ErrorCode = 40003 }).Value);
                 }
             }
             else

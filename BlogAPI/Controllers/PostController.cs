@@ -6,6 +6,8 @@ using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
+using BlogAPI.Interfaces.Services;
+using BlogAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
@@ -21,10 +23,10 @@ namespace BlogAPI.Controllers
     [Route("[controller]")]
     public class PostController : Controller
     {
-        private readonly IPostRepository _repo;
-        private readonly ITagRepository _repotags;
         private readonly ILogger<PostController> _logger;
         private readonly UserManager<User> _userManager;
+        private readonly IPostService _postService;
+        private readonly ITagService _tagService;
         private IMapper _mapper;
 
         /// <summary>
@@ -35,13 +37,14 @@ namespace BlogAPI.Controllers
         /// <param name="userManager">UserManager AspNetCore.Identity.</param>
         /// <param name="logger">NLOG logger.</param>
         /// <param name="mapper">Automapper.</param>
-        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger, IMapper mapper)
+        /// <param name="postService">Бизнес логика получения данных по статьям.</param>
+        public PostController(UserManager<User> userManager, ILogger<PostController> logger, IMapper mapper, IPostService postService, ITagService tagService)
         {
-            _repo = repo;
-            _repotags = repotags;
             _userManager = userManager;
             _logger = logger;
             _mapper = mapper;
+            _postService = postService;
+            _tagService = tagService;
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace BlogAPI.Controllers
         [Route("GetPost/{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
-            var post = await _repo.GetPostById(id);
+            var post = await _postService.GetPostById(id);
             if (post != null)
             {
                 GetPostByIdModel resp = new ()
@@ -103,7 +106,7 @@ namespace BlogAPI.Controllers
         [Route("GetPostFull/{id}")]
         public async Task<IActionResult> GetPostFull([FromRoute] int id)
         {
-            var post = await _repo.GetPostById(id);
+            var post = await _postService.GetPostById(id);
             if (post != null)
             {
                 GetPostFullByIdModel resp = new ()
@@ -142,11 +145,11 @@ namespace BlogAPI.Controllers
         {
             try
             {
-                var posts = await _repo.GetPosts();
+                var posts = await _postService.ListAsync();
                 GetPostsModel resp = new ()
                 {
-                    Count = posts.Length,
-                    Posts = _mapper.Map<Post[], PostView[]>(posts),
+                    Count = posts.Count(),
+                    Posts = _mapper.Map<IEnumerable<Post>, List<PostView>>(posts),
                 };
 
                 _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.Count.ToString());
@@ -183,22 +186,25 @@ namespace BlogAPI.Controllers
                         postText = newPost.PostText,
                         User = searchuser,
                     };
-
-                    await _repo.CreatePost(post);
-                    _logger.LogInformation("новая статья добавлена: " + post.postName);
-
-                    // Если добавление прошло успешно получим id новой статьи
-                    var getpost = _repo.GetPosts().Result.FirstOrDefault(p => p.postName == post.postName);
-
-                    SuccessResponse resp = new ()
+                    try
                     {
-                        code = 0,
-                        id = getpost.id.ToString(),
-                        name = getpost.postName,
-                        infoMessage = "Статья успешно добавлена",
-                    };
+                        int idnewpost = await _postService.CreatePost(post);
 
-                    return Json(resp);
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            id = idnewpost.ToString(),
+                            name = post.postName,
+                            infoMessage = "Статья успешно добавлена",
+                        };
+
+                        return Json(resp);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogInformation("Произошла ошибка при создании статьи " + ex.Message);
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при создании статьи", ErrorCode = 40003 }).Value);
+                    }
                 }
                 else
                 {
@@ -228,25 +234,33 @@ namespace BlogAPI.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var post = await _repo.GetPostById(id);
+                var post = await _postService.GetPostById(id);
                 if (post != null)
                 {
                     if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
                     {
                         post.postName = newPost.PostName;
                         post.postText = newPost.PostText;
-                        await _repo.EditPost(post, id);
-                        _logger.LogInformation("Статья отредактирована: " + post.postName);
 
-                        SuccessResponse resp = new ()
+                        var isPostEdite = await _postService.EditPost(id, post);
+                        if (isPostEdite)
                         {
-                            code = 0,
-                            id = post.id.ToString(),
-                            name = post.postName,
-                            infoMessage = "Статья успешно отредактирована",
-                        };
+                            _logger.LogInformation("Статья отредактирована: " + post.postName);
 
-                        return Json(resp);
+                            SuccessResponse resp = new()
+                            {
+                                code = 0,
+                                id = post.id.ToString(),
+                                name = post.postName,
+                                infoMessage = "Статья успешно отредактирована",
+                            };
+
+                            return Json(resp);
+                        }
+                        else
+                        {
+                            return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Ошибка при редактировании статьи", ErrorCode = 40004 }).Value);
+                        }
                     }
                     else
                     {
@@ -279,35 +293,43 @@ namespace BlogAPI.Controllers
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var post = await _repo.GetPostById(id);
-
-            // удалить статью может только автор или администратор
-            if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+            try
             {
+                var post = await _postService.GetPostById(id);
+
                 if (post == null)
                 {
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    await _repo.DelPost(post);
-
-                    SuccessResponse resp = new ()
+                    // удалить статью может только автор или администратор
+                    if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
                     {
-                        code = 0,
-                        id = post.id.ToString(),
-                        name = post.postName,
-                        infoMessage = "Статья успешно удалена",
-                    };
+                        await _postService.DeletePost(id);
 
-                    _logger.LogInformation("Статья удалена: " + post.postName);
-                    return Json(resp);
+                        SuccessResponse resp = new()
+                        {
+                            code = 0,
+                            id = post.id.ToString(),
+                            name = post.postName,
+                            infoMessage = "Статья успешно удалена",
+                        };
+
+                        _logger.LogInformation("Статья удалена: " + post.postName);
+                        return Json(resp);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
+                        return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
-                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
+                _logger.LogInformation("Произошла ошибка при удалении статьи " + ex.Message);
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при удалении статьи", ErrorCode = 40003 }).Value);
             }
         }
 
@@ -325,10 +347,10 @@ namespace BlogAPI.Controllers
         [Route("AddTag")]
         public async Task<IActionResult> AddTag(int tagid, int postid)
         {
-            var post = await _repo.GetPostById(postid);
+            var post = await _postService.GetPostById(postid);
             if (post != null)
             {
-                var tag = await _repotags.GetTagById(tagid);
+                var tag = await _tagService.GetTagById(tagid);
                 if (tag != null)
                 {
                     bool needAdd = true;
@@ -345,7 +367,7 @@ namespace BlogAPI.Controllers
                     {
                         post.Tags.Add(tag);
 
-                        await _repo.EditPost(post, postid);
+                        await _postService.EditPost(postid, post);
 
                         _logger.LogInformation("К статье " + post.id.ToString() + " добавлен тег " + tag.tagText);
 
@@ -390,24 +412,24 @@ namespace BlogAPI.Controllers
         [Route("RemoveTag")]
         public async Task<IActionResult> RemoveTag(int tagid, int postid)
         {
-            var post = await _repo.GetPostById(postid);
+            var post = await _postService.GetPostById(postid);
             if (post != null)
             {
-                var tag = await _repotags.GetTagById(tagid);
+                var tag = await _tagService.GetTagById(tagid);
                 if (tag != null)
                 {
-                        post.Tags.Remove(tag);
-                        await _repo.EditPost(post, postid);
+                    post.Tags.Remove(tag);
+                    await _postService.EditPost(postid, post);
 
-                        _logger.LogInformation("У статьи " + post.id.ToString() + " Удален тег " + tag.tagText);
+                    _logger.LogInformation("У статьи " + post.id.ToString() + " Удален тег " + tag.tagText);
 
-                        SuccessResponse resp = new ()
-                        {
-                            code = 0,
-                            infoMessage = "У статьи " + post.id.ToString() + " Удален тег " + tag.tagText,
-                        };
+                    SuccessResponse resp = new()
+                    {
+                        code = 0,
+                        infoMessage = "У статьи " + post.id.ToString() + " Удален тег " + tag.tagText,
+                    };
 
-                        return Json(resp);
+                    return Json(resp);
                 }
                 else
                 {

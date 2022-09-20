@@ -8,18 +8,15 @@ namespace BlogAPI.DATA.Repositories
     /// <summary>
     /// The post repository.
     /// </summary>
-    public class PostRepository : IPostRepository
+    public class PostRepository : BaseRepository, IPostRepository
     {
-        // ссылка на контекст
-        private readonly AppDBContext _context;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PostRepository"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         public PostRepository(AppDBContext context)
+         : base(context)
         {
-            _context = context;
         }
 
         /// <summary>
@@ -37,9 +34,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 await _context.Post.AddAsync(post);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -55,9 +49,6 @@ namespace BlogAPI.DATA.Repositories
             {
                 _context.Post.Remove(dbpost);
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -75,9 +66,6 @@ namespace BlogAPI.DATA.Repositories
                 dbpost.postText = post.postText;
                 dbpost.Tags = post.Tags;
             }
-
-            // Сохранение изменений
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>

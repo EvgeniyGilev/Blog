@@ -13,7 +13,7 @@
         /// <summary>
         /// Gets or sets the posts.
         /// </summary>
-        public PostView[] Posts { get; set; }
+        public List<PostView> Posts { get; set; }
 
         /// <summary>
         /// The post view.
