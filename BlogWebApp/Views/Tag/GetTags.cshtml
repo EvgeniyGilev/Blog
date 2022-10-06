@@ -11,8 +11,8 @@
     }
     @foreach (Tag tag in Model)
     {
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
+        <div class="card mt-2 w-25">
+            <div class="card-body bgpowderblue">
                 <h5 class="card-title">@tag.tagText</h5>
                 <p class="card-text">Статей по тегу: @tag.Posts.Count.ToString()</p>
                 @if (User.Identity.IsAuthenticated)

@@ -8,7 +8,7 @@
 }
 
 <div class="text-start">
-    <div>
+    <div class="container bgpowderblue">
         <h3 style="text-align: left">Редактирование статьи</h3>
         @if (User.Identity.IsAuthenticated)
         {
@@ -39,7 +39,7 @@
                 <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
             </form>
             <form method="post" asp-action="Delete" asp-controller="Post" asp-route-id="@Model.PostId">
-                <button type="submit" class="btn btn-danger btn-sm">
+                <button type="submit" class="btn btn-danger btn-sm mt-2">
                     Удалить
                 </button>
             </form>

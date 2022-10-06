@@ -17,7 +17,7 @@
     }
     @foreach (var user in Model)
     {
-        <div class="card" style="width: 18rem;">
+        <div class="card bgpowderblue mt-2 w-50">
             <div class="card-body">
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
                 {
