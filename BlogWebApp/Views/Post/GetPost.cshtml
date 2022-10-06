@@ -47,6 +47,7 @@
 
         }
         <hr class="mt-2 mb-3" />
+        @if (User.Identity.IsAuthenticated){
         <form method="post" asp-action="Create" asp-controller="Comment" asp-route-id="@Model.PostId">
             <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
@@ -57,6 +58,7 @@
                 Оставить комментарий
             </button>
         </form>
+        }
         <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>

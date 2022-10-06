@@ -13,7 +13,7 @@ namespace BlogAPI.Controllers
     /// </summary>
     [ExceptionHandler]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/tag/")]
     public class TagController : Controller
     {
         private readonly ILogger<TagController> _logger;
@@ -42,7 +42,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает все теги, JSON.</returns>
         // GET: TagController
         [HttpGet]
-        [Route("GetTags")]
+        [Route("")]
         public async Task<IActionResult> GetTags()
         {
             var tags = await _tagService.ListAsync();
@@ -68,8 +68,8 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает тег,JSON.</returns>
         // GET: TagController
         [HttpGet]
-        [Route("GetTagById")]
-        public async Task<IActionResult> GetTagById(int id)
+        [Route("{id}")]
+        public async Task<IActionResult> GetTagById([FromRoute] int id)
         {
             var tag = await _tagService.GetTagById(id);
             if (tag != null)
@@ -99,7 +99,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         // GET: TagController/Create
         [HttpPost]
-        [Route("Create")]
+        [Route("")]
         public async Task<IActionResult> Create([FromForm] CreateTagModel newTag)
         {
             if (User.IsInRole("Администратор"))
@@ -146,7 +146,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает сообщение со статусом редактирования, JSON.</returns>
         // GET: TagController/Edit
         [HttpPatch]
-        [Route("Edit/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> Edit([FromForm] EditeTagModel newTag, [FromRoute] int id)
         {
             if (User.IsInRole("Администратор"))
@@ -195,8 +195,8 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает сообщение со статусом удаления, JSON.</returns>
         // GET: TagController/Delete/5
         [HttpDelete]
-        [Route("Delete")]
-        public async Task<IActionResult> Delete(int id)
+        [Route("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             if (User.IsInRole("Администратор"))
             {

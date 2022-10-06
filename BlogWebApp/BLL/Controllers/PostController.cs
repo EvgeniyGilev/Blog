@@ -1,5 +1,5 @@
 ﻿using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories.Interfaces;
+using BlogWebApp.BLL.Interfaces.Services;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.Handlers;
 using Microsoft.AspNetCore.Identity;
@@ -16,8 +16,8 @@ namespace BlogWebApp.BLL.Controllers
     public class PostController : Controller
     {
 
-        private readonly IPostRepository _repo;
-        private readonly ITagRepository _repotags;
+        private readonly IPostService _postService;
+        private readonly ITagService _tagService;
         private readonly ILogger<PostController> _logger;
         private readonly UserManager<User> _userManager;
 
@@ -28,10 +28,10 @@ namespace BlogWebApp.BLL.Controllers
         /// <param name="repotags">The repotags.</param>
         /// <param name="userManager">The user manager.</param>
         /// <param name="logger">The logger.</param>
-        public PostController(IPostRepository repo, ITagRepository repotags, UserManager<User> userManager, ILogger<PostController> logger)
+        public PostController(IPostService postService, ITagService tagService, UserManager<User> userManager, ILogger<PostController> logger)
         {
-            _repo = repo;
-            _repotags = repotags;
+            _postService = postService;
+            _tagService = tagService;
             _userManager = userManager;
             _logger = logger;
         }
@@ -46,7 +46,7 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetPost/{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
-            var post = await _repo.GetPostById(id);
+            var post = await _postService.GetPostById(id);
             if (post != null)
             {
                 ShowPostAndCommentViewModel model = new ShowPostAndCommentViewModel { ShowPost = post, PostId=id };
@@ -68,28 +68,13 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetPosts")]
         public async Task<IActionResult> GetPosts()
         {
-            var posts = await _repo.GetPosts();
+            var posts = await _postService.ListAsync();
             ShowPostsViewModel model = new ShowPostsViewModel
             {
-                ShowPosts = posts,
+                ShowPosts = posts.ToList(),
             };
             _logger.LogInformation("Показываем все статьи ");
             return View(model);
-        }
-
-        /// <summary>
-        /// получить все статьи одного пользователя.
-        /// </summary>
-        /// <param name="id">id пользователя.</param>
-        /// <returns>An IActionResult.</returns>
-        // GET: PostController
-        [HttpGet]
-        [Route("GetPostsByUserId")]
-        public async Task<IActionResult> GetPostsByUserId(string id)
-        {
-            var posts = await _repo.GetPostsByUserId(id);
-            _logger.LogInformation("Получить все статьи пользователя с id: " + id);
-            return View(posts);
         }
 
         /// <summary>
@@ -100,9 +85,10 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create()
         {
+            var postTags = await _tagService.ListAsync();
             CreatePostViewModel model = new CreatePostViewModel
             {
-                PostTags = await _repotags.GetTags(),
+                PostTags = postTags.ToList(),
             };
             _logger.LogInformation("открываем страницу создания новой статьи");
             return View(model);
@@ -117,7 +103,7 @@ namespace BlogWebApp.BLL.Controllers
         /// GET: PostController/Create
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> Create([FromForm] CreatePostViewModel newPost, [FromForm] List<string> postTags)
+        public async Task<IActionResult> Create([FromForm] CreatePostViewModel newPost, [FromForm] List<Tag> postTags)
         {
             var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == newPost.PostAuthorEmail);
             if (searchuser != null)
@@ -126,7 +112,7 @@ namespace BlogWebApp.BLL.Controllers
 
                 foreach (var tag in postTags)
                 {
-                    Tag newtag = await _repotags.GetTagByName(tag);
+                    Tag newtag = await _tagService.GetTagById(tag.id);
                     if (newtag != null)
                     {
                         _posttags.Add(newtag);
@@ -141,7 +127,7 @@ namespace BlogWebApp.BLL.Controllers
                     Tags = _posttags,
                 };
 
-                await _repo.CreatePost(post);
+                await _postService.CreatePost(post);
                 _logger.LogInformation("новая статья добавлена: " + post.postName);
             }
 
@@ -157,18 +143,19 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            var post = await _repo.GetPostById(id);
+            var post = await _postService.GetPostById(id);
 
             // редактировать статью может только автор или администратор
             if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
             {
+                var postTags = await _tagService.ListAsync();
 
                 EditPostViewModel model = new EditPostViewModel
                 {
                     PostName = post.postName,
                     PostText = post.postText,
                     PostTagsCurrent = post.Tags,
-                    PostTagsAll = await _repotags.GetTags(),
+                    PostTagsAll = postTags.ToList(),
                     PostId = id,
                 };
 
@@ -193,25 +180,24 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostViewModel newPost, [FromForm] List<string> postTags, [FromRoute] int id)
         {
-
-            List<Tag> _posttags = new List<Tag>();
+            List<Tag> newposttags = new List<Tag>();
 
             foreach (var tag in postTags)
             {
-                Tag newtag = await _repotags.GetTagByName(tag);
+                Tag newtag = await _tagService.GetTagByName(tag);
                 if (newtag != null)
                 {
-                    _posttags.Add(newtag);
+                    newposttags.Add(newtag);
                 }
             }
 
-            var post = await _repo.GetPostById(id);
+            var post = await _postService.GetPostById(id);
 
             post.postName = newPost.PostName;
             post.postText = newPost.PostText;
-            post.Tags = _posttags;
+            post.Tags = newposttags;
 
-            await _repo.EditPost(post, id);
+            await _postService.EditPost(id, post);
             _logger.LogInformation("Статья отредактирована: " + post.postName);
 
             return RedirectToAction("GetPosts");
@@ -227,7 +213,7 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var post = await _repo.GetPostById(id);
+            var post = await _postService.GetPostById(id);
 
             // удалить статью может только автор или администратор
             if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
@@ -235,7 +221,7 @@ namespace BlogWebApp.BLL.Controllers
                 if (post == null) { return RedirectToAction(nameof(Index)); }
                 else
                 {
-                    await _repo.DelPost(post);
+                    await _postService.DeletePost(id);
                     _logger.LogInformation("Статья удалена: " + post.postName);
                     return RedirectToAction("GetPosts");
                 }

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blog.MockData\Blog.MockData.csproj" />
+    <ProjectReference Include="..\BlogAPI\BlogAPI.csproj" />
   </ItemGroup>
 
 </Project>

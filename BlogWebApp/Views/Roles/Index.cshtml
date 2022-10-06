@@ -2,6 +2,8 @@
 @model IEnumerable<Role>
 
 <h2>Список ролей</h2>
+@if (User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+{
 <table class="table">
     @foreach (var role in Model)
     {
@@ -27,3 +29,8 @@
 <a asp-action="Create">Добавить роль</a>
 <br />
 <a asp-action="UserList">Список пользователей и их ролей</a>
+}
+else 
+{
+   <p>Для управления ролями нужны права администратора</p>
+}

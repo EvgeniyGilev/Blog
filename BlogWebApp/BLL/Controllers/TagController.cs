@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BlogWebApp.BLL.Models.ViewModels.TagViews;
 using BlogWebApp.Handlers;
-using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.DATA.Models;
+using BlogWebApp.BLL.Interfaces.Services;
 
 namespace BlogWebApp.BLL.Controllers
 {
@@ -15,7 +15,7 @@ namespace BlogWebApp.BLL.Controllers
     public class TagController : Controller
     {
 
-        private readonly ITagRepository _repo;
+        private readonly ITagService _tagService;
         private readonly ILogger<TagController> _logger;
 
         /// <summary>
@@ -23,9 +23,9 @@ namespace BlogWebApp.BLL.Controllers
         /// </summary>
         /// <param name="repo">The repo.</param>
         /// <param name="logger">The logger.</param>
-        public TagController(ITagRepository repo, ILogger<TagController> logger)
+        public TagController(ITagService tagService, ILogger<TagController> logger)
         {
-            _repo = repo;
+            _tagService = tagService;
             _logger = logger;
         }
 
@@ -38,7 +38,7 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetTags")]
         public async Task<IActionResult> GetTags()
         {
-            var tags = await _repo.GetTags();
+            var tags = await _tagService.ListAsync();
             _logger.LogInformation("Получили все теги");
             return View(tags);
         }
@@ -53,7 +53,7 @@ namespace BlogWebApp.BLL.Controllers
         [Route("GetTagById")]
         public async Task<IActionResult> GetTagById(int id)
         {
-            var tag = await _repo.GetTagById(id);
+            var tag = await _tagService.GetTagById(id);
             _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
             return View(tag);
         }
@@ -80,10 +80,10 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Create([FromForm] CreateTagViewModel newTag)
         {
             Tag tag = new Tag(newTag.tagText);
-            var searchtag = _repo.GetTagByName(newTag.tagText);
-            if (searchtag.Result == null)
+            var searchtag = await _tagService.CreateTag(newTag.tagText);
+            if (searchtag == true)
             {
-                await _repo.CreateTag(tag);
+                await _tagService.CreateTag(newTag.tagText);
                 _logger.LogInformation("Создан новый тег" + tag.tagText);
                 return RedirectToAction("GetTags");
             }
@@ -103,7 +103,7 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            var tag = await _repo.GetTagById(id);
+            var tag = await _tagService.GetTagById(id);
 
             EditeTagViewModel model = new EditeTagViewModel
             {
@@ -126,10 +126,10 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit([FromForm] EditeTagViewModel newTag, [FromRoute] int id)
         {
-            var tag = await _repo.GetTagById(id);
+            var tag = await _tagService.GetTagById(id);
             tag.tagText = newTag.tagText;
 
-            await _repo.EditTag(tag, id);
+            await _tagService.EditTag(id, tag);
             _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
             return RedirectToAction("GetTags");
         }
@@ -145,11 +145,11 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
-            var tag = await _repo.GetTagById(id);
-            if (tag == null) { return RedirectToAction(nameof(Index)); }
+            var tag = await _tagService.GetTagById(id);
+            if (tag == null) { return RedirectToAction("Error404", "Error"); }
             else
             {
-                await _repo.DelTag(tag);
+                await _tagService.DeleteTag(id);
                 _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
                 return RedirectToAction("GetTags");
             }

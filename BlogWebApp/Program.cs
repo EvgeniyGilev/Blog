@@ -9,6 +9,8 @@ using NLog;
 using NLog.Web;
 using BlogAPI.DATA.Models;
 using Microsoft.EntityFrameworkCore;
+using BlogWebApp.BLL.Interfaces.Services;
+using BlogWebApp.BLL.Services;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -50,6 +52,12 @@ try
     builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
     builder.Services.AddSingleton<ITagRepository, TagRepository>();
     builder.Services.AddSingleton<IPostRepository, PostRepository>();
+
+    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+    builder.Services.AddScoped<ITagService, TagService>();
+    builder.Services.AddScoped<IPostService, PostService>();
+    builder.Services.AddScoped<ICommentService, CommentService>();
 
     // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

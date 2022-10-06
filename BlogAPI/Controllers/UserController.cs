@@ -15,8 +15,7 @@
     /// </summary>
     [ExceptionHandler]
     [ApiController]
-    [Produces("application/json")]
-    [Route("[controller]")]
+    [Route("api/user/")]
     public class UserController : Controller
     {
         private readonly SignInManager<User> _signInManager;
@@ -44,7 +43,7 @@
         /// <returns>Возвращает пользователей в формате JSON.</returns>
         // GET: UserController
         [HttpGet]
-        [Route("GetAllUsers")]
+        [Route("")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = _userManager.Users.ToList();
@@ -89,8 +88,8 @@
         /// <returns>Возвращает одного пользователя в формате JSON.</returns>
         // GET: UserController
         [HttpGet]
-        [Route("GetUserById")]
-        public async Task<IActionResult> GetUserById(string id)
+        [Route("{id}")]
+        public async Task<IActionResult> GetUserById([FromRoute] string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
@@ -123,7 +122,7 @@
         /// <returns>Возвращает сообщение со статусом редактирования, JSON.</returns>
         // GET: UserController/Edit/5
         [HttpPatch]
-        [Route("Edit/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> Edit([FromForm] EditUserModel newUser, [FromRoute] string id)
         {
             if (User.IsInRole("Администратор"))
@@ -186,7 +185,7 @@
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом удаления, JSON.</returns>
         [HttpDelete]
-        [Route("Delete/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)
         {
             if (User.IsInRole("Администратор"))
@@ -251,7 +250,7 @@
         /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         // POST: UserController/Register
         [HttpPost]
-        [Route("Register")]
+        [Route("")]
         public async Task<IActionResult> Register([FromForm] CreateUserModel newUser)
         {
             User user = new ()
@@ -303,7 +302,7 @@
         /// <response code="401">Ошибки при аутентификации.</response>
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом аутентификации.</returns>
-        [Route("Login")]
+        [Route("login")]
         [HttpPost]
         public async Task<IActionResult> Login([FromForm] LoginUserModel user)
         {
@@ -345,7 +344,7 @@
         /// <response code="401">Ошибки при выходе.</response>
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение о статусе выхода.</returns>
-        [Route("Logout")]
+        [Route("logout")]
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
