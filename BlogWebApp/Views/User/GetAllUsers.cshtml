@@ -19,7 +19,14 @@
     {
         <div class="card" style="width: 18rem;">
             <div class="card-body">
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+                {
                 <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.UserId">@user.UserName</a></p>
+                }
+                else 
+                {
+                    <p>@user.UserName</p>
+                }
                 @foreach (string roleUser in @user.UserRoles)
                 {
                     <span class="badge bg-info text-dark">@roleUser</span>

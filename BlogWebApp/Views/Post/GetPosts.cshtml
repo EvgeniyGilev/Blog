@@ -11,7 +11,7 @@
     <p><a asp-area="" asp-controller="Post" asp-action="Create">Добавить статью</a></p>
     @foreach (Post post in Model.ShowPosts)
     {
-        <div class="card w-auto p-3" >
+        <div class="card w-auto p-3">
             <div class="card-body">
                 <p><a asp-controller="Post" asp-action="GetPost" asp-route-id="@post.id">@post.postName</a></p>
                 @foreach (Tag tag in @post.Tags)
@@ -20,11 +20,15 @@
                 }
                 <br />
                 <p class="card-text">@Model.MiniPost(post)</p>
-                <form asp-action="Edit" asp-controller="Post" asp-route-id="@post.id" method="get">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        Редактировать
-                    </button>
-                </form>
+                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity.Name == post.User.Email || User.IsInRole("Администратор"))
+                {
+                    <form asp-action="Edit" asp-controller="Post" asp-route-id="@post.id" method="get">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            Редактировать
+                        </button>
+                    </form>
+                }
                 <br />
             </div>
         </div>

@@ -4,16 +4,22 @@
     ViewData["Title"] = "GetTags";
 }
 <div class="text-start">
-<h3>Все теги</h3>
-<p><a asp-area="" asp-controller="Tag" asp-action="Create">Добавить тег</a></p>
-@foreach (Tag tag in Model)
-{
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">@tag.tagText</h5>
-            <p class="card-text">Статей по тегу: @tag.Posts.Count.ToString()</p>
-            <a class="btn btn-outline-secondary btn-sm" asp-controller="Tag" asp-action="Edit" asp-route-id="@tag.id">Редактировать</a>
+    <h3>Все теги</h3>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <p><a asp-area="" asp-controller="Tag" asp-action="Create">Добавить тег</a></p>
+    }
+    @foreach (Tag tag in Model)
+    {
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">@tag.tagText</h5>
+                <p class="card-text">Статей по тегу: @tag.Posts.Count.ToString()</p>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="btn btn-outline-secondary btn-sm" asp-controller="Tag" asp-action="Edit" asp-route-id="@tag.id">Редактировать</a>
+                }
+            </div>
         </div>
-    </div>
-}
+    }
 </div>
