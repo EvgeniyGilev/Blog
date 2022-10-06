@@ -15,7 +15,7 @@ namespace BlogAPI.Controllers
     /// </summary>
     [ExceptionHandler]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/comment/")]
     public class CommentController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -39,7 +39,7 @@ namespace BlogAPI.Controllers
         }
 
         /// <summary>
-        /// Создаем комментарий у статьи, требуется аутентификация пользователя.
+        /// Создаем комментарий у статьи, требуется вход пользователя.
         /// </summary>
         /// <param name="newComment"> Форма комментария, указывается ID статьи и тело комментария.</param>
         /// <response code="200">Комментарий успешно добавлен.</response>
@@ -48,7 +48,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращается сообщение со статусом создания комментария в формате JSON.</returns>
         // GET: CommentController/Create
         [HttpPost]
-        [Route("Create")]
+        [Route("")]
         public async Task<IActionResult> Create([FromForm] CreateCommentModel newComment)
         {
             if (User.Identity.IsAuthenticated)
@@ -113,8 +113,8 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращается сообщение со статусом удаления, JSON.</returns>
         // GET: CommentController/Delete/5
         [HttpDelete]
-        [Route("Delete")]
-        public async Task<IActionResult> Delete(int id)
+        [Route("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             if (User.IsInRole("Администратор"))
             {

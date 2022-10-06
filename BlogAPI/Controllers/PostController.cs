@@ -19,8 +19,7 @@ namespace BlogAPI.Controllers
     /// </summary>
     [ExceptionHandler]
     [ApiController]
-    [Produces("application/json")]
-    [Route("[controller]")]
+    [Route("api/post/")]
     public class PostController : Controller
     {
         private readonly ILogger<PostController> _logger;
@@ -67,7 +66,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает статью в формате JSON.</returns>
         // GET: PostController
         [HttpGet]
-        [Route("GetPost/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
             var post = await _postService.GetPostById(id);
@@ -103,7 +102,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает статью в формате JSON.</returns>
         // GET: PostController
         [HttpGet]
-        [Route("GetPostFull/{id}")]
+        [Route("fullinfo/{id}")]
         public async Task<IActionResult> GetPostFull([FromRoute] int id)
         {
             var post = await _postService.GetPostById(id);
@@ -140,7 +139,7 @@ namespace BlogAPI.Controllers
         /// <returns>Список статей в формате JSON.</returns>
         // GET: PostController
         [HttpGet]
-        [Route("GetPosts")]
+        [Route("")]
         public async Task<IActionResult> GetPosts()
         {
             try
@@ -172,7 +171,7 @@ namespace BlogAPI.Controllers
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение о статусе добавления статьи в формате JSON.</returns>
         [HttpPost]
-        [Route("Create")]
+        [Route("")]
         public async Task<IActionResult> Create([FromForm] CreatePostModel newPost)
         {
             if (User.Identity.IsAuthenticated)
@@ -229,7 +228,7 @@ namespace BlogAPI.Controllers
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом редактирования, JSON.</returns>
         [HttpPatch]
-        [Route("Edit/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostModel newPost, [FromRoute] int id)
         {
             if (User.Identity.IsAuthenticated)
@@ -290,7 +289,7 @@ namespace BlogAPI.Controllers
         /// <returns>Возвращает сообщение о статусе удаления статьи, JSON.</returns>
         // Delete: PostController/Delete/5
         [HttpDelete]
-        [Route("Delete/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try
@@ -343,9 +342,9 @@ namespace BlogAPI.Controllers
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
         // GET: TagController/Create
-        [HttpPatch]
-        [Route("AddTag")]
-        public async Task<IActionResult> AddTag(int tagid, int postid)
+        [HttpPost]
+        [Route("{postid}/tag/{tagid}")]
+        public async Task<IActionResult> AddTag([FromRoute] int tagid, [FromRoute] int postid)
         {
             var post = await _postService.GetPostById(postid);
             if (post != null)
@@ -408,8 +407,8 @@ namespace BlogAPI.Controllers
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение об удалении тега в формате JSON.</returns>
         // GET: TagController/Create
-        [HttpPatch]
-        [Route("RemoveTag")]
+        [HttpDelete]
+        [Route("{postid}/tag/{tagid}")]
         public async Task<IActionResult> RemoveTag(int tagid, int postid)
         {
             var post = await _postService.GetPostById(postid);

@@ -12,6 +12,8 @@ namespace BlogAPI.Controllers
     /// The roles controller.
     /// </summary>
     [ExceptionHandler]
+    [ApiController]
+    [Route("api/role/")]
     public class RolesController : Controller
     {
         private readonly ILogger<RolesController> _logger;
@@ -42,7 +44,7 @@ namespace BlogAPI.Controllers
         /// <response code="500"> Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает существующие роли.</returns>
         [HttpGet]
-        [Route("GetRoles")]
+        [Route("")]
         public IActionResult GetRoles()
         {
             List<Role> roles = _roleManager.Roles.ToList();
@@ -74,7 +76,7 @@ namespace BlogAPI.Controllers
         /// <response code="500">Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом создания роли, JSON.</returns>
         [HttpPost]
-        [Route("Create")]
+        [Route("")]
         public async Task<IActionResult> Create([FromForm] CreateRoleView newRole)
         {
             if (User.IsInRole("Администратор"))
@@ -120,7 +122,7 @@ namespace BlogAPI.Controllers
         /// <response code="500"> Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом удаления, JSON.</returns>
         [HttpDelete]
-        [Route("Delete/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (User.IsInRole("Администратор"))
@@ -183,9 +185,9 @@ namespace BlogAPI.Controllers
         /// <response code="400"> Роль не добавлена.</response>
         /// <response code="500"> Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
-        [HttpPatch]
-        [Route("AddUserRole")]
-        public async Task<IActionResult> AddUserRole(string userId, string roleid)
+        [HttpPost]
+        [Route("{roleid}/user/{userId}")]
+        public async Task<IActionResult> AddUserRole([FromRoute] string userId, [FromRoute] string roleid)
         {
             if (User.IsInRole("Администратор"))
             {
@@ -236,9 +238,9 @@ namespace BlogAPI.Controllers
         /// <response code="400"> Роль не удалена.</response>
         /// <response code="500"> Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом добавления, JSON.</returns>
-        [HttpPatch]
-        [Route("RemoveUserRole")]
-        public async Task<IActionResult> RemoveUserRole(string userId, string roleid)
+        [HttpDelete]
+        [Route("{roleid}/user/{userId}")]
+        public async Task<IActionResult> RemoveUserRole([FromRoute] string userId, [FromRoute] string roleid)
         {
             if (User.IsInRole("Администратор"))
             {
@@ -289,7 +291,7 @@ namespace BlogAPI.Controllers
         /// <response code="500"> Произошла непредвиденная ошибка.</response>
         /// <returns>Возвращает сообщение со статусом изменения роли, JSON.</returns>
         [HttpPatch]
-        [Route("EditRole")]
+        [Route("{id}")]
         public async Task<IActionResult> EditRole([FromForm] ShowRoleView newRole)
         {
             if (User.IsInRole("Администратор"))

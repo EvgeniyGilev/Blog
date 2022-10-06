@@ -20,7 +20,7 @@
         </member>
         <member name="M:BlogAPI.Controllers.CommentController.Create(BlogAPI.Contracts.Models.Comments.CreateCommentModel)">
             <summary>
-            Создаем комментарий у статьи, требуется аутентификация пользователя.
+            Создаем комментарий у статьи, требуется вход пользователя.
             </summary>
             <param name="newComment"> Форма комментария, указывается ID статьи и тело комментария.</param>
             <response code="200">Комментарий успешно добавлен.</response>
