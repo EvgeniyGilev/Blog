@@ -9,6 +9,8 @@ namespace BlogApi.Tests.Controllers
     [TestFixture]
     public class CommentControllerTest
     {
+        // Mock CommentRepository
+        private readonly CommentRepository _repo;
 
     }
 }

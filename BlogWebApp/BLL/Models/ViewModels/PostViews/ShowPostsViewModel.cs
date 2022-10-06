@@ -10,7 +10,7 @@ namespace BlogWebApp.BLL.Models.ViewModels.PostViews
         /// <summary>
         /// Gets or sets the show posts.
         /// </summary>
-        public Post[] ShowPosts { get; set; }
+        public List<Post> ShowPosts { get; set; }
 
         /// <summary>
         /// Minis the post.
