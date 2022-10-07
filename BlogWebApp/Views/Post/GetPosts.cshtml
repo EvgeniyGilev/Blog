@@ -20,7 +20,7 @@
                 }
                 <br />
                 <p class="card-text">@Model.MiniPost(post)</p>
-                @if (User.Identity.IsAuthenticated)
+                @if (User!=null && User.Identity != null && User.Identity.IsAuthenticated && post.User!=null)
                 @if (User.Identity.Name == post.User.Email || User.IsInRole("Администратор"))
                 {
                     <form asp-action="Edit" asp-controller="Post" asp-route-id="@post.id" method="get">
