@@ -5,6 +5,8 @@ using NUnit.Framework;
 
 namespace BlogApi.Tests.Controllers
 {
+    // тут надо реализовать интеграционные тесты
+
     internal class TagControllerTest
     {
         // Mock CommentRepository

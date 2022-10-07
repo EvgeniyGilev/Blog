@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace BlogApi.Tests.Controllers
 {
+    // тут надо реализовать интеграционные тесты
     /// <summary>
     /// The comment controller tests.
     /// </summary>
