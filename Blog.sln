@@ -23,10 +23,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.MockData", "Blog.MockData\Blog.MockData.csproj", "{9C21091A-B581-4926-A34E-EA5EEE40DB75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.MockData", "Blog.MockData\Blog.MockData.csproj", "{9C21091A-B581-4926-A34E-EA5EEE40DB75}"
 	ProjectSection(ProjectDependencies) = postProject
 		{84621AD3-A580-43FF-9D5E-239F4F3F7C17} = {84621AD3-A580-43FF-9D5E-239F4F3F7C17}
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "in progress", "in progress", "{02403485-F3AE-4E3C-95BE-5C480E923424}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{8FAFDDA2-3687-465E-98E9-8B2D00D9C52F} = {BB845EFE-0466-4477-B178-DA1EEBBF9587}
 		{D01ECB42-13DE-4D32-9DEC-71B6F42C232F} = {BB845EFE-0466-4477-B178-DA1EEBBF9587}
+		{C993E057-821B-468B-B696-1F069410546E} = {02403485-F3AE-4E3C-95BE-5C480E923424}
+		{9C21091A-B581-4926-A34E-EA5EEE40DB75} = {02403485-F3AE-4E3C-95BE-5C480E923424}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE3AD72D-DE78-4AF9-B554-5F0FB5FC7EA6}

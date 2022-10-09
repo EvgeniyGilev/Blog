@@ -7,7 +7,7 @@
 }
 <div class="text-start">
     <h3>Все пользователи</h3>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+    @if (User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
     {
         <p><a asp-area="" asp-controller="User" asp-action="Register">Добавить пользователя</a></p>
     }
@@ -17,9 +17,9 @@
     }
     @foreach (var user in Model)
     {
-        <div class="card" style="width: 18rem;">
+        <div class="card bgpowderblue mt-2 w-50">
             <div class="card-body">
-                @if (User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+                @if (User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
                 {
                 <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.UserId">@user.UserName</a></p>
                 }

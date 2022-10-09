@@ -2,27 +2,27 @@
 @model IEnumerable<Role>
 
 <h2>Список ролей</h2>
-@if (User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+@if (User!=null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
 {
-<table class="table">
+    <table class="table bgpowderblue w-50">
     @foreach (var role in Model)
     {
         <tr>
-            <td>@role.Name</td>
-            <td>@role.Description</td>
-            <td>
-                <form asp-action="EditRole" asp-route-id="@role.Id" asp-controller="Roles" method="get">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        Редактировать
-                    </button>
-                </form>
-                <br />
-                <form asp-action="Delete" asp-route-id="@role.Id" asp-controller="Roles" method="post">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                        Удалить
-                    </button>
-                </form>
-            </td>
+                <td>@role.Name</td>
+                <td>@role.Description</td>
+                <td align="right">
+                    <form asp-action="EditRole" asp-route-id="@role.Id" asp-controller="Roles" method="get">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            Редактировать
+                        </button>
+                    </form>
+                    <br />
+                    <form asp-action="Delete" asp-route-id="@role.Id" asp-controller="Roles" method="post">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            Удалить
+                        </button>
+                    </form>
+                </td>
         </tr>
     }
 </table>

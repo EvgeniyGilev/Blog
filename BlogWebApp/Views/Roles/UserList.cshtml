@@ -1,12 +1,12 @@
 ﻿@model IEnumerable<BlogAPI.DATA.Models.User>
  
 <h2>Список пользователей</h2>
-<table class="table">
+<table class="table bgpowderblue w-50">
     @foreach (var user in Model)
     {
         <tr>
             <td>@user.Email</td>
-            <td>
+            <td align="right">
                 <a class="btn btn-sm btn-primary btn-sm" asp-action="Edit" asp-route-userid="@user.Id">Права доступа</a>
             </td>
         </tr>
