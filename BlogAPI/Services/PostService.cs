@@ -1,8 +1,8 @@
-﻿using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Interfaces.Services;
-using Microsoft.Extensions.Hosting;
 
 namespace BlogAPI.Services
 {
@@ -13,18 +13,16 @@ namespace BlogAPI.Services
     {
         private readonly IPostRepository _postRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<PostService> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostService"/> class.
         /// </summary>
         /// <param name="postRepository"></param>
         /// <param name="unitOfWork"></param>
-        public PostService(IPostRepository postRepository, IUnitOfWork unitOfWork, ILogger<PostService> logger)
+        public PostService(IPostRepository postRepository, IUnitOfWork unitOfWork)
         {
             _postRepository = postRepository;
             _unitOfWork = unitOfWork;
-            _logger = logger;
         }
 
         /// <summary>
@@ -37,10 +35,8 @@ namespace BlogAPI.Services
             await _postRepository.CreatePost(newpost);
             await _unitOfWork.CompleteAsync();
 
-            _logger.LogInformation("новая статья добавлена: " + newpost.postName);
-
             // Если добавление прошло успешно получим id новой статьи
-            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.postName == newpost.postName).id;
+            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.postName == newpost.postName)?.id ?? 0;
             return getpost;
         }
 
@@ -62,7 +58,6 @@ namespace BlogAPI.Services
             }
             else
             {
-                _logger.LogInformation("Удалить статью невозможно, статьи не существует ");
                 return false;
             }
         }
@@ -83,7 +78,6 @@ namespace BlogAPI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка при добавлении статьи: " + ex.Message);
                 return false;
             }
         }

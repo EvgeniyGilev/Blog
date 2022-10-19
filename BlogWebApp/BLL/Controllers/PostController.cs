@@ -1,4 +1,6 @@
-﻿using BlogAPI.DATA.Models;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using BlogAPI.DATA.Models;
 using BlogWebApp.BLL.Interfaces.Services;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.Handlers;
@@ -216,15 +218,11 @@ namespace BlogWebApp.BLL.Controllers
             var post = await _postService.GetPostById(id);
 
             // удалить статью может только автор или администратор
-            if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+            if ((User != null && User.Identity != null && post.User != null && (User.Identity.Name == post.User.UserName)) || (User != null && User.IsInRole("Администратор")))
             {
-                if (post == null) { return RedirectToAction(nameof(Index)); }
-                else
-                {
                     await _postService.DeletePost(id);
                     _logger.LogInformation("Статья удалена: " + post.postName);
                     return RedirectToAction("GetPosts");
-                }
             }
             else
             {

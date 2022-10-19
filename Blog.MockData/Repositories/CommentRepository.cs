@@ -1,4 +1,6 @@
-﻿using BlogAPI.DATA.Context;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using BlogAPI.DATA.Context;
 using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 

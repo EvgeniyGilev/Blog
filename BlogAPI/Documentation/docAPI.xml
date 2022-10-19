@@ -565,7 +565,7 @@
             The post service.
             </summary>
         </member>
-        <member name="M:BlogAPI.Services.PostService.#ctor(BlogAPI.DATA.Repositories.Interfaces.IPostRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork,Microsoft.Extensions.Logging.ILogger{BlogAPI.Services.PostService})">
+        <member name="M:BlogAPI.Services.PostService.#ctor(BlogAPI.DATA.Repositories.Interfaces.IPostRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Services.PostService"/> class.
             </summary>
@@ -612,12 +612,12 @@
             The tag service.
             </summary>
         </member>
-        <member name="M:BlogAPI.Services.TagService.#ctor(BlogAPI.DATA.Repositories.Interfaces.ITagRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork,Microsoft.Extensions.Logging.ILogger{BlogAPI.Services.TagService})">
+        <member name="M:BlogAPI.Services.TagService.#ctor(BlogAPI.DATA.Repositories.Interfaces.ITagRepository,BlogAPI.DATA.Repositories.Interfaces.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Services.TagService"/> class.
             </summary>
-            <param name="tagRepository"></param>
-            <param name="unitOfWork"></param>
+            <param name="tagRepository">tag repository.</param>
+            <param name="unitOfWork">UoW.</param>
         </member>
         <member name="M:BlogAPI.Services.TagService.BlogAPI#Interfaces#Services#ITagService#ListAsync">
             <summary>

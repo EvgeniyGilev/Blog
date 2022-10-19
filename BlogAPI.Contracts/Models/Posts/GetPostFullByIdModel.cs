@@ -1,4 +1,6 @@
-﻿using BlogAPI.Contracts.Models.Tags;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.Contracts.Models.Comments;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;

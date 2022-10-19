@@ -1,10 +1,12 @@
-﻿using BlogAPI.Contracts.Models;
-using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories.Interfaces;
-using BlogAPI.Interfaces.Services;
-
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 namespace BlogAPI.Services
 {
+    using BlogAPI.Contracts.Models;
+    using BlogAPI.DATA.Models;
+    using BlogAPI.DATA.Repositories.Interfaces;
+    using BlogAPI.Interfaces.Services;
+
     /// <summary>
     /// The tag service.
     /// </summary>
@@ -12,18 +14,16 @@ namespace BlogAPI.Services
     {
         private readonly ITagRepository _tagRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<TagService> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagService"/> class.
         /// </summary>
-        /// <param name="tagRepository"></param>
-        /// <param name="unitOfWork"></param>
-        public TagService(ITagRepository tagRepository, IUnitOfWork unitOfWork, ILogger<TagService> logger)
+        /// <param name="tagRepository">tag repository.</param>
+        /// <param name="unitOfWork">UoW.</param>
+        public TagService(ITagRepository tagRepository, IUnitOfWork unitOfWork)
         {
             _tagRepository = tagRepository;
             _unitOfWork = unitOfWork;
-            _logger = logger;
         }
 
         /// <summary>
@@ -45,12 +45,10 @@ namespace BlogAPI.Services
             var tag = await _tagRepository.GetTagById(id);
             if (tag != null)
             {
-                _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
                 return tag;
             }
             else
             {
-                _logger.LogInformation("Тег не найден");
                 return null;
             }
         }
@@ -69,13 +67,10 @@ namespace BlogAPI.Services
                 await _tagRepository.CreateTag(new Tag(name));
                 await _unitOfWork.CompleteAsync();
 
-                _logger.LogInformation("Создан новый тег" + name);
-
                 return true;
             }
             else
             {
-                _logger.LogInformation("Тег уже существует");
                 return false;
             }
         }
@@ -96,13 +91,10 @@ namespace BlogAPI.Services
                 await _tagRepository.EditTag(tag, id);
                 await _unitOfWork.CompleteAsync();
 
-                _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + newTag.tagText);
-
                 return true;
             }
             else
             {
-                _logger.LogInformation("Тег не найден");
                 return false;
             }
         }
@@ -120,13 +112,10 @@ namespace BlogAPI.Services
                 await _tagRepository.DelTag(tag);
                 await _unitOfWork.CompleteAsync();
 
-                _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
-
                 return true;
             }
             else
             {
-                _logger.LogInformation("Тег не найден");
                 return false;
             }
         }
