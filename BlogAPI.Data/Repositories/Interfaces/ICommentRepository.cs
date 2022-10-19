@@ -1,4 +1,6 @@
-﻿using BlogAPI.DATA.Models;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using BlogAPI.DATA.Models;
 
 namespace BlogAPI.DATA.Repositories.Interfaces
 {

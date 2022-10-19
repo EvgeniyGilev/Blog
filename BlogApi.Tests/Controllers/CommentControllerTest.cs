@@ -1,4 +1,6 @@
-﻿using Blog.MockData.Repositories;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using Blog.MockData.Repositories;
 using NUnit.Framework;
 
 namespace BlogApi.Tests.Controllers

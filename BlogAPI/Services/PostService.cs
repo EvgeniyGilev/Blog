@@ -1,8 +1,8 @@
-﻿using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using BlogAPI.DATA.Models;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Interfaces.Services;
-using Microsoft.Extensions.Hosting;
 
 namespace BlogAPI.Services
 {
@@ -36,7 +36,7 @@ namespace BlogAPI.Services
             await _unitOfWork.CompleteAsync();
 
             // Если добавление прошло успешно получим id новой статьи
-            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.postName == newpost.postName).id;
+            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.postName == newpost.postName)?.id ?? 0;
             return getpost;
         }
 

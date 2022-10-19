@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using BlogWebApp.BLL.Models.ViewModels.RoleViews;
 using BlogWebApp.Handlers;
