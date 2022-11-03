@@ -1,17 +1,18 @@
 ﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+using System.Globalization;
+using BlogAPI.Contracts.Models;
+using BlogAPI.Contracts.Models.Users;
+using BlogAPI.DATA.Models;
+using BlogAPI.Handlers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+
 namespace BlogAPI.Controllers
 {
-    using BlogAPI.Contracts.Models;
-    using BlogAPI.Contracts.Models.Users;
-    using BlogAPI.DATA.Models;
-    using BlogAPI.DATA.Repositories.Interfaces;
-    using BlogAPI.Handlers;
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Authentication.Cookies;
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Mvc;
-
     /// <summary>
     /// Действия с пользователем.
     /// </summary>
@@ -58,7 +59,7 @@ namespace BlogAPI.Controllers
 
                 foreach (var role in userRoles)
                 {
-                    roles.Add(role.ToString());
+                    roles.Add(role);
                 }
 
                 model.Add(new ShowUserModel
@@ -94,7 +95,7 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> GetUserById([FromRoute] string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if (user != null)
+            if (user is { UserFirstName: { }, UserLastName: { } })
             {
                 EditUserModel model = new ()
                 {
@@ -137,7 +138,7 @@ namespace BlogAPI.Controllers
 
                     user.UserLastName = newUser.UserLastName;
                     user.UserFirstName = newUser.UserFirstName;
-                    user.UserPassword = newUser.UserPassword;
+                    user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, newUser.UserPassword);
 
                     var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
@@ -146,9 +147,9 @@ namespace BlogAPI.Controllers
 
                         SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            name = user.Email,
-                            infoMessage = "Пользователь отредактирован",
+                            Code = 0,
+                            Name = user.Email,
+                            InfoMessage = "Пользователь отредактирован",
                         };
 
                         return Json(resp);
@@ -222,9 +223,9 @@ namespace BlogAPI.Controllers
 
                     SuccessResponse resp = new ()
                     {
-                        code = 0,
-                        name = user.Email,
-                        infoMessage = "Пользователь удаленн",
+                        Code = 0,
+                        Name = user.Email,
+                        InfoMessage = "Пользователь удаленн",
                     };
 
                     return Json(resp);
@@ -259,10 +260,9 @@ namespace BlogAPI.Controllers
             {
                 Email = newUser.Email,
                 UserName = newUser.Email,
-                UserCreateDate = DateTime.Now.ToString(),
+                UserCreateDate = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                 UserFirstName = newUser.UserFirstName,
                 UserLastName = newUser.UserLastName,
-                UserPassword = newUser.UserPassword,
             };
 
             // по умолчанию права пользователя
@@ -276,9 +276,9 @@ namespace BlogAPI.Controllers
 
                 SuccessResponse resp = new ()
                 {
-                    code = 0,
-                    name = user.Email,
-                    infoMessage = "Пользователь зарегистрирован",
+                    Code = 0,
+                    Name = user.Email,
+                    InfoMessage = "Пользователь зарегистрирован",
                 };
 
                 return Json(resp);
@@ -319,9 +319,9 @@ namespace BlogAPI.Controllers
 
                     SuccessResponse resp = new ()
                     {
-                        code = 0,
-                        name = searchuser.Email,
-                        infoMessage = "Пользователь успешно залогинился",
+                        Code = 0,
+                        Name = searchuser.Email,
+                        InfoMessage = "Пользователь успешно залогинился",
                     };
 
                     return Json(resp);
@@ -350,18 +350,18 @@ namespace BlogAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true, Name: { } })
             {
                 var username = User.Identity.Name;
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await _signInManager.SignOutAsync();
                 HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");
 
-                SuccessResponse resp = new ()
+                SuccessResponse resp = new()
                 {
-                    code = 0,
-                    name = User.Identity.Name,
-                    infoMessage = "Пользователь успешно разлогинился",
+                    Code = 0,
+                    Name = User.Identity.Name,
+                    InfoMessage = "Пользователь успешно разлогинился",
                 };
 
                 _logger.LogInformation("Пользователь успешно вышел Email: " + username);

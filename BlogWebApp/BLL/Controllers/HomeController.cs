@@ -47,7 +47,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <returns>An IActionResult.</returns>
         public IActionResult Logout()
         {
-            _logger.LogInformation("Пользователь разлогинился: " + User.Identity.Name);
+            _logger.LogInformation("Пользователь разлогинился: " + User.Identity?.Name);
 
             // разлогиневаемся и чистим куки
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

@@ -10,12 +10,12 @@ namespace BlogAPI.DATA.Models
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
-        public int id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the tag text.
         /// </summary>
-        public string tagText { get; set; }
+        public string TagText { get; set; }
 
         /// <summary>
         /// Gets or sets the posts.
@@ -29,7 +29,7 @@ namespace BlogAPI.DATA.Models
         /// <param name="tagText">The tag text.</param>
         public Tag(string tagText)
         {
-            this.tagText = tagText;
+            this.TagText = tagText;
         }
     }
 }

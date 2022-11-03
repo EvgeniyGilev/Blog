@@ -16,7 +16,7 @@ namespace BlogAPI.DATA.Repositories
         /// Initializes a new instance of the <see cref="CommentRepository"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public CommentRepository(AppDBContext context)
+        public CommentRepository(AppDbContext context)
             : base(context)
         {
         }
@@ -28,7 +28,7 @@ namespace BlogAPI.DATA.Repositories
         /// <returns>A Task.</returns>
         public async Task CreateComment(Comment comment)
         {
-            comment.commentCreatedDate = DateTime.Now.ToString();
+            comment.CommentCreatedDate = DateTime.Now.ToString();
 
             var entry = _context.Entry(comment);
             if (entry.State == EntityState.Detached)
@@ -45,7 +45,7 @@ namespace BlogAPI.DATA.Repositories
         public async Task DelComment(Comment comment)
         {
             // Удаление комментария
-            var dbcomment = _context.Comment.Where(u => u.id == comment.id).First();
+            var dbcomment = _context.Comment.Where(u => u.Id == comment.Id).First();
             if (dbcomment != null)
             {
                 _context.Comment.Remove(dbcomment);

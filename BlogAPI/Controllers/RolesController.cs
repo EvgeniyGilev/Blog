@@ -19,9 +19,9 @@ namespace BlogAPI.Controllers
     public class RolesController : Controller
     {
         private readonly ILogger<RolesController> _logger;
-        private RoleManager<Role> _roleManager;
-        private UserManager<User> _userManager;
-        private IMapper _mapper;
+        private readonly RoleManager<Role> _roleManager;
+        private readonly UserManager<User> _userManager;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RolesController"/> class.
@@ -90,8 +90,8 @@ namespace BlogAPI.Controllers
 
                     SuccessResponse resp = new ()
                     {
-                        code = 0,
-                        infoMessage = "Новая роль добавлена: " + newRole.Name,
+                        Code = 0,
+                        InfoMessage = "Новая роль добавлена: " + newRole.Name,
                     };
 
                     return Json(resp);
@@ -140,10 +140,10 @@ namespace BlogAPI.Controllers
                         {
                             SuccessResponse resp = new ()
                             {
-                                code = 0,
-                                id = id,
-                                name = role.Name,
-                                infoMessage = "Роль успешно удалена",
+                                Code = 0,
+                                Id = id,
+                                Name = role.Name,
+                                InfoMessage = "Роль успешно удалена",
                             };
                             return Json(resp);
                         }
@@ -207,8 +207,8 @@ namespace BlogAPI.Controllers
 
                         SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            infoMessage = "Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name,
+                            Code = 0,
+                            InfoMessage = "Роль успешно добавлена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name,
                         };
                         return Json(resp);
                     }
@@ -260,8 +260,8 @@ namespace BlogAPI.Controllers
 
                         SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            infoMessage = "Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name,
+                            Code = 0,
+                            InfoMessage = "Роль успешно удалена для пользователя: " + user.Email + " имя роли: " + roleToAdd.Name,
                         };
                         return Json(resp);
                     }
@@ -312,10 +312,10 @@ namespace BlogAPI.Controllers
 
                             SuccessResponse resp = new ()
                             {
-                                code = 0,
-                                id = newRole.id,
-                                name = newRole.Name,
-                                infoMessage = "Роль успешно отредактирована",
+                                Code = 0,
+                                Id = newRole.id,
+                                Name = newRole.Name,
+                                InfoMessage = "Роль успешно отредактирована",
                             };
                             return Json(resp);
                         }

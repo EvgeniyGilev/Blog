@@ -26,10 +26,10 @@ namespace BlogWebApp.BLL.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="PostController"/> class.
         /// </summary>
-        /// <param name="repo">The repo.</param>
-        /// <param name="repotags">The repotags.</param>
+        /// <param name="tagService"> tags. </param>
         /// <param name="userManager">The user manager.</param>
         /// <param name="logger">The logger.</param>
+        /// <param name="postService"> posts. </param>
         public PostController(IPostService postService, ITagService tagService, UserManager<User> userManager, ILogger<PostController> logger)
         {
             _postService = postService;
@@ -49,16 +49,12 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
             var post = await _postService.GetPostById(id);
-            if (post != null)
             {
                 ShowPostAndCommentViewModel model = new ShowPostAndCommentViewModel { ShowPost = post, PostId=id };
                 _logger.LogInformation("Получаем статью с ID: " + id.ToString());
 
                 return View(model);
             }
-
-            _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-            return RedirectToAction("GetPosts");
         }
 
         /// <summary>
@@ -110,27 +106,24 @@ namespace BlogWebApp.BLL.Controllers
             var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == newPost.PostAuthorEmail);
             if (searchuser != null)
             {
-                List<Tag> _posttags = new List<Tag>();
+                List<Tag> posttags = new List<Tag>();
 
                 foreach (var tag in postTags)
                 {
-                    Tag newtag = await _tagService.GetTagById(tag.id);
-                    if (newtag != null)
-                    {
-                        _posttags.Add(newtag);
-                    }
+                    Tag newtag = await _tagService.GetTagById(tag.Id);
+                    posttags.Add(newtag);
                 }
 
                 Post post = new Post
                 {
-                    postName = newPost.PostName,
-                    postText = newPost.PostText,
+                    PostName = newPost.PostName,
+                    PostText = newPost.PostText,
                     User = searchuser,
-                    Tags = _posttags,
+                    Tags = posttags,
                 };
 
                 await _postService.CreatePost(post);
-                _logger.LogInformation("новая статья добавлена: " + post.postName);
+                _logger.LogInformation("новая статья добавлена: " + post.PostName);
             }
 
             return RedirectToAction("GetPosts");
@@ -148,29 +141,35 @@ namespace BlogWebApp.BLL.Controllers
             var post = await _postService.GetPostById(id);
 
             // редактировать статью может только автор или администратор
-            if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+            if (User.Identity?.Name == post.User?.UserName || User.IsInRole("Администратор"))
             {
                 var postTags = await _tagService.ListAsync();
 
-                EditPostViewModel model = new EditPostViewModel
+                if (post.PostName != null && post.PostText != null)
                 {
-                    PostName = post.postName,
-                    PostText = post.postText,
-                    PostTagsCurrent = post.Tags,
-                    PostTagsAll = postTags.ToList(),
-                    PostId = id,
-                };
+                    var model = new EditPostViewModel
+                    {
+                        PostName = post.PostName,
+                        PostText = post.PostText,
+                        PostTagsCurrent = post.Tags,
+                        PostTagsAll = postTags.ToList(),
+                        PostId = id,
+                    };
 
-                _logger.LogInformation("Статья отредактирована: " + post.postName);
-                return View(model);
+                    _logger.LogInformation("Статья отредактирована: " + post.PostName);
+                    return View(model);
+                }
+                else
+                {
+                    return Redirect("~/Error/Error404");
+                }
             }
             else
             {
-                return RedirectToAction("AccessDenied", "Home");
+                return Redirect("~/Error/Error403");
             }
         }
 
-        // Put: PostController/Edit/5
         /// <summary>
         /// Edits the.
         /// </summary>
@@ -187,20 +186,17 @@ namespace BlogWebApp.BLL.Controllers
             foreach (var tag in postTags)
             {
                 Tag newtag = await _tagService.GetTagByName(tag);
-                if (newtag != null)
-                {
-                    newposttags.Add(newtag);
-                }
+                newposttags.Add(newtag);
             }
 
             var post = await _postService.GetPostById(id);
 
-            post.postName = newPost.PostName;
-            post.postText = newPost.PostText;
+            post.PostName = newPost.PostName;
+            post.PostText = newPost.PostText;
             post.Tags = newposttags;
 
             await _postService.EditPost(id, post);
-            _logger.LogInformation("Статья отредактирована: " + post.postName);
+            _logger.LogInformation("Статья отредактирована: " + post.PostName);
 
             return RedirectToAction("GetPosts");
         }
@@ -218,15 +214,15 @@ namespace BlogWebApp.BLL.Controllers
             var post = await _postService.GetPostById(id);
 
             // удалить статью может только автор или администратор
-            if ((User != null && User.Identity != null && post.User != null && (User.Identity.Name == post.User.UserName)) || (User != null && User.IsInRole("Администратор")))
+            if ((User.Identity != null && post.User != null && (User.Identity.Name == post.User.UserName)) || User.IsInRole("Администратор"))
             {
                     await _postService.DeletePost(id);
-                    _logger.LogInformation("Статья удалена: " + post.postName);
+                    _logger.LogInformation("Статья удалена: " + post.PostName);
                     return RedirectToAction("GetPosts");
             }
             else
             {
-                return RedirectToAction("AccessDenied", "Home");
+                return Redirect("~/Error/Error403");
             }
         }
     }

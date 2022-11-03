@@ -35,7 +35,7 @@ namespace BlogApi.Tests.Repositories
             var comment = _repo.GetCommentById(id);
 
             // Assert
-            Assert.That(comment.Result.commentTexte == "Комментарий");
+            Assert.That(comment.Result.CommentTexte == "Комментарий");
         }
     }
 }

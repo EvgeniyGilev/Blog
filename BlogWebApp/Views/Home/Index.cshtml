@@ -3,7 +3,7 @@
 }
 
 <div class="container-page">
-    @if (User.Identity.IsAuthenticated)
+    @if (User.Identity is { IsAuthenticated: true })
     {
         <div class="container-page">
             <div class="text-start">

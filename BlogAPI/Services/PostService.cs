@@ -36,7 +36,7 @@ namespace BlogAPI.Services
             await _unitOfWork.CompleteAsync();
 
             // Если добавление прошло успешно получим id новой статьи
-            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.postName == newpost.postName)?.id ?? 0;
+            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.PostName == newpost.PostName)?.Id ?? 0;
             return getpost;
         }
 
@@ -76,7 +76,7 @@ namespace BlogAPI.Services
                 await _unitOfWork.CompleteAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -89,8 +89,8 @@ namespace BlogAPI.Services
         /// <returns>Post.</returns>
         async Task<Post> IPostService.GetPostById(int id)
         {
-            Post? post = await _postRepository.GetPostById(id);
-            return post;
+            var post = await _postRepository.GetPostById(id);
+            return post ?? throw new InvalidOperationException();
         }
 
         /// <summary>

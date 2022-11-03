@@ -2,7 +2,7 @@
 @model IEnumerable<Role>
 
 <h2>Список ролей</h2>
-@if (User!=null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+@if (User.Identity is { IsAuthenticated: true } && User.IsInRole("Администратор"))
 {
     <table class="table bgpowderblue w-50">
     @foreach (var role in Model)

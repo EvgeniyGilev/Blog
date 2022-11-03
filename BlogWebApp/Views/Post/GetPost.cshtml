@@ -1,5 +1,4 @@
 ﻿@using BlogWebApp.BLL.Models.ViewModels.PostViews
-@using Microsoft.AspNetCore.Identity
 @using BlogAPI.DATA.Models
 @model ShowPostAndCommentViewModel
 @{
@@ -8,12 +7,12 @@
 
 <div class="text-start">
     <div class="container bgpowderblue">
-        <h3>@Model.ShowPost.postName</h3>
-        @foreach (Tag tag in @Model.ShowPost.Tags)
+        <h3>@Model.ShowPost?.PostName</h3>
+        @foreach (Tag tag in @Model.ShowPost?.Tags)
         {
-            <span class="badge bg-info text-dark">@tag.tagText</span>
+            <span class="badge bg-info text-dark">@tag.TagText</span>
         }
-        <p class="lh-sm">@Model.ShowPost.postText</p>
+        <p class="lh-sm">@Model.ShowPost.PostText</p>
         @if (@Model.ShowPost.User != null)
         {
             <p class="text-end">@Model.ShowPost.User.UserFirstName @Model.ShowPost.User.UserLastName</p>
@@ -27,10 +26,10 @@
         <h6>Комментарии к статье</h6>
         @foreach (Comment com in @Model.ShowPost.Comments)
         {
-            <p class="text-left">@com.commentTexte</p>
+            <p class="text-left">@com.CommentTexte</p>
             @if (User.IsInRole("Администратор"))
             {
-                <form asp-action="Delete" asp-route-id="@com.id" asp-route-Postid=@Model.PostId asp-controller="Comment" method="post">
+                <form asp-action="Delete" asp-route-id="@com.Id" asp-route-Postid=@Model.PostId asp-controller="Comment" method="post">
                     <button type="submit" class="btn btn-outline-danger btn-sm">
                         Удалить комментарий
                     </button>

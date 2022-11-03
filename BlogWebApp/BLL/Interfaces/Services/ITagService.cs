@@ -20,14 +20,14 @@ namespace BlogWebApp.BLL.Interfaces.Services
         /// </summary>
         /// <param name="id">id тега.</param>
         /// <returns>Tag.</returns>
-        Task<Tag> GetTagById(int id);
+        Task<Tag?> GetTagById(int id);
 
         /// <summary>
         /// Получить тег по имени
         /// </summary>
         /// <param name="name">name тега.</param>
         /// <returns>Tag.</returns>
-        Task<Tag> GetTagByName(string name);
+        Task<Tag?> GetTagByName(string name);
 
 
         /// <summary>

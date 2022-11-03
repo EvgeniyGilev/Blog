@@ -16,7 +16,7 @@ namespace BlogAPI.DATA.Repositories
         /// Initializes a new instance of the <see cref="PostRepository"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public PostRepository(AppDBContext context)
+        public PostRepository(AppDbContext context)
          : base(context)
         {
         }
@@ -28,7 +28,7 @@ namespace BlogAPI.DATA.Repositories
         /// <returns>A Task.</returns>
         public async Task CreatePost(Post post)
         {
-            post.postCreateDate = DateTime.Now.ToString();
+            post.PostCreateDate = DateTime.Now.ToString();
 
             // Добавление статьи
             var entry = _context.Entry(post);
@@ -46,7 +46,7 @@ namespace BlogAPI.DATA.Repositories
         public async Task DelPost(Post post)
         {
             // Удаление статьи
-            var dbpost = _context.Post.Where(u => u.id == post.id).First();
+            var dbpost = _context.Post.Where(u => u.Id == post.Id).First();
             if (dbpost != null)
             {
                 _context.Post.Remove(dbpost);
@@ -61,11 +61,11 @@ namespace BlogAPI.DATA.Repositories
         /// <returns>A Task.</returns>
         public async Task EditPost(Post post, int id)
         {
-            var dbpost = _context.Post.Where(u => u.id == id).First();
+            var dbpost = _context.Post.Where(u => u.Id == id).First();
             if (dbpost != null)
             {
-                dbpost.postName = post.postName;
-                dbpost.postText = post.postText;
+                dbpost.PostName = post.PostName;
+                dbpost.PostText = post.PostText;
                 dbpost.Tags = post.Tags;
             }
         }
@@ -101,7 +101,7 @@ namespace BlogAPI.DATA.Repositories
         /// <returns>A Task.</returns>
         public async Task<Post?> GetPostById(int id)
         {
-            var postById = await _context.Post.Include(p => p.Tags).Include(u => u.User).Include(c => c.Comments).ThenInclude(cu => cu.User).Where(p => p.id == id).FirstOrDefaultAsync();
+            var postById = await _context.Post.Include(p => p.Tags).Include(u => u.User).Include(c => c.Comments).ThenInclude(cu => cu.User).Where(p => p.Id == id).FirstOrDefaultAsync();
 
             return postById;
         }

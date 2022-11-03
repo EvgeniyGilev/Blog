@@ -13,10 +13,10 @@
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.CommentController"/> class.
             </summary>
-            <param name="repo">репозиторий комментариев.</param>
-            <param name="repoposts">репозиторий статей.</param>
             <param name="userManager">UserManager AspNetCore.Identity.</param>
             <param name="logger">NLOG logger.</param>
+            <param name="commentService"> комментарии. </param>
+            <param name="postService"> статьи. </param>
         </member>
         <member name="M:BlogAPI.Controllers.CommentController.Create(BlogAPI.Contracts.Models.Comments.CreateCommentModel)">
             <summary>
@@ -82,12 +82,11 @@
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.PostController"/> class.
             </summary>
-            <param name="repo">Репозиторий статей (posts).</param>
-            <param name="repotags">Репозиторий тегов (tags).</param>
             <param name="userManager">UserManager AspNetCore.Identity.</param>
             <param name="logger">NLOG logger.</param>
             <param name="mapper">Automapper.</param>
             <param name="postService">Бизнес логика получения данных по статьям.</param>
+            <param name="tagService"></param>
         </member>
         <member name="M:BlogAPI.Controllers.PostController.GetPost(System.Int32)">
             <summary>
@@ -265,7 +264,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Controllers.TagController"/> class.
             </summary>
-            <param name="repo">The repo.</param>
             <param name="logger">The logger.</param>
             <param name="mapper">The mapper.</param>
             /// <param name="tagService"> бизнес логика работы с tag</param>
@@ -433,7 +431,7 @@
             <summary>
             Удаление комментария.
             </summary>
-            <param name="Comment">комментарий, который будет удален.</param>
+            <param name="comment">комментарий, который будет удален.</param>
             <returns>Boolean - true - success or false - failure..</returns>
         </member>
         <member name="T:BlogAPI.Interfaces.Services.IPostService">
@@ -536,8 +534,9 @@
             <summary>
             Initializes a new instance of the <see cref="T:BlogAPI.Services.CommentService"/> class.
             </summary>
-            <param name="_commentRepository"></param>
+            <param name="commentRepository"></param>
             <param name="unitOfWork"></param>
+            <param name="logger">logger.</param>
         </member>
         <member name="M:BlogAPI.Services.CommentService.BlogAPI#Interfaces#Services#ICommentService#CreateComment(BlogAPI.DATA.Models.Comment)">
             <summary>
@@ -550,7 +549,6 @@
             <summary>
             Deletes the comment.
             </summary>
-            <param name="id">The id comment.</param>
             <returns>true or false.</returns>
         </member>
         <member name="M:BlogAPI.Services.CommentService.BlogAPI#Interfaces#Services#ICommentService#GetCommentById(System.Int32)">

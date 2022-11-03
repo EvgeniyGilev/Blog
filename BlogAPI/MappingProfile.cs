@@ -23,27 +23,27 @@ namespace BlogAPI
             CreateMap<Post, PostView>()
             .ForMember(
                 d => d.PostTitle,
-                opt => opt.MapFrom(r => r.postName))
+                opt => opt.MapFrom(r => r.PostName))
             .ForMember(
                 d => d.AuthorEmail,
-                opt => opt.MapFrom(r => r.User.Email))
+                opt => opt.MapFrom(r => r.User!.Email))
             .ForMember(
                 d => d.CreateDate,
-                opt => opt.MapFrom(r => DateTime.Parse(r.postCreateDate)));
+                opt => opt.MapFrom(r => DateTime.Parse(r.PostCreateDate!)));
 
             CreateMap<Tag, TagView>().ForMember(
                 d => d.tagText,
-                opt => opt.MapFrom(r => r.tagText));
+                opt => opt.MapFrom(r => r.TagText));
 
             CreateMap<Comment, CommentView>().ForMember(
                 c => c.CommentText,
-                opt => opt.MapFrom(c => c.commentTexte))
+                opt => opt.MapFrom(c => c.CommentTexte))
                 .ForMember(
                     c => c.CommentAuthorEmail,
                     opt => opt.MapFrom(c => c.User.Email))
                 .ForMember(
                     d => d.DateCreate,
-                    opt => opt.MapFrom(r => DateTime.Parse(r.commentCreatedDate)));
+                    opt => opt.MapFrom(r => DateTime.Parse(r.CommentCreatedDate)));
 
             CreateMap<Role, ShowRoleView>();
         }

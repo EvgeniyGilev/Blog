@@ -10,28 +10,28 @@ namespace BlogAPI.DATA.Models
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
-        public int id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the comment text.
         /// </summary>
-        public string commentTexte { get; set; }
+        public string? CommentTexte { get; set; }
 
         /// <summary>
         /// Gets or sets the comment created date.
         /// </summary>
-        public string commentCreatedDate { get; set; }
+        public string? CommentCreatedDate { get; set; }
 
         /// <summary>
         /// Gets or sets the post.
         /// ссылка на статью.
         /// </summary>
-        public virtual Post Post { get; set; } = new();
+        public virtual Post Post { get; set; } = new Post();
 
         /// <summary>
         /// Gets or sets the user.
         /// ссылка на пользователя.
         /// </summary>
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
     }
 }

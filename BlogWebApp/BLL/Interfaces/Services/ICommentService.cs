@@ -14,7 +14,7 @@ namespace BlogWebApp.BLL.Interfaces.Services
         /// </summary>
         /// <param name="id">id комментария.</param>
         /// <returns>comment.</returns>
-        Task<Comment> GetCommentById(int id);
+        Task<Comment?> GetCommentById(int id);
 
         /// <summary>
         /// Создание комментария.
@@ -26,8 +26,8 @@ namespace BlogWebApp.BLL.Interfaces.Services
         /// <summary>
         /// Удаление комментария.
         /// </summary>
-        /// <param name="Comment">комментарий, который будет удален.</param>
+        /// <param name="comment">комментарий, который будет удален.</param>
         /// <returns>Boolean - true - success or false - failure..</returns>
-        Task<bool> DeleteComment(Comment Comment);
+        Task<bool> DeleteComment(Comment comment);
     }
 }

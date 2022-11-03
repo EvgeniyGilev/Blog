@@ -16,7 +16,7 @@ namespace BlogAPI.DATA.Repositories
         /// Initializes a new instance of the <see cref="TagRepository"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public TagRepository(AppDBContext context)
+        public TagRepository(AppDbContext context)
          : base(context)
         {
         }
@@ -44,7 +44,7 @@ namespace BlogAPI.DATA.Repositories
         {
 
             // Удаление тега
-            var dbtag = _context.Tag.Where(u => u.tagText == tag.tagText).First();
+            var dbtag = _context.Tag.Where(u => u.TagText == tag.TagText).First();
             if (dbtag != null)
             {
                 _context.Tag.Remove(dbtag);
@@ -60,10 +60,10 @@ namespace BlogAPI.DATA.Repositories
         public async Task EditTag(Tag tag, int id)
         {
             // изменение тега
-            var dbtag = _context.Tag.Where(u => u.id == id).First();
+            var dbtag = _context.Tag.Where(u => u.Id == id).First();
             if (dbtag != null)
             {
-                dbtag.tagText = tag.tagText;
+                dbtag.TagText = tag.TagText;
             }
         }
 
@@ -96,7 +96,7 @@ namespace BlogAPI.DATA.Repositories
         /// <returns>A Task.</returns>
         public async Task<Tag?> GetTagByName(string Name)
         {
-            var tagByName = await _context.Tag.FirstOrDefaultAsync(t => t.tagText == Name);
+            var tagByName = await _context.Tag.FirstOrDefaultAsync(t => t.TagText == Name);
 
             return tagByName;
         }

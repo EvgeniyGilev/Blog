@@ -2,7 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 using System.Security.Claims;
 using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories.Interfaces;
 using BlogWebApp.BLL.Interfaces.Services;
 using BlogWebApp.BLL.Models.ViewModels.PostViews;
 using BlogWebApp.Handlers;
@@ -22,7 +21,6 @@ namespace BlogWebApp.BLL.Controllers
         private readonly ICommentService _commentService;
         private readonly IPostService _postService;
         private readonly UserManager<User> _userManager;
-        private readonly ILogger<CommentController> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentController"/> class.
@@ -30,13 +28,11 @@ namespace BlogWebApp.BLL.Controllers
         /// <param name="commentService">The comment Service.</param>
         /// <param name="postService">The posts.</param>
         /// <param name="userManager">The user manager.</param>
-        /// <param name="logger">The logger.</param>
-        public CommentController(ICommentService commentService, IPostService postService, UserManager<User> userManager, ILogger<CommentController> logger)
+        public CommentController(ICommentService commentService, IPostService postService, UserManager<User> userManager)
         {
             _commentService = commentService;
             _postService = postService;
             _userManager = userManager;
-            _logger = logger;
         }
 
         /// <summary>
@@ -49,29 +45,23 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Create/{id}")]
         public async Task<IActionResult> Create([FromForm] ShowPostAndCommentViewModel newComment, [FromRoute] int id)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
                 ClaimsPrincipal currentUser = User;
-                var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                var user = await _userManager.FindByIdAsync(currentUserID);
+                var user = await _userManager.FindByIdAsync(currentUserId);
                 if (user != null)
                 {
                     var post = await _postService.GetPostById(id);
-                    if (post != null)
                     {
-
                         Comment comment = new Comment();
-                        comment.commentTexte = newComment.Comment;
+                        comment.CommentTexte = newComment.Comment;
                         comment.Post = post;
                         comment.User = user;
 
                         await _commentService.CreateComment(comment);
-                        return RedirectToAction("GetPost", "Post", new { id = id });
-                    }
-                    else
-                    {
-                        return RedirectToAction("Error500", "Error");
+                        return RedirectToAction("GetPost", "Post", new {id });
                     }
                 }
                 else
@@ -89,19 +79,15 @@ namespace BlogWebApp.BLL.Controllers
         /// Deletes the.
         /// </summary>
         /// <param name="id">The id.</param>
-        /// <param name="PostId">The post id.</param>
+        /// <param name="postId">The post id.</param>
         /// <returns>A Task.</returns>
         [HttpPost]
         [Route("Delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id, int PostId)
+        public async Task<IActionResult> Delete([FromRoute] int id, int postId)
         {
             var comment = await _commentService.GetCommentById(id);
-            if (comment == null) { return RedirectToAction(nameof(Index)); }
-            else
-            {
-                await _commentService.DeleteComment(comment);
-                return RedirectToAction("GetPost", "Post", new { id = PostId });
-            }
+            await _commentService.DeleteComment(comment);
+            return RedirectToAction("GetPost", "Post", new { id = postId });
         }
     }
 }

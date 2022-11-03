@@ -1,12 +1,12 @@
 ﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+using BlogAPI.DATA.Models;
+using BlogAPI.DATA.Repositories.Interfaces;
+using BlogAPI.Interfaces.Services;
+
 namespace BlogAPI.Services
 {
-    using BlogAPI.Contracts.Models;
-    using BlogAPI.DATA.Models;
-    using BlogAPI.DATA.Repositories.Interfaces;
-    using BlogAPI.Interfaces.Services;
-
     /// <summary>
     /// The tag service.
     /// </summary>
@@ -40,17 +40,10 @@ namespace BlogAPI.Services
         /// </summary>
         /// <param name="id">id tag, int.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        async Task<Tag?> ITagService.GetTagById(int id)
+        async Task<Tag> ITagService.GetTagById(int id)
         {
             var tag = await _tagRepository.GetTagById(id);
-            if (tag != null)
-            {
-                return tag;
-            }
-            else
-            {
-                return null;
-            }
+            return (tag ?? null) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -86,7 +79,7 @@ namespace BlogAPI.Services
             var tag = await _tagRepository.GetTagById(id);
             if (tag != null)
             {
-                tag.tagText = newTag.tagText;
+                tag.TagText = newTag.TagText;
 
                 await _tagRepository.EditTag(tag, id);
                 await _unitOfWork.CompleteAsync();

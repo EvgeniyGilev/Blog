@@ -26,8 +26,8 @@ namespace BlogAPI.Interfaces.Services
         /// <summary>
         /// Удаление комментария.
         /// </summary>
-        /// <param name="Comment">комментарий, который будет удален.</param>
+        /// <param name="comment">комментарий, который будет удален.</param>
         /// <returns>Boolean - true - success or false - failure..</returns>
-        Task<bool> DeleteComment(Comment Comment);
+        Task<bool> DeleteComment(Comment comment);
     }
 }

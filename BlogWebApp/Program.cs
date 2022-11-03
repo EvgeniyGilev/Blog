@@ -13,6 +13,7 @@ using BlogAPI.DATA.Models;
 using Microsoft.EntityFrameworkCore;
 using BlogWebApp.BLL.Interfaces.Services;
 using BlogWebApp.BLL.Services;
+using Microsoft.Extensions.Hosting;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -63,7 +64,7 @@ try
 
     // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
 
     builder.Services.AddIdentity<User, Role>(opts =>
     {
@@ -76,9 +77,19 @@ try
         opts.SignIn.RequireConfirmedAccount = false;
         opts.SignIn.RequireConfirmedEmail = false;
         opts.SignIn.RequireConfirmedPhoneNumber = false;
-    }).AddEntityFrameworkStores<AppDBContext>();
+    }).AddEntityFrameworkStores<AppDbContext>();
 
     var app = builder.Build();
+
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+
+        var userManager = services.GetRequiredService<UserManager<User>>();
+        var rolesManager = services.GetRequiredService<RoleManager<Role>>();
+        await Initializer.CheckAdminUser(userManager, rolesManager);
+    }
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
@@ -121,5 +132,5 @@ catch (Exception exception)
 finally
 {
     // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-    NLog.LogManager.Shutdown();
+    LogManager.Shutdown();
 }
