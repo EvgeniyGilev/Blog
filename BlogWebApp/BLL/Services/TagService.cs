@@ -18,8 +18,9 @@ namespace BlogWebApp.BLL.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="TagService"/> class.
         /// </summary>
-        /// <param name="tagRepository"></param>
-        /// <param name="unitOfWork"></param>
+        /// <param name="tagRepository">tags rep.</param>
+        /// <param name="unitOfWork">UoW.</param>
+        /// <param name="logger">logger.</param>
         public TagService(ITagRepository tagRepository, IUnitOfWork unitOfWork, ILogger<TagService> logger)
         {
             _tagRepository = tagRepository;
@@ -41,12 +42,12 @@ namespace BlogWebApp.BLL.Services
         /// </summary>
         /// <param name="id">id tag, int.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        async Task<Tag> ITagService.GetTagById(int id)
+        async Task<Tag?> ITagService.GetTagById(int id)
         {
             var tag = await _tagRepository.GetTagById(id);
             if (tag != null)
             {
-                _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
+                _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.TagText);
                 return tag;
             }
             else
@@ -61,12 +62,12 @@ namespace BlogWebApp.BLL.Services
         /// </summary>
         /// <param name="name">name tag, string.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        async Task<Tag> ITagService.GetTagByName(string name)
+        async Task<Tag?> ITagService.GetTagByName(string name)
         {
             var tag = await _tagRepository.GetTagByName(name);
             if (tag != null)
             {
-                _logger.LogInformation("Получили тег по имени,имя тега: " + tag.tagText);
+                _logger.LogInformation("Получили тег по имени,имя тега: " + tag.TagText);
                 return tag;
             }
             else
@@ -112,12 +113,12 @@ namespace BlogWebApp.BLL.Services
             var tag = await _tagRepository.GetTagById(id);
             if (tag != null)
             {
-                tag.tagText = newTag.tagText;
+                tag.TagText = newTag.TagText;
 
                 await _tagRepository.EditTag(tag, id);
                 await _unitOfWork.CompleteAsync();
 
-                _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + newTag.tagText);
+                _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + newTag.TagText);
 
                 return true;
             }
@@ -141,7 +142,7 @@ namespace BlogWebApp.BLL.Services
                 await _tagRepository.DelTag(tag);
                 await _unitOfWork.CompleteAsync();
 
-                _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
+                _logger.LogInformation("Удалили тег по id: " + id + " имя тега: " + tag.TagText);
 
                 return true;
             }

@@ -9,13 +9,13 @@ namespace BlogAPI.DATA.Repositories
     /// </summary>
     public abstract class BaseRepository
     {
-        protected readonly AppDBContext _context;
+        protected readonly AppDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRepository"/> class.
         /// </summary>
         /// <param name="context">The context AppDBContext.</param>
-        public BaseRepository(AppDBContext context)
+        public BaseRepository(AppDbContext context)
         {
             _context = context;
         }

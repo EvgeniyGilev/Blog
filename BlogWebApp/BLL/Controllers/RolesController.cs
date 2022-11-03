@@ -1,12 +1,13 @@
 ﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
+
+using BlogAPI.DATA.Models;
 using BlogWebApp.BLL.Models.ViewModels.RoleViews;
 using BlogWebApp.Handlers;
-using BlogAPI.DATA.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
-namespace CustomIdentityApp.Controllers
+namespace BlogWebApp.BLL.Controllers
 {
     /// <summary>
     /// The roles controller.
@@ -14,8 +15,8 @@ namespace CustomIdentityApp.Controllers
     [ExceptionHandler]
     public class RolesController : Controller
     {
-        RoleManager<Role> _roleManager;
-        UserManager<User> _userManager;
+        readonly RoleManager<Role> _roleManager;
+        readonly UserManager<User> _userManager;
         private readonly ILogger<RolesController> _logger;
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace CustomIdentityApp.Controllers
             Role role = await _roleManager.FindByIdAsync(id);
             if (role != null)
             {
-                IdentityResult result = await _roleManager.DeleteAsync(role);
+                await _roleManager.DeleteAsync(role);
                 _logger.LogInformation("Роль удалена: " + role.Name);
             }
 
@@ -151,9 +152,6 @@ namespace CustomIdentityApp.Controllers
                 // получаем список ролей пользователя
                 var userRoles = await _userManager.GetRolesAsync(user);
 
-                // получаем все роли
-                var allRoles = _roleManager.Roles.ToList();
-
                 // получаем список ролей, которые были добавлены
                 var addedRoles = roles.Except(userRoles);
 
@@ -183,7 +181,7 @@ namespace CustomIdentityApp.Controllers
         {
             Role role = await _roleManager.FindByIdAsync(id);
 
-            if (role != null)
+            if (role is {Description: { }})
             {
                 EditeRoleViewModel model = new EditeRoleViewModel
                 {
@@ -201,7 +199,6 @@ namespace CustomIdentityApp.Controllers
             }
         }
 
-        // GET: TagController/Edit
         /// <summary>
         /// Edits the role.
         /// </summary>
@@ -217,7 +214,9 @@ namespace CustomIdentityApp.Controllers
             {
                 role.Name = newRole.Name;
                 role.Description = newRole.Description;
-                IdentityResult result = await _roleManager.UpdateAsync(role);
+
+                await _roleManager.UpdateAsync(role);
+
                 _logger.LogInformation("изменили роль: " + role.Name);
             }
 

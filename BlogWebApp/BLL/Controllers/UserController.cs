@@ -1,12 +1,13 @@
 ﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using BlogWebApp.BLL.Models.ViewModels.UserViews;
 using BlogWebApp.Handlers;
-using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.DATA.Models;
 
 namespace BlogWebApp.BLL.Controllers
@@ -22,8 +23,6 @@ namespace BlogWebApp.BLL.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<UserController> _logger;
-        private readonly IPostRepository _repoposts;
-        private readonly ICommentRepository _repocomments;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class.
@@ -31,15 +30,11 @@ namespace BlogWebApp.BLL.Controllers
         /// <param name="signInManager">The sign in manager.</param>
         /// <param name="userManager">The user manager.</param>
         /// <param name="logger">The logger.</param>
-        /// <param name="repoposts">The repoposts.</param>
-        /// <param name="repocomments">The repocomments.</param>
-        public UserController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<UserController> logger, IPostRepository repoposts, ICommentRepository repocomments)
+        public UserController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<UserController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
-            _repoposts = repoposts;
-            _repocomments = repocomments;
         }
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace BlogWebApp.BLL.Controllers
 
                 foreach (var role in userRoles)
                 {
-                    roles.Add(role.ToString());
+                    roles.Add(role);
                 }
 
                 model.Add(new ShowUserViewModel
@@ -96,9 +91,8 @@ namespace BlogWebApp.BLL.Controllers
                 Email = user.Email,
                 UserFirstName = user.UserFirstName,
                 UserLastName = user.UserLastName,
-                UserPassword = user.UserPassword,
             };
-            _logger.LogInformation("Форма редактирования пользователя по его id: " + id + " Email: " +user.UserName);
+            _logger.LogInformation("Форма редактирования пользователя по его id: " + id + " Email: " + user.UserName);
             return View(model);
         }
 
@@ -127,10 +121,9 @@ namespace BlogWebApp.BLL.Controllers
             {
                 Email = newUser.Email,
                 UserName = newUser.Email,
-                UserCreateDate = DateTime.Now.ToString(),
+                UserCreateDate = DateTime.Now.ToString(CultureInfo.CurrentCulture),
                 UserFirstName = newUser.UserFirstName,
                 UserLastName = newUser.UserLastName,
-                UserPassword = newUser.UserPassword,
             };
 
             // по умолчанию права пользователя
@@ -139,7 +132,7 @@ namespace BlogWebApp.BLL.Controllers
             {
                 // добавляем роль по умолчанию Пользователь
                 await _userManager.AddToRoleAsync(user, "Пользователь");
-                if (!User.Identity.IsAuthenticated)
+                if (User.Identity is { IsAuthenticated: false })
                 {
                     await _signInManager.SignInAsync(user, false);
                 }
@@ -171,7 +164,7 @@ namespace BlogWebApp.BLL.Controllers
 
                     user.UserLastName = newUser.UserLastName;
                     user.UserFirstName = newUser.UserFirstName;
-                    user.UserPassword = newUser.UserPassword;
+                    user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, newUser.UserPassword);
 
                     var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
@@ -205,44 +198,15 @@ namespace BlogWebApp.BLL.Controllers
         {
             if (User.IsInRole("Администратор"))
             {
-                var user = await _userManager.FindByIdAsync(id); 
-                if (user == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    /*Если удаляем пользователя то нужно решать что делать с его Статьями и его комментариями.
-                    //В лоб удаляем статьи пользователя
-                   /* if (user.Posts != null)
-                    {
-                        foreach (var post in user.Posts)
-                        {
-                            await _repoposts.DelPost(post);
-                            _logger.LogInformation("Удаление статьей пользователя, id статьи: " + post.id + " название " + post.postName);
-                        }
-                    }
-                    // в лоб удаляем комментарии
-                    if (user.Comments != null)
-                    {
-                        foreach (var comment in user.Comments)
-                        {
-                            await _repocomments.DelComment(comment);
-                            _logger.LogInformation("Удаляем комментарий пользователя, id комментария: " + comment.id);
-                        }
-                    }
-                   */
+                var user = await _userManager.FindByIdAsync(id);
 
-                    // Удаляем самого пользователя
-                    await _userManager.DeleteAsync(user);
-                    _logger.LogInformation("Пользователь удален Email: " + user.UserName);
-                    return RedirectToAction("GetAllUsers");
-                }
+                // Удаляем самого пользователя
+                await _userManager.DeleteAsync(user);
+                _logger.LogInformation("Пользователь удален Email: " + user.UserName);
+                return RedirectToAction("GetAllUsers");
             }
-            else
-            {
-                return RedirectToAction("AccessDenied", "Home");
-            }
+
+            return Redirect("~/Error/Error403");
         }
 
         /// <summary>
@@ -299,7 +263,7 @@ namespace BlogWebApp.BLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            var username = User.Identity.Name;
+            var username = User.Identity?.Name;
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             HttpContext.Response.Cookies.Delete(".AspNetCore.Cookies");

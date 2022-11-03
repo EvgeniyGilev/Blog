@@ -9,6 +9,7 @@ using BlogAPI.DATA.Repositories;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Interfaces.Services;
 using BlogAPI.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog;
@@ -81,7 +82,7 @@ try
 
     // задаем подключение к БД. Строку подключения берем из конфигурации
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<AppDBContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Singleton);
 
     builder.Services.AddIdentity<User, Role>(opts =>
     {
@@ -94,9 +95,19 @@ try
         opts.SignIn.RequireConfirmedAccount = false;
         opts.SignIn.RequireConfirmedEmail = false;
         opts.SignIn.RequireConfirmedPhoneNumber = false;
-    }).AddEntityFrameworkStores<AppDBContext>();
+    }).AddEntityFrameworkStores<AppDbContext>();
 
     var app = builder.Build();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+
+        var userManager = services.GetRequiredService<UserManager<User>>();
+        var rolesManager = services.GetRequiredService<RoleManager<Role>>();
+        await Initializer.CheckAdminUser(userManager, rolesManager);
+    }
+
 
     if (app.Environment.IsDevelopment())
     {

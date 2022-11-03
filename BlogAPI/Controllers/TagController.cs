@@ -25,7 +25,6 @@ namespace BlogAPI.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="TagController"/> class.
         /// </summary>
-        /// <param name="repo">The repo.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="mapper">The mapper.</param>
         /// /// <param name="tagService"> бизнес логика работы с tag</param>
@@ -51,10 +50,11 @@ namespace BlogAPI.Controllers
 
             _logger.LogInformation("Получили все теги");
 
-            GetTags resp = new()
+            var enumerable = tags.ToList();
+            GetTags resp = new ()
             {
-                Count = tags.Count(),
-                Tags = _mapper.Map<IEnumerable<Tag>, List<TagView>>(tags),
+                Count = enumerable.Count,
+                Tags = _mapper.Map<IEnumerable<Tag>, List<TagView>>(enumerable),
             };
 
             return Json(resp);
@@ -74,22 +74,14 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> GetTagById([FromRoute] int id)
         {
             var tag = await _tagService.GetTagById(id);
-            if (tag != null)
+            TagView resp = new()
             {
-                TagView resp = new ()
-                {
-                    id = id,
-                    tagText = tag.tagText,
-                };
+                id = id,
+                tagText = tag.TagText,
+            };
 
-                _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
-                return Json(resp);
-            }
-            else
-            {
-                _logger.LogInformation("Тег не найден");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
-            }
+            _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.TagText);
+            return Json(resp);
         }
 
         /// <summary>
@@ -109,12 +101,12 @@ namespace BlogAPI.Controllers
                 try
                 {
                     var isTagCreate = await _tagService.CreateTag(newTag.tagText);
-                    if (isTagCreate == true)
+                    if (isTagCreate)
                     {
                         SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            infoMessage = "Новый тег успешно создан - " + newTag.tagText,
+                            Code = 0,
+                            InfoMessage = "Новый тег успешно создан - " + newTag.tagText,
                         };
                         return Json(resp);
                     }
@@ -156,14 +148,14 @@ namespace BlogAPI.Controllers
                 try
                 {
                     var isTagEdite = await _tagService.EditTag(id, new Tag(newTag.tagText));
-                    if (isTagEdite == true)
+                    if (isTagEdite)
                     {
                         SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            id = id.ToString(),
-                            name = newTag.tagText,
-                            infoMessage = "Тег успешно изменен",
+                            Code = 0,
+                            Id = id.ToString(),
+                            Name = newTag.tagText,
+                            InfoMessage = "Тег успешно изменен",
                         };
 
                         return Json(resp);
@@ -205,13 +197,13 @@ namespace BlogAPI.Controllers
                 try
                 {
                     var isTagDelete = await _tagService.DeleteTag(id);
-                    if (isTagDelete == true)
+                    if (isTagDelete)
                     {
                         SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            id = id.ToString(),
-                            infoMessage = "Тег успешно удален",
+                            Code = 0,
+                            Id = id.ToString(),
+                            InfoMessage = "Тег успешно удален",
                         };
 
                         return Json(resp);

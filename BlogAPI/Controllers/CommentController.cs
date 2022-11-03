@@ -3,7 +3,6 @@
 using BlogAPI.Contracts.Models;
 using BlogAPI.Contracts.Models.Comments;
 using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
 using BlogAPI.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
@@ -28,10 +27,10 @@ namespace BlogAPI.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentController"/> class.
         /// </summary>
-        /// <param name="repo">репозиторий комментариев.</param>
-        /// <param name="repoposts">репозиторий статей.</param>
         /// <param name="userManager">UserManager AspNetCore.Identity.</param>
         /// <param name="logger">NLOG logger.</param>
+        /// <param name="commentService"> комментарии. </param>
+        /// <param name="postService"> статьи. </param>
         public CommentController(UserManager<User> userManager, ILogger<CommentController> logger,ICommentService commentService, IPostService postService)
         {
             _userManager = userManager;
@@ -53,43 +52,38 @@ namespace BlogAPI.Controllers
         [Route("")]
         public async Task<IActionResult> Create([FromForm] CreateCommentModel newComment)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
-                ClaimsPrincipal currentUser = User;
-                var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var currentUser = User;
+                var currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                var user = await _userManager.FindByIdAsync(currentUserID);
+                var user = await _userManager.FindByIdAsync(currentUserId);
                 if (user != null)
                 {
                     var post = await _postService.GetPostById(newComment.PostId);
-                    if (post != null)
+
+                    var comment = new Comment
                     {
-                        Comment comment = new Comment();
-                        comment.commentTexte = newComment.CommentText;
-                        comment.Post = post;
-                        comment.User = user;
+                        CommentTexte = newComment.CommentText,
+                        Post = post,
+                        User = user,
+                    };
 
-                        var isCommentCreate = await _commentService.CreateComment(comment);
-                        if (isCommentCreate)
+                    var isCommentCreate = await _commentService.CreateComment(comment);
+                    if (isCommentCreate)
+                    {
+                        SuccessResponse resp = new ()
                         {
-                            SuccessResponse resp = new ()
-                            {
-                                code = 0,
-                                infoMessage = "Комментарий успешно добавлен к статье: \"" + post.postName + "\" пользователем: " + user.Email,
-                            };
+                            Code = 0,
+                            InfoMessage = "Комментарий успешно добавлен к статье: \"" + post.PostName + "\" пользователем: " + user.Email,
+                        };
 
-                            return Json(resp);
-                        }
-                        else
-                        {
-                            _logger.LogError("Ошибка при добавлении комментария");
-                            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Ошибка при добавлении комментария", ErrorCode = 40001 }).Value);
-                        }
+                        return Json(resp);
                     }
                     else
                     {
-                        _logger.LogInformation("Статья не найдена");
-                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+                        _logger.LogError("Ошибка при добавлении комментария");
+                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Ошибка при добавлении комментария", ErrorCode = 40001 }).Value);
                     }
                 }
                 else
@@ -121,29 +115,21 @@ namespace BlogAPI.Controllers
             if (User.IsInRole("Администратор"))
             {
                 var comment = await _commentService.GetCommentById(id);
-                if (comment != null)
+                var isCommentDelete = await _commentService.DeleteComment(comment);
+                if (isCommentDelete)
                 {
-                    var isCommentDelete = await _commentService.DeleteComment(comment);
-                    if (isCommentDelete)
+                    SuccessResponse resp = new()
                     {
-                        SuccessResponse resp = new ()
-                        {
-                            code = 0,
-                            infoMessage = "Комментарий успешно удален",
-                        };
+                        Code = 0,
+                        InfoMessage = "Комментарий успешно удален",
+                    };
 
-                        return Json(resp);
-                    }
-                    else
-                    {
-                        _logger.LogError("Ошибка при удалении комментария");
-                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Ошибка при удалении комментария", ErrorCode = 40001 }).Value);
-                    }
+                    return Json(resp);
                 }
                 else
                 {
-                    _logger.LogInformation("Комментарий не найден");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Комментарий не найден", ErrorCode = 40001 }).Value);
+                    _logger.LogError("Ошибка при удалении комментария");
+                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Ошибка при удалении комментария", ErrorCode = 40001 }).Value);
                 }
             }
             else

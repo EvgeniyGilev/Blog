@@ -10,13 +10,13 @@ namespace BlogAPI.DATA.Repositories
     /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly AppDBContext _context;
+        private readonly AppDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public UnitOfWork(AppDBContext context)
+        public UnitOfWork(AppDbContext context)
         {
             _context = context;
         }

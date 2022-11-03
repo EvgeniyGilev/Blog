@@ -12,12 +12,12 @@ namespace BlogWebApp.BLL.Models.ViewModels.RoleViews
         /// <summary>
         /// Gets or sets the user id.
         /// </summary>
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         /// <summary>
         /// Gets or sets the user email.
         /// </summary>
-        public string UserEmail { get; set; }
+        public string? UserEmail { get; set; }
 
         /// <summary>
         /// Gets or sets the all roles.

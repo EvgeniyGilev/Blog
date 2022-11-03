@@ -1,10 +1,8 @@
 ﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories;
 using BlogAPI.DATA.Repositories.Interfaces;
 using BlogWebApp.BLL.Interfaces.Services;
-using Microsoft.Extensions.Hosting;
 
 namespace BlogWebApp.BLL.Services
 {
@@ -20,8 +18,9 @@ namespace BlogWebApp.BLL.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PostService"/> class.
         /// </summary>
-        /// <param name="postRepository"></param>
-        /// <param name="unitOfWork"></param>
+        /// <param name="postRepository">posts.</param>
+        /// <param name="unitOfWork">UoW.</param>
+        /// <param name="logger">logger.</param>
         public PostService(IPostRepository postRepository, IUnitOfWork unitOfWork, ILogger<PostService> logger)
         {
             _postRepository = postRepository;
@@ -39,10 +38,10 @@ namespace BlogWebApp.BLL.Services
             await _postRepository.CreatePost(newpost);
             await _unitOfWork.CompleteAsync();
 
-            _logger.LogInformation("новая статья добавлена: " + newpost.postName);
+            _logger.LogInformation("новая статья добавлена: " + newpost.PostName);
 
             // Если добавление прошло успешно получим id новой статьи
-            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.postName == newpost.postName)?.id ?? 0;
+            var getpost = _postRepository.GetPosts().Result.FirstOrDefault(p => p.PostName == newpost.PostName)?.Id ?? 0;
             return getpost;
         }
 
@@ -95,9 +94,9 @@ namespace BlogWebApp.BLL.Services
         /// </summary>
         /// <param name="id">The id post.</param>
         /// <returns>Post.</returns>
-        async Task<Post> IPostService.GetPostById(int id)
+        async Task<Post?> IPostService.GetPostById(int id)
         {
-            Post? post = await _postRepository.GetPostById(id);
+            var post = await _postRepository.GetPostById(id);
             return post;
         }
 

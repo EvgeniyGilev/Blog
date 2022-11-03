@@ -10,21 +10,21 @@ namespace BlogAPI.Contracts.Models
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
-        public string id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        public string name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the info message.
         /// </summary>
-        public string infoMessage { get; set; }
+        public string? InfoMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the code.
         /// </summary>
-        public int code { get; set; }
+        public int Code { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace BlogWebApp.BLL.Models.ViewModels.PostViews
         /// Gets or sets the comment.
         /// </summary>
         [Required(ErrorMessage = "Комментарий не может быть пустым")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         /// <summary>
         /// Gets or sets the post id.

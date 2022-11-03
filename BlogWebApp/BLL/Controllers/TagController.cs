@@ -23,7 +23,7 @@ namespace BlogWebApp.BLL.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="TagController"/> class.
         /// </summary>
-        /// <param name="repo">The repo.</param>
+        /// <param name="tagService">The tagService.</param>
         /// <param name="logger">The logger.</param>
         public TagController(ITagService tagService, ILogger<TagController> logger)
         {
@@ -43,21 +43,6 @@ namespace BlogWebApp.BLL.Controllers
             var tags = await _tagService.ListAsync();
             _logger.LogInformation("Получили все теги");
             return View(tags);
-        }
-
-        /// <summary>
-        /// получить теги по id.
-        /// </summary>
-        /// <param name="id">id тега.</param>
-        /// <returns>An IActionResult.</returns>
-        // GET: TagController
-        [HttpGet]
-        [Route("GetTagById")]
-        public async Task<IActionResult> GetTagById(int id)
-        {
-            var tag = await _tagService.GetTagById(id);
-            _logger.LogInformation("Получили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
-            return View(tag);
         }
 
         /// <summary>
@@ -81,17 +66,17 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create([FromForm] CreateTagViewModel newTag)
         {
-            Tag tag = new Tag(newTag.tagText);
-            var searchtag = await _tagService.CreateTag(newTag.tagText);
-            if (searchtag == true)
+            var tag = new Tag(newTag.TagText);
+            var searchtag = await _tagService.CreateTag(newTag.TagText);
+            if (searchtag)
             {
-                await _tagService.CreateTag(newTag.tagText);
-                _logger.LogInformation("Создан новый тег" + tag.tagText);
+                await _tagService.CreateTag(newTag.TagText);
+                _logger.LogInformation("Создан новый тег" + tag.TagText);
                 return RedirectToAction("GetTags");
             }
             else
             {
-                _logger.LogInformation("тег уже существует " + tag.tagText);
+                _logger.LogInformation("тег уже существует " + tag.TagText);
                 return RedirectToAction("GetTags");
             }
         }
@@ -109,11 +94,11 @@ namespace BlogWebApp.BLL.Controllers
 
             EditeTagViewModel model = new EditeTagViewModel
             {
-                id = id,
-                tagText = tag.tagText,
+                Id = id,
+                TagText = tag.TagText,
             };
 
-            _logger.LogInformation("Открыли форму изменения тега по id: " + id.ToString() + " имя тега: " + tag.tagText);
+            _logger.LogInformation("Открыли форму изменения тега по id: " + id.ToString() + " имя тега: " + tag.TagText);
             return View(model);
         }
 
@@ -129,10 +114,10 @@ namespace BlogWebApp.BLL.Controllers
         public async Task<IActionResult> Edit([FromForm] EditeTagViewModel newTag, [FromRoute] int id)
         {
             var tag = await _tagService.GetTagById(id);
-            tag.tagText = newTag.tagText;
+            tag.TagText = newTag.TagText;
 
             await _tagService.EditTag(id, tag);
-            _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.tagText);
+            _logger.LogInformation("Изменили тег по id: " + id.ToString() + " новое имя тега: " + tag.TagText);
             return RedirectToAction("GetTags");
         }
 
@@ -146,15 +131,10 @@ namespace BlogWebApp.BLL.Controllers
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-
             var tag = await _tagService.GetTagById(id);
-            if (tag == null) { return RedirectToAction("Error404", "Error"); }
-            else
-            {
-                await _tagService.DeleteTag(id);
-                _logger.LogInformation("Удалили тег по id: " + id.ToString() + " имя тега: " + tag.tagText);
-                return RedirectToAction("GetTags");
-            }
+            await _tagService.DeleteTag(id);
+            _logger.LogInformation("Удалили тег по id: " + id + " имя тега: " + tag.TagText);
+            return RedirectToAction("GetTags");
         }
     }
 }

@@ -41,9 +41,9 @@ namespace Blog.MockData.Repositories
         public Task<Comment> GetCommentById(int id)
          => new Comment
          {
-             id = id,
-             commentCreatedDate = DateTime.Now.ToString(),
-             commentTexte = "Комментарий",
+             Id = id,
+             CommentCreatedDate = DateTime.Now.ToString(),
+             CommentTexte = "Комментарий",
          }.AsTask();
 
         /// <summary>
@@ -55,15 +55,15 @@ namespace Blog.MockData.Repositories
             Comment[] ArrComment = new Comment[1];
             ArrComment[0] = new Comment
             {
-                id = 1,
-                commentCreatedDate = DateTime.Now.ToString(),
-                commentTexte = "Комментарий",
+                Id = 1,
+                CommentCreatedDate = DateTime.Now.ToString(),
+                CommentTexte = "Комментарий",
                 Post = new Post()
                 {
-                    id = 1,
-                    postName = "Статья",
-                    postText = "Текст статьи",
-                    postCreateDate = DateTime.Now.ToString(),
+                    Id = 1,
+                    PostName = "Статья",
+                    PostText = "Текст статьи",
+                    PostCreateDate = DateTime.Now.ToString(),
                 },
                 User = new User()
                 {

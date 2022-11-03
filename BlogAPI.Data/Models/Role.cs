@@ -7,19 +7,12 @@ namespace BlogAPI.DATA.Models
     /// <summary>
     /// The role.
     /// </summary>
-    public class Role : IdentityRole
+    public sealed class Role : IdentityRole
     {
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
-        public string Description { get; set; } = null;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Role"/> class.
-        /// </summary>
-        public Role()
-        {
-        }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Role"/> class.
@@ -30,6 +23,10 @@ namespace BlogAPI.DATA.Models
         {
             Name = name;
             Description = description;
+        }
+
+        public Role()
+        {
         }
     }
 }

@@ -20,7 +20,7 @@ namespace BlogWebApp.BLL.Interfaces.Services
         /// </summary>
         /// <param name="id">id статьи.</param>
         /// <returns>Post.</returns>
-        Task<Post> GetPostById(int id);
+        Task<Post?> GetPostById(int id);
 
         /// <summary>
         /// Создание статьи.

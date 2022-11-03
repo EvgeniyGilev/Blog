@@ -47,8 +47,8 @@ namespace BlogAPI.DATA.Repositories.Interfaces
         /// <summary>
         /// Gets the tag by name.
         /// </summary>
-        /// <param name="Name">The name.</param>
+        /// <param name="name">The name.</param>
         /// <returns>A Task.</returns>
-        Task<Tag?> GetTagByName(string Name);
+        Task<Tag?> GetTagByName(string name);
     }
 }

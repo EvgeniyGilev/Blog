@@ -1,15 +1,14 @@
 ﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
 using AutoMapper;
 using BlogAPI.Contracts.Models;
 using BlogAPI.Contracts.Models.Comments;
 using BlogAPI.Contracts.Models.Posts;
 using BlogAPI.Contracts.Models.Tags;
 using BlogAPI.DATA.Models;
-using BlogAPI.DATA.Repositories.Interfaces;
 using BlogAPI.Handlers;
 using BlogAPI.Interfaces.Services;
-using BlogAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static BlogAPI.Contracts.Models.Posts.GetPostsModel;
@@ -28,17 +27,16 @@ namespace BlogAPI.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IPostService _postService;
         private readonly ITagService _tagService;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostController"/> class.
         /// </summary>
-        /// <param name="repo">Репозиторий статей (posts).</param>
-        /// <param name="repotags">Репозиторий тегов (tags).</param>
         /// <param name="userManager">UserManager AspNetCore.Identity.</param>
         /// <param name="logger">NLOG logger.</param>
         /// <param name="mapper">Automapper.</param>
         /// <param name="postService">Бизнес логика получения данных по статьям.</param>
+        /// <param name="tagService"></param>
         public PostController(UserManager<User> userManager, ILogger<PostController> logger, IMapper mapper, IPostService postService, ITagService tagService)
         {
             _userManager = userManager;
@@ -72,26 +70,24 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> GetPost([FromRoute] int id)
         {
             var post = await _postService.GetPostById(id);
-            if (post != null)
+            if (post.User != null && post.PostCreateDate != null)
             {
                 GetPostByIdModel resp = new ()
                 {
-                    id = post.id,
+                    id = post.Id,
                     AuthorEmail = post.User.Email,
-                    PostTitle = post.postName,
-                    PostText = post.postText,
-                    CreateDate = DateTime.Parse(post.postCreateDate),
+                    PostTitle = post.PostName,
+                    PostText = post.PostText,
+                    CreateDate = DateTime.Parse(post.PostCreateDate),
                 };
 
-                _logger.LogInformation("Получаем статью с ID: " + id.ToString());
+                _logger.LogInformation("Получаем статью с ID: " + id);
 
                 return Json(resp);
             }
-            else
-            {
-                _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
-            }
+
+            _logger.LogInformation("По текущему ID не смогли получить статью или её дату создания " + id + "возвращаемся на страницу всех статей.");
+            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
         }
 
         /// <summary>
@@ -108,28 +104,26 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> GetPostFull([FromRoute] int id)
         {
             var post = await _postService.GetPostById(id);
-            if (post != null)
+            if (post.User != null && post.PostCreateDate != null)
             {
-                GetPostFullByIdModel resp = new ()
+                GetPostFullByIdModel resp = new()
                 {
-                    id = post.id,
+                    id = post.Id,
                     AuthorEmail = post.User.Email,
-                    PostTitle = post.postName,
-                    PostText = post.postText,
-                    CreateDate = DateTime.Parse(post.postCreateDate),
+                    PostTitle = post.PostName,
+                    PostText = post.PostText,
+                    CreateDate = DateTime.Parse(post.PostCreateDate),
                     Tags = _mapper.Map<List<Tag>, List<TagView>>(post.Tags),
                     Comments = _mapper.Map<List<Comment>, List<CommentView>>(post.Comments),
                 };
 
-                _logger.LogInformation("Получаем статью с ID: " + id.ToString());
+                _logger.LogInformation("Получаем статью с ID: " + id);
 
                 return Json(resp);
             }
-            else
-            {
-                _logger.LogInformation("По текущему ID не смогли получить статью" + id.ToString() + "возвращаемся на страницу всех статей.");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
-            }
+
+            _logger.LogInformation("По текущему ID не смогли получить статью  или её дату создания " + id + "возвращаемся на страницу всех статей.");
+            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
         }
 
         /// <summary>
@@ -147,13 +141,14 @@ namespace BlogAPI.Controllers
             try
             {
                 var posts = await _postService.ListAsync();
+                var enumerable = posts.ToList();
                 GetPostsModel resp = new ()
                 {
-                    Count = posts.Count(),
-                    Posts = _mapper.Map<IEnumerable<Post>, List<PostView>>(posts),
+                    Count = enumerable.Count,
+                    Posts = _mapper.Map<IEnumerable<Post>, List<PostView>>(enumerable),
                 };
 
-                _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.Count.ToString());
+                _logger.LogInformation("Показываем все статьи, всего статей найдено: " + resp.Count);
 
                 return Json(resp);
             }
@@ -176,27 +171,27 @@ namespace BlogAPI.Controllers
         [Route("")]
         public async Task<IActionResult> Create([FromForm] CreatePostModel newPost)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
                 var searchuser = _userManager.Users.FirstOrDefault(u => u.Email == User.Identity.Name);
                 if (searchuser != null)
                 {
                     Post post = new ()
                     {
-                        postName = newPost.PostName,
-                        postText = newPost.PostText,
+                        PostName = newPost.PostName,
+                        PostText = newPost.PostText,
                         User = searchuser,
                     };
                     try
                     {
-                        int idnewpost = await _postService.CreatePost(post);
+                        var idnewpost = await _postService.CreatePost(post);
 
-                        SuccessResponse resp = new()
+                        SuccessResponse resp = new ()
                         {
-                            code = 0,
-                            id = idnewpost.ToString(),
-                            name = post.postName,
-                            infoMessage = "Статья успешно добавлена",
+                            Code = 0,
+                            Id = idnewpost.ToString(),
+                            Name = post.PostName,
+                            InfoMessage = "Статья успешно добавлена",
                         };
 
                         return Json(resp);
@@ -207,17 +202,13 @@ namespace BlogAPI.Controllers
                         return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Произошла ошибка при создании статьи", ErrorCode = 40003 }).Value);
                     }
                 }
-                else
-                {
-                    _logger.LogInformation("Автор статьи не найден");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Автор статьи не найден", ErrorCode = 40003 }).Value);
-                }
-            }
-            else
-            {
+
                 _logger.LogInformation("Автор статьи не найден");
-                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован", ErrorCode = 40004 }).Value);
+                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Автор статьи не найден", ErrorCode = 40003 }).Value);
             }
+
+            _logger.LogInformation("Автор статьи не найден");
+            return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован", ErrorCode = 40004 }).Value);
         }
 
         /// <summary>
@@ -233,52 +224,38 @@ namespace BlogAPI.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Edit([FromForm] EditPostModel newPost, [FromRoute] int id)
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity is { IsAuthenticated: true })
             {
                 var post = await _postService.GetPostById(id);
-                if (post != null)
+                if (post.User != null && ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор")))
                 {
-                    if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
+                    post.PostName = newPost.PostName;
+                    post.PostText = newPost.PostText;
+
+                    var isPostEdite = await _postService.EditPost(id, post);
+                    if (isPostEdite)
                     {
-                        post.postName = newPost.PostName;
-                        post.postText = newPost.PostText;
+                        _logger.LogInformation("Статья отредактирована: " + post.PostName);
 
-                        var isPostEdite = await _postService.EditPost(id, post);
-                        if (isPostEdite)
+                        SuccessResponse resp = new ()
                         {
-                            _logger.LogInformation("Статья отредактирована: " + post.postName);
+                            Code = 0,
+                            Id = post.Id.ToString(),
+                            Name = post.PostName,
+                            InfoMessage = "Статья успешно отредактирована",
+                        };
 
-                            SuccessResponse resp = new()
-                            {
-                                code = 0,
-                                id = post.id.ToString(),
-                                name = post.postName,
-                                infoMessage = "Статья успешно отредактирована",
-                            };
+                        return Json(resp);
+                    }
 
-                            return Json(resp);
-                        }
-                        else
-                        {
-                            return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Ошибка при редактировании статьи", ErrorCode = 40004 }).Value);
-                        }
-                    }
-                    else
-                    {
-                        return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
-                    }
+                    return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Ошибка при редактировании статьи", ErrorCode = 40004 }).Value);
                 }
-                else
-                {
-                    _logger.LogInformation("Статья не найдена");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
-                }
-            }
-            else
-            {
-                _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
+
                 return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
             }
+
+            _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
+            return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
         }
 
         /// <summary>
@@ -298,34 +275,25 @@ namespace BlogAPI.Controllers
             {
                 var post = await _postService.GetPostById(id);
 
-                if (post == null)
+                // удалить статью может только автор или администратор
+                if ((User.Identity?.Name == post.User?.UserName) || User.IsInRole("Администратор"))
                 {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    // удалить статью может только автор или администратор
-                    if ((User.Identity.Name == post.User.UserName) || User.IsInRole("Администратор"))
-                    {
-                        await _postService.DeletePost(id);
+                    await _postService.DeletePost(id);
 
-                        SuccessResponse resp = new()
-                        {
-                            code = 0,
-                            id = post.id.ToString(),
-                            name = post.postName,
-                            infoMessage = "Статья успешно удалена",
-                        };
-
-                        _logger.LogInformation("Статья удалена: " + post.postName);
-                        return Json(resp);
-                    }
-                    else
+                    SuccessResponse resp = new ()
                     {
-                        _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
-                        return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
-                    }
+                        Code = 0,
+                        Id = post.Id.ToString(),
+                        Name = post.PostName,
+                        InfoMessage = "Статья успешно удалена",
+                    };
+
+                    _logger.LogInformation("Статья удалена: " + post.PostName);
+                    return Json(resp);
                 }
+
+                _logger.LogInformation("Автор статьи не авторизован или недостаточно прав");
+                return StatusCode(401, Json(new ErrorResponse { ErrorMessage = "Автор статьи не авторизован или недостаточно прав", ErrorCode = 40004 }).Value);
             }
             catch (Exception ex)
             {
@@ -349,54 +317,37 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> AddTag([FromRoute] int tagid, [FromRoute] int postid)
         {
             var post = await _postService.GetPostById(postid);
-            if (post != null)
+
+            var tag = await _tagService.GetTagById(tagid);
+            bool needAdd = true;
+            foreach (var tagpost in post.Tags)
             {
-                var tag = await _tagService.GetTagById(tagid);
-                if (tag != null)
+                if (tag.TagText == tagpost.TagText)
                 {
-                    bool needAdd = true;
-                    foreach (var tagpost in post.Tags)
-                    {
-                        if (tag.tagText == tagpost.tagText)
-                        {
-                            needAdd = false;
-                            break;
-                        }
-                    }
-
-                    if (needAdd)
-                    {
-                        post.Tags.Add(tag);
-
-                        await _postService.EditPost(postid, post);
-
-                        _logger.LogInformation("К статье " + post.id.ToString() + " добавлен тег " + tag.tagText);
-
-                        SuccessResponse resp = new ()
-                        {
-                            code = 0,
-                            infoMessage = "К статье " + post.id.ToString() + " добавлен тег " + tag.tagText,
-                        };
-
-                        return Json(resp);
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Тег уже добавлен");
-                        return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже добавлен", ErrorCode = 40003 }).Value);
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Тег не найден");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
+                    needAdd = false;
+                    break;
                 }
             }
-            else
+
+            if (needAdd)
             {
-                _logger.LogInformation("Статья не найдена");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
+                post.Tags.Add(tag);
+
+                await _postService.EditPost(postid, post);
+
+                _logger.LogInformation("К статье " + post.Id + " добавлен тег " + tag.TagText);
+
+                SuccessResponse resp = new ()
+                {
+                    Code = 0,
+                    InfoMessage = "К статье " + post.Id + " добавлен тег " + tag.TagText,
+                };
+
+                return Json(resp);
             }
+
+            _logger.LogInformation("Тег уже добавлен");
+            return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег уже добавлен", ErrorCode = 40003 }).Value);
         }
 
         /// <summary>
@@ -414,35 +365,19 @@ namespace BlogAPI.Controllers
         public async Task<IActionResult> RemoveTag(int tagid, int postid)
         {
             var post = await _postService.GetPostById(postid);
-            if (post != null)
+            var tag = await _tagService.GetTagById(tagid);
+            post.Tags.Remove(tag);
+            await _postService.EditPost(postid, post);
+
+            _logger.LogInformation("У статьи " + post.Id + " Удален тег " + tag.TagText);
+
+            SuccessResponse resp = new()
             {
-                var tag = await _tagService.GetTagById(tagid);
-                if (tag != null)
-                {
-                    post.Tags.Remove(tag);
-                    await _postService.EditPost(postid, post);
+                Code = 0,
+                InfoMessage = "У статьи " + post.Id + " Удален тег " + tag.TagText,
+            };
 
-                    _logger.LogInformation("У статьи " + post.id.ToString() + " Удален тег " + tag.tagText);
-
-                    SuccessResponse resp = new()
-                    {
-                        code = 0,
-                        infoMessage = "У статьи " + post.id.ToString() + " Удален тег " + tag.tagText,
-                    };
-
-                    return Json(resp);
-                }
-                else
-                {
-                    _logger.LogInformation("Тег не найден");
-                    return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Тег не найден", ErrorCode = 40003 }).Value);
-                }
-            }
-            else
-            {
-                _logger.LogInformation("Статья не найдена");
-                return StatusCode(400, Json(new ErrorResponse { ErrorMessage = "Статьи с таким id не существует!", ErrorCode = 40001 }).Value);
-            }
+            return Json(resp);
         }
     }
 }

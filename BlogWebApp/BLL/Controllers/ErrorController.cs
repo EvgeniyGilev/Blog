@@ -10,7 +10,6 @@ namespace BlogWebApp.BLL.Controllers
     /// </summary>
     public class ErrorController : Controller
     {
-
         private readonly ILogger<CommentController> _logger;
 
         /// <summary>

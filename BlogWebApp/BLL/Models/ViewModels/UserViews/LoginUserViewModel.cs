@@ -15,7 +15,7 @@ namespace BlogWebApp.BLL.Models.ViewModels.UserViews
         [Required(ErrorMessage = "Заполните поле \"Email\" (логин пользователя)")]
         [EmailAddress(ErrorMessage = "Email введен некорректно")]
         [Display(Name = "Email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         /// <summary>
         /// Gets or sets the password.
@@ -24,6 +24,6 @@ namespace BlogWebApp.BLL.Models.ViewModels.UserViews
         [StringLength(8, ErrorMessage = "{0} Должен быть минимум {2} символа", MinimumLength = 3)]
         [DataType(DataType.Password)]
         [Display(Name = "Пароль")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
     }
 }

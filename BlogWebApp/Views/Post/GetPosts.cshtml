@@ -1,5 +1,4 @@
 ﻿@using BlogWebApp.BLL.Models.ViewModels.PostViews
-@using Microsoft.AspNetCore.Identity
 @using BlogAPI.DATA.Models
 @model ShowPostsViewModel
 
@@ -13,21 +12,23 @@
     {
         <div class="card w-auto mt-2 bgpowderblue">
             <div class="card-body">
-                <p><a asp-controller="Post" asp-action="GetPost" asp-route-id="@post.id">@post.postName</a></p>
+                <p><a asp-controller="Post" asp-action="GetPost" asp-route-id="@post.Id">@post.PostName</a></p>
                 @foreach (Tag tag in @post.Tags)
                 {
-                    <span class="badge bg-info text-dark">@tag.tagText</span>
+                    <span class="badge bg-info text-dark">@tag.TagText</span>
                 }
                 <br />
                 <p class="card-text">@Model.MiniPost(post)</p>
-                @if (User!=null && User.Identity != null && User.Identity.IsAuthenticated && post.User!=null)
-                @if (User.Identity.Name == post.User.Email || User.IsInRole("Администратор"))
+                @if (User.Identity is { IsAuthenticated: true } && post.User != null)
                 {
-                    <form asp-action="Edit" asp-controller="Post" asp-route-id="@post.id" method="get">
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            Редактировать
-                        </button>
-                    </form>
+                    @if (User.Identity.Name == post.User.Email || User.IsInRole("Администратор"))
+                    {
+                        <form asp-action="Edit" asp-controller="Post" asp-route-id="@post.Id" method="get">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                Редактировать
+                            </button>
+                        </form>
+                    }
                 }
                 <br />
             </div>

@@ -10,22 +10,22 @@ namespace BlogAPI.DATA.Models
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
-        public int id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the post name.
         /// </summary>
-        public string postName { get; set; }
+        public string? PostName { get; set; }
 
         /// <summary>
         /// Gets or sets the post text.
         /// </summary>
-        public string postText { get; set; }
+        public string? PostText { get; set; }
 
         /// <summary>
         /// Gets or sets the post create date.
         /// </summary>
-        public string? postCreateDate { get; set; }
+        public string? PostCreateDate { get; set; }
 
 
         /// <summary>

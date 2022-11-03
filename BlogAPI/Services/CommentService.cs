@@ -18,8 +18,9 @@ namespace BlogAPI.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentService"/> class.
         /// </summary>
-        /// <param name="_commentRepository"></param>
+        /// <param name="commentRepository"></param>
         /// <param name="unitOfWork"></param>
+        /// <param name="logger">logger.</param>
         public CommentService(ICommentRepository commentRepository, IUnitOfWork unitOfWork, ILogger<CommentService> logger)
         {
             _commentRepository = commentRepository;
@@ -51,7 +52,6 @@ namespace BlogAPI.Services
         /// <summary>
         /// Deletes the comment.
         /// </summary>
-        /// <param name="id">The id comment.</param>
         /// <returns>true or false.</returns>
         async Task<bool> ICommentService.DeleteComment(Comment comment)
         {
@@ -74,9 +74,9 @@ namespace BlogAPI.Services
         /// </summary>
         /// <param name="id">The id comment.</param>
         /// <returns>Comment.</returns>
-        async Task<Comment?> ICommentService.GetCommentById(int id)
+        async Task<Comment> ICommentService.GetCommentById(int id)
         {
-            return await _commentRepository.GetCommentById(id);
+            return await _commentRepository.GetCommentById(id) ?? throw new InvalidOperationException();
         }
     }
 }
