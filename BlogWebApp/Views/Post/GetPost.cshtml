@@ -1,5 +1,4 @@
 ﻿@using BlogWebApp.BLL.Models.ViewModels.PostViews
-@using BlogAPI.DATA.Models
 @model ShowPostAndCommentViewModel
 @{
     ViewData["Title"] = "GetPost";
@@ -8,7 +7,8 @@
 <div class="text-start">
     <div class="container bgpowderblue">
         <h3>@Model.ShowPost?.PostName</h3>
-        @foreach (Tag tag in @Model.ShowPost?.Tags)
+
+        @foreach (var tag in @Model.ShowPost?.Tags)
         {
             <span class="badge bg-info text-dark">@tag.TagText</span>
         }
@@ -24,7 +24,7 @@
         <hr class="mt-2 mb-3" />
 
         <h6>Комментарии к статье</h6>
-        @foreach (Comment com in @Model.ShowPost.Comments)
+        @foreach (var com in @Model.ShowPost.Comments)
         {
             <p class="text-left">@com.CommentTexte</p>
             @if (User.IsInRole("Администратор"))
@@ -46,7 +46,7 @@
 
         }
         <hr class="mt-2 mb-3" />
-        @if (User != null && User.Identity != null && User.Identity.IsAuthenticated){
+        @if (User.Identity is {IsAuthenticated: true }){
         <form method="post" asp-action="Create" asp-controller="Comment" asp-route-id="@Model.PostId">
             <div asp-validation-summary="ModelOnly"></div>
             <div class="mb-3">
@@ -58,7 +58,7 @@
             </button>
         </form>
         }
-        <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
+        <p><a class="link-dark" asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>
 @section Scripts

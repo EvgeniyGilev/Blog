@@ -1,5 +1,4 @@
 ﻿@using BlogWebApp.BLL.Models.ViewModels.PostViews
-@using BlogAPI.DATA.Models
 @model EditPostViewModel
 
 @{
@@ -21,7 +20,7 @@
                 <div class="form-group">
                     @if (Model.PostTagsAll != null)
                     {
-                        foreach (Tag tag in Model.PostTagsAll)
+                        foreach (var tag in Model.PostTagsAll)
                         {
                             <input type="checkbox" name="postTags" value="@tag.TagText" @(Model.PostTagsCurrent != null && Model.PostTagsCurrent.Contains(tag) ? "checked=\"checked\"" : "")/>
 
@@ -47,7 +46,7 @@
                 </button>
             </form>
         }
-        <p><a asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
+        <p><a class="link-dark" asp-area="" asp-controller="Post" asp-action="GetPosts">Перейти к списку всех статей</a></p>
     </div>
 </div>
 @section Scripts

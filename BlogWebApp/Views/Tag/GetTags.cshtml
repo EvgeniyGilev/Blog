@@ -7,15 +7,15 @@
     <h3>Все теги</h3>
     @if (User.Identity is { IsAuthenticated: true })
     {
-        <p><a asp-area="" asp-controller="Tag" asp-action="Create">Добавить тег</a></p>
+        <p><a class="link-dark" asp-area="" asp-controller="Tag" asp-action="Create">Добавить тег</a></p>
     }
-    @foreach (Tag tag in Model)
+    @foreach (var tag in Model)
     {
         <div class="card mt-2 w-25">
             <div class="card-body bgpowderblue">
                 <h5 class="card-title">@tag.TagText</h5>
                 <p class="card-text">Статей по тегу: @tag.Posts.Count.ToString()</p>
-                @if (User != null && User.Identity != null && User.Identity.IsAuthenticated)
+                @if (User is {Identity.IsAuthenticated: true })
                 {
                     <a class="btn btn-outline-secondary btn-sm" asp-controller="Tag" asp-action="Edit" asp-route-id="@tag.Id">Редактировать</a>
                 }

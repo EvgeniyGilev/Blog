@@ -1,5 +1,4 @@
 ﻿@using BlogWebApp.BLL.Models.ViewModels.PostViews
-@using BlogAPI.DATA.Models
 @model ShowPostsViewModel
 
 @{
@@ -7,13 +6,17 @@
 }
 <div class="text-start">
     <h3>Все статьи</h3>
-    <p><a asp-area="" asp-controller="Post" asp-action="Create">Добавить статью</a></p>
-    @foreach (Post post in Model.ShowPosts)
+    <p><a class="link-dark" asp-area="" asp-controller="Post" asp-action="Create">Добавить статью</a></p>
+
+    @{
+        System.Diagnostics.Debug.Assert(Model.ShowPosts != null, "Model.ShowPosts != null");
+    }
+    @foreach (var post in Model.ShowPosts)
     {
         <div class="card w-auto mt-2 bgpowderblue">
             <div class="card-body">
-                <p><a asp-controller="Post" asp-action="GetPost" asp-route-id="@post.Id">@post.PostName</a></p>
-                @foreach (Tag tag in @post.Tags)
+                <p><a class="link-dark" asp-controller="Post" asp-action="GetPost" asp-route-id="@post.Id">@post.PostName</a></p>
+                @foreach (var tag in @post.Tags)
                 {
                     <span class="badge bg-info text-dark">@tag.TagText</span>
                 }

@@ -28,8 +28,5 @@ footer {
 
 
 body {
-    background-image: url(../img/21906_full.jpg);
-    background-size: cover;
-    background-repeat: no-repeat; 
-    background-position: center; 
+    background-color: lightcyan;
 }
