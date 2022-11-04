@@ -7,9 +7,9 @@
 }
 <div class="text-start">
     <h3>Все пользователи</h3>
-    @if (User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+    @if (User.Identity is {IsAuthenticated: true } && User.IsInRole("Администратор"))
     {
-        <p><a asp-area="" asp-controller="User" asp-action="Register">Добавить пользователя</a></p>
+        <p><a class="link-dark" asp-area="" asp-controller="User" asp-action="Register">Добавить пользователя</a></p>
     }
     else
     {
@@ -19,17 +19,21 @@
     {
         <div class="card bgpowderblue mt-2 w-50">
             <div class="card-body">
-                @if (User != null && User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Администратор"))
+                @if (User is {Identity.IsAuthenticated: true } && User.IsInRole("Администратор"))
                 {
-                <p><a asp-controller="User" asp-action="GetUserById" asp-route-id="@user.UserId">@user.UserName</a></p>
+                    <p><a class="link-dark" asp-controller="User" asp-action="GetUserById" asp-route-id="@user.UserId">@user.UserName</a></p>
                 }
                 else 
                 {
                     <p>@user.UserName</p>
                 }
-                @foreach (string roleUser in @user.UserRoles)
+
+                @if (@user.UserRoles != null)
                 {
-                    <span class="badge bg-info text-dark">@roleUser</span>
+                    foreach (var roleUser in @user.UserRoles)
+                    {
+                        <span class="badge bg-info text-dark">@roleUser</span>
+                    }
                 }
                 <p class="card-text">@user.UserEmail</p>
             </div>

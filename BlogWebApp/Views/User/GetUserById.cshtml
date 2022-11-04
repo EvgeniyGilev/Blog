@@ -39,7 +39,7 @@
             <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
         </form>
         <br>
-        <form method="post" asp-action="Delete" asp-action="User" asp-route-id="@Model.Id">
+        <form method="post" asp-action="DeleteUser" asp-controller="User" asp-route-id="@Model.Id">
             <button type="submit" class="btn btn-sm btn-danger btn-sm">Удалить</button>
         </form>
 
