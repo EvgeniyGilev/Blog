@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>C:\Users\EvgeniyGilev\source\repos\Blog\BlogAPI\Documentation\docAPI.xml</DocumentationFile>
+    <DocumentationFile>C:\work\repo\GitHub\Blog\BlogAPI\Documentation\docAPI.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
